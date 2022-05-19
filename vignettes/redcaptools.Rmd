@@ -45,7 +45,7 @@ REDCap has both single and multiple choice factor type variables. These need han
 
 Lists of the options can be obtained with the `singlechoice_opts` and `multichoice_opts` functions. These are rather for your information.
 
-```{r}
+```{r, eval = FALSE}
 meta <- redcap_export_meta(token, url)
 singlechoice_opts(meta$metadata)
 mutlichoice_opts(meta$metadata)
