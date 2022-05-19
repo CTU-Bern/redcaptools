@@ -4,7 +4,7 @@ Title: Tools for exporting and working with REDCap data
 Version: 0.2.0
 Authors@R: 
     c(
-    person(given = "Alan G.", family = "Haynes", role = "aut",
+    person(given = "Alan G.", family = "Haynes", role = "cre",
     email = "alan.haynes@ctu.unibe.ch"))
 Maintainer: Alan G Haynes <alan.haynes@ctu.unibe.ch>
 Description: Tools for exporting and working with REDCap data
