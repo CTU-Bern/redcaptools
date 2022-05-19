@@ -17,3 +17,39 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(redcaptools)
 ```
+
+`redcaptools` assists in exporting data from REDCap via the API, converting variable types (e.g. radio-buttons to factors), labelling etc. 
+
+### Exporting from REDCap
+
+REDCap exports generally come in a single files, with repeating elements as new rows, lots of empty variables (e.g. because they don't exist for a given visit). To use the data, it must often be subsetted by form or event, variables selected, etc. 
+
+`redcaptools` eases this by exporting the data by form from the beginning with the `redcap_export_byform` function. 
+
+```{r, eval = FALSE}
+token <- "my-redcap-token"
+url <- "https://redcap.mydomain.com/api/"
+
+data <- redcap_export_byform(token, url)
+```
+
+Other export functions are `redcap_export_meta` (for downloading various metadata objects - currently the data dictionary, form-event-mapping and event tables) and `redcap_export_tbl`, which can be used to use whatever parameters you like for the API (see the REDCap documentation for details).
+
+### Processing REDCap data
+
+To make the data more usable in R, it's often nice to label data, create factor, convert dates etc. `redcaptools` has functions to help with that too.
+
+#### Create factors
+
+REDCap has both single and multiple choice factor type variables. These need handling separately, so there are two sets of functions.
+
+Lists of the options can be obtained with the `singlechoice_opts` and `multichoice_opts` functions. These are rather for your information.
+
+```{r}
+meta <- redcap_export_meta(token, url)
+singlechoice_opts(meta$metadata)
+mutlichoice_opts(meta$metadata)
+```
+
+
+

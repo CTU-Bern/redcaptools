@@ -1,5 +1,14 @@
-
-# get radio button options into a dataframe
+#' Get options for single and multi choice questions
+#'
+#' @rdname choice_options
+#' @param metadata data.frame containing the metadata
+#'
+#' @return data.frame with variables \code{var} (variable), \code{label} (the
+#' variable label), \code{vals} (possible values for the variable) and
+#' \code{labs} (the labels related to each value in \code{vals})
+#' @export
+#'
+#' @examples
 singlechoice_opts <- function(metadata){
   radio <- metadata[metadata$field_type %in% c("radio", "dropdown"), ]
   fn <- function(var, choices, label){
@@ -19,7 +28,20 @@ singlechoice_opts <- function(metadata){
 }
 
 
-# get checkbox button options into a dataframe
+#' @rdname choice_options
+#' @details Multiple choice variables exist in REDCap data as a set of 0/1/TRUE/FALSE
+#' variables, where 1/TRUE represents a selected/checked answer. Hence, for a
+#' single multiple choice 'question' in the datadictionary/metadata with \code{n} options,
+#' there are \code{n} variables. Each variable is the variable name (e.g. morbidities)
+#' followed by 3 underscores (\code{___}) and the option number (e.g. 1) -
+#' \code{morbidities___1}.
+#' @export
+#' @return data.frame with variables \code{ovar} (the variable as it appears in
+#' the data dictionary/metadata), \code{var} (the variable as it appears in
+#' the data itself), \code{vlabel} (the variable label), \code{vals} (possible
+#' values for the variable) and \code{labs} (the labels related to each value in
+#' \code{vals})
+#' @examples
 multichoice_opts <- function(metadata){
   tmp <- metadata[metadata$field_type == "checkbox", ]
   fn <- function(var, choices, label){
@@ -40,10 +62,21 @@ multichoice_opts <- function(metadata){
 }
 
 
-
-# create factors for radio buttons
+#' create factors for single choice variables
+#'
+#' Converts the numeric values returned from REDCap to factors. This function also
+#' applies labels to the variable itself.
+#'
+#' @param data the data.frame to modify
+#' @param metadata metadata/datadictionary
+#' @param replace whether to overwrite the existing data .
+#' @param append text to append to the variable name if not overwriting
+#'
+#' @return
+#' @export
+#'
+#' @examples
 singlechoice_factor <- function(data, metadata, replace = FALSE, append = "_factor"){
-  require(Hmisc)
   radios <- singlechoice_opts(metadata)
   radios <- radios[radios$var %in% names(data), ]
   if(nrow(radios) > 0){
@@ -58,7 +91,20 @@ singlechoice_factor <- function(data, metadata, replace = FALSE, append = "_fact
   return(data)
 }
 
-# create factors for checkbox buttons
+#' create factors for multiple choice variables
+#'
+#' Converts the numeric values returned from REDCap to factors (with levels Yes/No).
+#' This function also applies labels to the variable itself, based on the option label.
+#'
+#' @param data the data.frame to modify
+#' @param metadata metadata/datadictionary
+#' @param replace whether to overwrite the existing data .
+#' @param append text to append to the variable name if not overwriting
+#'
+#' @return input data.frame with additional factor variables.
+#' @export
+#'
+#' @examples
 multichoice_factor <- function(data, metadata, replace = FALSE, append = "_factor"){
   require(Hmisc)
   checks <- multichoice_opts(metadata)
@@ -76,7 +122,21 @@ multichoice_factor <- function(data, metadata, replace = FALSE, append = "_facto
   return(data)
 }
 
-# format dates
+#' Convert dates stored as strings to \code{Date} variables
+#'
+#' Converts the numeric values returned from REDCap to factors (with levels Yes/No).
+#' This function also applies labels to the variable itself, based on the option label.
+#'
+#' @rdname rc_date
+#' @param data the data.frame to modify
+#' @param metadata metadata/datadictionary
+#' @param replace whether to overwrite the existing data .
+#' @param append text to append to the variable name if not overwriting
+#'
+#' @return input data.frame with additional date variables/variables converted to dates.
+#' @export
+#'
+#' @examples
 rc_dates <- function(data, metadata, replace = FALSE, append = "_date"){
   tmp <- subset(metadata, metadata$text_validation_type_or_show_slider_number == "date_dmy")
   tmp <- tmp[tmp$field_name %in% names(data), ]
@@ -93,7 +153,8 @@ rc_dates <- function(data, metadata, replace = FALSE, append = "_date"){
   return(data)
 }
 
-# format datetimes
+#' @rdname rc_date
+#' Convert strings to POSIX
 rc_datetimes <- function(data, metadata, replace = FALSE, append = "_datetime"){
   tmp <- subset(metadata, metadata$text_validation_type_or_show_slider_number == "datetime_dmy")
   tmp <- tmp[tmp$field_name %in% names(data), ]
@@ -111,7 +172,9 @@ rc_datetimes <- function(data, metadata, replace = FALSE, append = "_datetime"){
 }
 
 
-# label non-radio/checkbox/date(time) fields
+#' Label non-single/multiple choice/date(time) fields
+#' \code{singlechoice_factor}, \code{multichoice_factor}, \code{rc_date} and \code{rc_datetime}
+#'
 label_others <- function(data, metadata){
   tmp <- metadata[!metadata$field_type %in% c("checkbox", "radio", "dropdown") & !metadata$text_validation_type_or_show_slider_number %in% c("date_dmy", "datetime_dmy"), ]
   tmp <- tmp[tmp$field_name %in% names(data), ]

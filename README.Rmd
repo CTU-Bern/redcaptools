@@ -16,6 +16,7 @@ knitr::opts_chunk$set(
 # redcaptools
 
 <!-- badges: start -->
+[![R-CMD-check](https://github.com/aghaynes/redcaptools/workflows/R-CMD-check/badge.svg)](https://github.com/aghaynes/redcaptools/actions)
 <!-- badges: end -->
 
 The goal of redcaptools is to ...
