@@ -27,6 +27,6 @@ list of dataframes
 Export most important REDCap metadata tables
 }
 \examples{
-token <- "some_really_long_string_provided_by_REDCap"
-redcap_export_meta(token, "https://www.some_redcap_url.com/api/")
+# token <- "some_really_long_string_provided_by_REDCap"
+# redcap_export_meta(token, "https://www.some_redcap_url.com/api/")
 }

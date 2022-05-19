@@ -10,10 +10,8 @@
 #' @importFrom httr2 request req_headers req_body_form req_perform resp_status resp_body_string
 #'
 #' @examples
-#' \dontrun{
-#' token <- "some_really_long_string_provided_by_REDCap"
-#' redcap_export_tbl(token, "https://www.some_redcap_url.com/api/", "record")
-#' }
+#' # token <- "some_really_long_string_provided_by_REDCap"
+#' # redcap_export_tbl(token, "https://www.some_redcap_url.com/api/", "record")
 redcap_export_tbl <- function(token, url, content, ...){
 
   if(length(token) != 1) stop("'token' must have length 1")
@@ -51,8 +49,8 @@ redcap_export_tbl <- function(token, url, content, ...){
 #' @export
 #'
 #' @examples
-#' token <- "some_really_long_string_provided_by_REDCap"
-#' redcap_export_meta(token, "https://www.some_redcap_url.com/api/")
+#' # token <- "some_really_long_string_provided_by_REDCap"
+#' # redcap_export_meta(token, "https://www.some_redcap_url.com/api/")
 redcap_export_meta <- function(token,
                                url,
                                tabs = c("metadata", "event", "formEventMapping"),
@@ -79,10 +77,9 @@ redcap_export_meta <- function(token,
 #' @export
 #'
 #' @examples
-#' \dontrun {
-#' token <- "some_really_long_string_provided_by_REDCap"
-#' redcap_export_byform(token, "https://www.some_redcap_url.com/api/")
-#' }
+#' # token <- "some_really_long_string_provided_by_REDCap"
+#' # redcap_export_byform(token, "https://www.some_redcap_url.com/api/")
+#'
 redcap_export_byform <- function(token,
                                  url,
                                  meta = NULL,

@@ -7,7 +7,6 @@
 #' variable label), \code{vals} (possible values for the variable) and
 #' \code{labs} (the labels related to each value in \code{vals})
 #' @export
-#'
 #' @examples
 singlechoice_opts <- function(metadata){
   radio <- metadata[metadata$field_type %in% c("radio", "dropdown"), ]
@@ -74,6 +73,7 @@ multichoice_opts <- function(metadata){
 #'
 #' @return
 #' @export
+#' @importFrom labelled var_label
 #'
 #' @examples
 singlechoice_factor <- function(data, metadata, replace = FALSE, append = "_factor"){
@@ -106,7 +106,6 @@ singlechoice_factor <- function(data, metadata, replace = FALSE, append = "_fact
 #'
 #' @examples
 multichoice_factor <- function(data, metadata, replace = FALSE, append = "_factor"){
-  require(Hmisc)
   checks <- multichoice_opts(metadata)
   checks <- checks[checks$var %in% names(data), ]
   if(nrow(checks) > 0){
@@ -154,7 +153,7 @@ rc_dates <- function(data, metadata, replace = FALSE, append = "_date"){
 }
 
 #' @rdname rc_date
-#' Convert strings to POSIX
+#' @describeIn rc_date
 rc_datetimes <- function(data, metadata, replace = FALSE, append = "_datetime"){
   tmp <- subset(metadata, metadata$text_validation_type_or_show_slider_number == "datetime_dmy")
   tmp <- tmp[tmp$field_name %in% names(data), ]

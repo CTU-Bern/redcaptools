@@ -22,8 +22,7 @@ list of dataframes
 Export REDCap data by form
 }
 \examples{
-\dontrun {
-token <- "some_really_long_string_provided_by_REDCap"
-redcap_export_byform(token, "https://www.some_redcap_url.com/api/")
-}
+# token <- "some_really_long_string_provided_by_REDCap"
+# redcap_export_byform(token, "https://www.some_redcap_url.com/api/")
+
 }

@@ -7,7 +7,7 @@ Authors@R:
     person(given = "Alan G.", family = "Haynes", role = "cre",
     email = "alan.haynes@ctu.unibe.ch"))
 Maintainer: Alan G Haynes <alan.haynes@ctu.unibe.ch>
-Description: Tools for exporting and working with REDCap data
+Description: Tools for exporting and working with REDCap data (e.g. adding labels, formatting dates).
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

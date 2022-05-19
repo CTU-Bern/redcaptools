@@ -22,8 +22,6 @@ dataframe
 Export tables from REDCap
 }
 \examples{
-\dontrun{
-token <- "some_really_long_string_provided_by_REDCap"
-redcap_export_tbl(token, "https://www.some_redcap_url.com/api/", "record")
-}
+# token <- "some_really_long_string_provided_by_REDCap"
+# redcap_export_tbl(token, "https://www.some_redcap_url.com/api/", "record")
 }
