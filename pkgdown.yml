@@ -1,0 +1,7 @@
+pandoc: 2.7.3
+pkgdown: 2.0.5
+pkgdown_sha: ~
+articles:
+  redcaptools: redcaptools.html
+last_built: 2022-06-29T10:00Z
+
