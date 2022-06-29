@@ -7,7 +7,6 @@
 #' variable label), \code{vals} (possible values for the variable) and
 #' \code{labs} (the labels related to each value in \code{vals})
 #' @export
-#' @examples
 singlechoice_opts <- function(metadata){
   radio <- metadata[metadata$field_type %in% c("radio", "dropdown"), ]
   fn <- function(var, choices, label){
@@ -40,7 +39,6 @@ singlechoice_opts <- function(metadata){
 #' the data itself), \code{vlabel} (the variable label), \code{vals} (possible
 #' values for the variable) and \code{labs} (the labels related to each value in
 #' \code{vals})
-#' @examples
 multichoice_opts <- function(metadata){
   tmp <- metadata[metadata$field_type == "checkbox", ]
   fn <- function(var, choices, label){
@@ -71,11 +69,8 @@ multichoice_opts <- function(metadata){
 #' @param replace whether to overwrite the existing data .
 #' @param append text to append to the variable name if not overwriting
 #'
-#' @return
-#' @export
+#' @return dataframe with factor variables
 #' @importFrom labelled var_label
-#'
-#' @examples
 singlechoice_factor <- function(data, metadata, replace = FALSE, append = "_factor"){
   radios <- singlechoice_opts(metadata)
   radios <- radios[radios$var %in% names(data), ]
@@ -84,8 +79,8 @@ singlechoice_factor <- function(data, metadata, replace = FALSE, append = "_fact
       tmp <- radios[radios$var == i, ]
       v <- if(replace) i else  paste0(i, append)
       data[, v] <- factor(data[, i], levels = tmp$val, labels = tmp$lab)
-      labelled::var_label(data[, i]) <- unique(tmp$label)
-      if(!replace) labelled::var_label(data[, v]) <- unique(tmp$label)
+      var_label(data[, i]) <- unique(tmp$label)
+      if(!replace) var_label(data[, v]) <- unique(tmp$label)
     }
   }
   return(data)
@@ -103,8 +98,6 @@ singlechoice_factor <- function(data, metadata, replace = FALSE, append = "_fact
 #'
 #' @return input data.frame with additional factor variables.
 #' @export
-#'
-#' @examples
 multichoice_factor <- function(data, metadata, replace = FALSE, append = "_factor"){
   checks <- multichoice_opts(metadata)
   checks <- checks[checks$var %in% names(data), ]
@@ -114,8 +107,8 @@ multichoice_factor <- function(data, metadata, replace = FALSE, append = "_facto
       l <- checks$label[i]
       v <- if(replace) ov else paste0(ov, append)
       data[, v] <- factor(data[, ov], levels = c(0, 1), labels = c("No", "Yes"))
-      labelled::var_label(data[, ov]) <- l
-      if(!replace) labelled::var_label(data[, v]) <- l
+      var_label(data[, ov]) <- l
+      if(!replace) var_label(data[, v]) <- l
     }
   }
   return(data)
@@ -123,7 +116,7 @@ multichoice_factor <- function(data, metadata, replace = FALSE, append = "_facto
 
 #' Convert dates stored as strings to \code{Date} variables
 #'
-#' Converts the numeric values returned from REDCap to factors (with levels Yes/No).
+#' Converts the string values returned from REDCap to Dates.
 #' This function also applies labels to the variable itself, based on the option label.
 #'
 #' @rdname rc_date
@@ -133,9 +126,8 @@ multichoice_factor <- function(data, metadata, replace = FALSE, append = "_facto
 #' @param append text to append to the variable name if not overwriting
 #'
 #' @return input data.frame with additional date variables/variables converted to dates.
+#' @importFrom labelled var_label
 #' @export
-#'
-#' @examples
 rc_dates <- function(data, metadata, replace = FALSE, append = "_date"){
   tmp <- subset(metadata, metadata$text_validation_type_or_show_slider_number == "date_dmy")
   tmp <- tmp[tmp$field_name %in% names(data), ]
@@ -145,15 +137,15 @@ rc_dates <- function(data, metadata, replace = FALSE, append = "_date"){
       # print(ov)
       v <- if(replace) ov else paste0(ov, append)
       data[, v] <- lubridate::as_date(data[, ov])
-      labelled::var_label(data[, ov]) <- tmp$field_label[i]
-      if(!replace) labelled::var_label(data[, v]) <- tmp$field_label[i]
+      var_label(data[, ov]) <- tmp$field_label[i]
+      if(!replace) var_label(data[, v]) <- tmp$field_label[i]
     }
   }
   return(data)
 }
 
-#' @rdname rc_date
-#' @describeIn rc_date
+#' @describeIn rc_date input data.frame with date-time variables reformated to POSIX
+#' @importFrom labelled var_label
 rc_datetimes <- function(data, metadata, replace = FALSE, append = "_datetime"){
   tmp <- subset(metadata, metadata$text_validation_type_or_show_slider_number == "datetime_dmy")
   tmp <- tmp[tmp$field_name %in% names(data), ]
@@ -163,7 +155,7 @@ rc_datetimes <- function(data, metadata, replace = FALSE, append = "_datetime"){
       # print(ov)
       v <- if(replace) ov else paste0(ov, append)
       data[, v] <- lubridate::as_datetime(data[, ov])
-      labelled::var_label(data[, ov]) <- unique(tmp$field_label[i])
+      var_label(data[, ov]) <- unique(tmp$field_label[i])
       if(!replace) labelled::var_label(data[, v]) <- unique(tmp$field_label[i])
     }
   }
@@ -174,31 +166,35 @@ rc_datetimes <- function(data, metadata, replace = FALSE, append = "_datetime"){
 #' Label non-single/multiple choice/date(time) fields
 #' \code{singlechoice_factor}, \code{multichoice_factor}, \code{rc_date} and \code{rc_datetime}
 #'
+#' @param data dataframe
+#' @param metadata redcap data dictionary
+#' @export
+#' @importFrom labelled var_label
 label_others <- function(data, metadata){
   tmp <- metadata[!metadata$field_type %in% c("checkbox", "radio", "dropdown") & !metadata$text_validation_type_or_show_slider_number %in% c("date_dmy", "datetime_dmy"), ]
   tmp <- tmp[tmp$field_name %in% names(data), ]
   for(i in 1:nrow(tmp)){
-    labelled::var_label(data[, tmp$field_name[i]]) <- tmp$field_label[i]
+    var_label(data[, tmp$field_name[i]]) <- tmp$field_label[i]
   }
   return(data)
 }
 
 
-# do all of the above
+#' Convert REDCap variable types (dates, datetimes, factors)
+#'
+#' @param data dataframe
+#' @param metadata data dictionary from REDCap
+#'
+#' @return dataframe with converted factors, dates, POSIX, ...
+#' @export
+#'
 rc_prep <- function(data, metadata){
 
-  if(!is.null(data)){
-
-    tmp <- singlechoice_factor(data, metadata)
-    tmp <- multichoice_factor(tmp, metadata)
-    tmp <- rc_dates(tmp, metadata)
-    tmp <- rc_datetimes(tmp, metadata)
-    tmp <- label_others(tmp, metadata)
-    return(tmp)
-  } else {
-
-    return(data)
-
-  }
+  tmp <- singlechoice_factor(data, metadata)
+  tmp <- multichoice_factor(tmp, metadata)
+  tmp <- rc_dates(tmp, metadata)
+  tmp <- rc_datetimes(tmp, metadata)
+  tmp <- label_others(tmp, metadata)
+  return(tmp)
 
 }

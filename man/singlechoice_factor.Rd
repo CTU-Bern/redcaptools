@@ -16,7 +16,7 @@ singlechoice_factor(data, metadata, replace = FALSE, append = "_factor")
 \item{append}{text to append to the variable name if not overwriting}
 }
 \value{
-
+dataframe with factor variables
 }
 \description{
 Converts the numeric values returned from REDCap to factors. This function also

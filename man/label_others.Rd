@@ -7,6 +7,11 @@
 \usage{
 label_others(data, metadata)
 }
+\arguments{
+\item{data}{dataframe}
+
+\item{metadata}{redcap data dictionary}
+}
 \description{
 Label non-single/multiple choice/date(time) fields
 \code{singlechoice_factor}, \code{multichoice_factor}, \code{rc_date} and \code{rc_datetime}

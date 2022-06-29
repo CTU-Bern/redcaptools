@@ -2,9 +2,12 @@
 % Please edit documentation in R/reformat.R
 \name{rc_dates}
 \alias{rc_dates}
+\alias{rc_datetimes}
 \title{Convert dates stored as strings to \code{Date} variables}
 \usage{
 rc_dates(data, metadata, replace = FALSE, append = "_date")
+
+rc_datetimes(data, metadata, replace = FALSE, append = "_datetime")
 }
 \arguments{
 \item{data}{the data.frame to modify}
@@ -19,6 +22,11 @@ rc_dates(data, metadata, replace = FALSE, append = "_date")
 input data.frame with additional date variables/variables converted to dates.
 }
 \description{
-Converts the numeric values returned from REDCap to factors (with levels Yes/No).
+Converts the string values returned from REDCap to Dates.
 This function also applies labels to the variable itself, based on the option label.
 }
+\section{Functions}{
+\itemize{
+\item \code{rc_datetimes}: input data.frame with date-time variables reformated to POSIX
+}}
+
