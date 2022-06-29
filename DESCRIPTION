@@ -19,4 +19,5 @@ VignetteBuilder: knitr
 Depends:
     httr2,
     labelled,
+    lubridate,
     magrittr
