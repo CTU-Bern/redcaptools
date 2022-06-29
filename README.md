@@ -20,3 +20,9 @@ You can install the development version of redcaptools from github with:
 ``` r
 remotes::install_github("CTU-Bern/redcaptools")
 ```
+
+or from CTU Bern’s universe with:
+
+``` r
+install.packages("redcaptools", repos = "https://ctu-bern.r-universe.dev")
+```
