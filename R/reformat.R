@@ -147,7 +147,7 @@ rc_dates <- function(data, metadata, replace = FALSE, append = "_date"){
 
 #' @describeIn rc_date input data.frame with date-time variables reformated to POSIX
 #' @importFrom labelled var_label var_label<-
-#' #' @importFrom lubridate as_datetime
+#' @importFrom lubridate as_datetime
 rc_datetimes <- function(data, metadata, replace = FALSE, append = "_datetime"){
   tmp <- subset(metadata, metadata$text_validation_type_or_show_slider_number == "datetime_dmy")
   tmp <- tmp[tmp$field_name %in% names(data), ]
