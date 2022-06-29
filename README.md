@@ -5,18 +5,18 @@
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/aghaynes/redcaptools/workflows/R-CMD-check/badge.svg)](https://github.com/aghaynes/redcaptools/actions)
+[![R-CMD-check](https://github.com/CTU-Bern/redcaptools/workflows/R-CMD-check/badge.svg)](https://github.com/aghaynes/redcaptools/actions)
 <!-- badges: end -->
 
-The goal of redcaptools is to …
+`redcaptools` contains home-grown functions for working with REDCap data
+in R.
 
 ## Installation
 
-You can install the released version of redcaptools from
-[CRAN](https://CRAN.R-project.org) with:
+You can install the development version of redcaptools from github with:
 
 <!-- install.packages("redcaptools") -->
 
 ``` r
-remotes::install_github("aghaynes/redcaptools")
+remotes::install_github("CTU-Bern/redcaptools")
 ```
