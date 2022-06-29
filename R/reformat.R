@@ -70,7 +70,7 @@ multichoice_opts <- function(metadata){
 #' @param append text to append to the variable name if not overwriting
 #'
 #' @return dataframe with factor variables
-#' @importFrom labelled var_label
+#' @importFrom labelled var_label var_label<-
 singlechoice_factor <- function(data, metadata, replace = FALSE, append = "_factor"){
   radios <- singlechoice_opts(metadata)
   radios <- radios[radios$var %in% names(data), ]
@@ -126,7 +126,7 @@ multichoice_factor <- function(data, metadata, replace = FALSE, append = "_facto
 #' @param append text to append to the variable name if not overwriting
 #'
 #' @return input data.frame with additional date variables/variables converted to dates.
-#' @importFrom labelled var_label
+#' @importFrom labelled var_label var_label<-
 #' @export
 rc_dates <- function(data, metadata, replace = FALSE, append = "_date"){
   tmp <- subset(metadata, metadata$text_validation_type_or_show_slider_number == "date_dmy")
@@ -145,7 +145,7 @@ rc_dates <- function(data, metadata, replace = FALSE, append = "_date"){
 }
 
 #' @describeIn rc_date input data.frame with date-time variables reformated to POSIX
-#' @importFrom labelled var_label
+#' @importFrom labelled var_label var_label<-
 rc_datetimes <- function(data, metadata, replace = FALSE, append = "_datetime"){
   tmp <- subset(metadata, metadata$text_validation_type_or_show_slider_number == "datetime_dmy")
   tmp <- tmp[tmp$field_name %in% names(data), ]
@@ -169,7 +169,7 @@ rc_datetimes <- function(data, metadata, replace = FALSE, append = "_datetime"){
 #' @param data dataframe
 #' @param metadata redcap data dictionary
 #' @export
-#' @importFrom labelled var_label
+#' @importFrom labelled var_label var_label<-
 label_others <- function(data, metadata){
   tmp <- metadata[!metadata$field_type %in% c("checkbox", "radio", "dropdown") & !metadata$text_validation_type_or_show_slider_number %in% c("date_dmy", "datetime_dmy"), ]
   tmp <- tmp[tmp$field_name %in% names(data), ]
