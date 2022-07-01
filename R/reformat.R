@@ -8,7 +8,8 @@
 #' \code{labs} (the labels related to each value in \code{vals})
 #' @export
 singlechoice_opts <- function(metadata){
-  radio <- metadata[metadata$field_type %in% c("radio", "dropdown"), ]
+  radio <- metadata[metadata$field_type %in% c("radio", "dropdown", "yesno"), ]
+  radio$select_choices_or_calculations[radio$field_type == "yesno"] <- "0, No | 1, Yes"
   fn <- function(var, choices, label){
     opts <- choices
     opts <- trimws(unlist(strsplit(opts, "|", fixed = TRUE)))
