@@ -25,10 +25,10 @@ redcap_export_tbl <- function(token, url, content, ...){
 
   req <- httr2::request(url) %>%
     httr2::req_headers() %>%
-    httr2::req_body_form(list(token = token,
-                              content = content,
-                              format = "csv",
-                              ...))
+    httr2::req_body_form(token = token,
+                         content = content,
+                         format = "csv",
+                         ...)
   resp <- req %>% httr2::req_perform()
   if(httr2::resp_status(resp) == 200){
     body <- resp %>% httr2::resp_body_string()
