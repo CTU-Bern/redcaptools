@@ -53,16 +53,16 @@ redcap_export_tbl <- function(token, url, content, ...){
 #' # redcap_export_meta(token, "https://www.some_redcap_url.com/api/")
 redcap_export_meta <- function(token,
                                url,
-                               tabs = c("metadata", "event", "formEventMapping"),
+                               tabs = c("metadata", "event", "formEventMapping", "instrument"),
                                ...){
-  out <- lapply(tabs,
+  out <- sapply(tabs,
          function(x){
            redcap_export_tbl(token,
                              url,
                              content = x,
                              ...)
          })
-  names(out) <- tabs
+
   return(out)
 }
 
@@ -72,6 +72,8 @@ redcap_export_meta <- function(token,
 #'
 #' @inheritParams redcap_export_tbl
 #' @param meta metadata from \code{redcap_export_meta} (will be downloaded if not provided)
+#' @param remove_empty should empty rows be removed from the dataset (REDCap automatically
+#' creates all forms for an event when any form in the event is created)
 #'
 #' @return list of dataframes
 #' @export
@@ -83,29 +85,32 @@ redcap_export_meta <- function(token,
 redcap_export_byform <- function(token,
                                  url,
                                  meta = NULL,
+                                 remove_empty = TRUE,
                                  ...) {
 
   if(is.null(meta)) meta <- redcap_export_meta(token, url)
 
-  db_sheets <- unique(meta$formEventMapping$form)
+  db_sheets <- unique(meta$instrument$instrument_name)
 
   formmapping <- meta$formEventMapping
 
-  tabs <- lapply(db_sheets,
+  tabs <- sapply(db_sheets,
                  function(x){
 
                    events <- subset(formmapping, formmapping$form == x)$unique_event_name
                    events <- paste0(events, collapse = ",")
 
-                   redcap_export_tbl(token, url,
+                   d <- redcap_export_tbl(token, url,
                                      content = "record",
                                      forms = x,
                                      events = events,
                                      'fields[0]' = "record_id",
                                      ...)
-                   })
 
-  names(tabs) <- db_sheets
+                   if(remove_empty & !is.null(d)) d <- remove_empty_rows(d)
+
+                   return(d)
+                   })
 
   return(tabs)
 }

@@ -1,3 +1,10 @@
+# redcaptools 0.2.2
+
+* better support for forms - removes empty rows during API export
+* some support for splitting manually exporting exports into forms `split_by_form`
+* `rc_prep` has added options for replacing variable types and text to append (if not replacing)
+* improve the vignette
+
 # redcaptools 0.2.1
 
 * add support for `yesno` variables

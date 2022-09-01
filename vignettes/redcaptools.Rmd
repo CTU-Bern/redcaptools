@@ -33,11 +33,30 @@ url <- "https://redcap.mydomain.com/api/"
 data <- redcap_export_byform(token, url)
 ```
 
-Other export functions are `redcap_export_meta` (for downloading various metadata objects - currently the data dictionary, form-event-mapping and event tables) and `redcap_export_tbl`, which can be used to use whatever parameters you like for the API (see the REDCap documentation for details).
+Other export functions are `redcap_export_meta` (for downloading various metadata objects - currently the data dictionary, form-event-mapping and event tables) and `redcap_export_tbl`, which can be used to use whatever parameters you like for the API (see the REDCap documentation for details). The dataset that REDCap exports through the website interface is accessed for instance via:
+
+```{r, eval = FALSE}
+record <- redcap_export_tbl(token, url, "record")
+```
+
 
 ### Processing REDCap data
 
-To make the data more usable in R, it's often nice to label data, create factor, convert dates etc. `redcaptools` has functions to help with that too.
+To make the data more usable in R, it's often nice to label data, create factor, convert dates etc. `redcaptools` has functions to help with that too. Each of the following functions also label variables.
+
+The `rc_prep` function is the easiest to use. It wraps all of the functions in the following section.
+
+```{r, eval = FALSE}
+meta <- redcap_export_meta(token, url)
+# could also use a data dictionary exported manually
+
+# where all data is in a single dataframe
+prepped <- rc_prep(record, meta$metadata)
+
+# for data split by forms, use sapply
+prepped <- sapply(data, rc_prep, metadata = meta$metadata)
+```
+
 
 #### Create factors
 
@@ -46,10 +65,25 @@ REDCap has both single and multiple choice factor type variables. These need han
 Lists of the options can be obtained with the `singlechoice_opts` and `multichoice_opts` functions. These are rather for your information.
 
 ```{r, eval = FALSE}
-meta <- redcap_export_meta(token, url)
 singlechoice_opts(meta$metadata)
 mutlichoice_opts(meta$metadata)
 ```
 
+Factors can be created easily with 
+
+```{r, eval = FALSE}
+prepped <- sapply(data, singlechoice_factor, metadata = meta$metadata)
+prepped <- sapply(prepped, multichoice_factor, metadata = meta$metadata)
+```
+
+
+#### Create `Date`s and `POSIX` variables
+
+As with single and multiple choice variables, `Date` and `POSIX` variables also need handling separately.
+
+```{r, eval = FALSE}
+prepped <- sapply(prepped, rc_dates, metadata = meta$metadata)
+prepped <- sapply(prepped, rc_datetimes, metadata = meta$metadata)
+```
 
 

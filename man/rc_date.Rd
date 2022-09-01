@@ -27,6 +27,6 @@ This function also applies labels to the variable itself, based on the option la
 }
 \section{Functions}{
 \itemize{
-\item \code{rc_datetimes}: input data.frame with date-time variables reformated to POSIX
-}}
+\item \code{rc_datetimes()}: input data.frame with date-time variables reformated to POSIX
 
+}}
