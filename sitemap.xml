@@ -52,6 +52,12 @@
     <loc>/reference/redcap_export_tbl.html</loc>
   </url>
   <url>
+    <loc>/reference/remove_empty_rows.html</loc>
+  </url>
+  <url>
     <loc>/reference/singlechoice_factor.html</loc>
+  </url>
+  <url>
+    <loc>/reference/split_by_form.html</loc>
   </url>
 </urlset>

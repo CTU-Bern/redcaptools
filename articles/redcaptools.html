@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">redcaptools</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.2</span>
       </span>
     </div>
 
@@ -94,21 +94,44 @@
 <span><span class="va">url</span> <span class="op">&lt;-</span> <span class="st">"https://redcap.mydomain.com/api/"</span></span>
 <span></span>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/redcap_export_byform.html">redcap_export_byform</a></span><span class="op">(</span><span class="va">token</span>, <span class="va">url</span><span class="op">)</span></span></code></pre></div>
-<p>Other export functions are <code>redcap_export_meta</code> (for downloading various metadata objects - currently the data dictionary, form-event-mapping and event tables) and <code>redcap_export_tbl</code>, which can be used to use whatever parameters you like for the API (see the REDCap documentation for details).</p>
+<p>Other export functions are <code>redcap_export_meta</code> (for downloading various metadata objects - currently the data dictionary, form-event-mapping and event tables) and <code>redcap_export_tbl</code>, which can be used to use whatever parameters you like for the API (see the REDCap documentation for details). The dataset that REDCap exports through the website interface is accessed for instance via:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">record</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/redcap_export_tbl.html">redcap_export_tbl</a></span><span class="op">(</span><span class="va">token</span>, <span class="va">url</span>, <span class="st">"record"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="processing-redcap-data">Processing REDCap data<a class="anchor" aria-label="anchor" href="#processing-redcap-data"></a>
 </h3>
-<p>To make the data more usable in R, it’s often nice to label data, create factor, convert dates etc. <code>redcaptools</code> has functions to help with that too.</p>
+<p>To make the data more usable in R, it’s often nice to label data, create factor, convert dates etc. <code>redcaptools</code> has functions to help with that too. Each of the following functions also label variables.</p>
+<p>The <code>rc_prep</code> function is the easiest to use. It wraps all of the functions in the following section.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">meta</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/redcap_export_meta.html">redcap_export_meta</a></span><span class="op">(</span><span class="va">token</span>, <span class="va">url</span><span class="op">)</span></span>
+<span><span class="co"># could also use a data dictionary exported manually</span></span>
+<span></span>
+<span><span class="co"># where all data is in a single dataframe</span></span>
+<span><span class="va">prepped</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rc_prep.html">rc_prep</a></span><span class="op">(</span><span class="va">record</span>, <span class="va">meta</span><span class="op">$</span><span class="va">metadata</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># for data split by forms, use sapply</span></span>
+<span><span class="va">prepped</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">data</span>, <span class="va">rc_prep</span>, metadata <span class="op">=</span> <span class="va">meta</span><span class="op">$</span><span class="va">metadata</span><span class="op">)</span></span></code></pre></div>
 <div class="section level4">
 <h4 id="create-factors">Create factors<a class="anchor" aria-label="anchor" href="#create-factors"></a>
 </h4>
 <p>REDCap has both single and multiple choice factor type variables. These need handling separately, so there are two sets of functions.</p>
 <p>Lists of the options can be obtained with the <code>singlechoice_opts</code> and <code>multichoice_opts</code> functions. These are rather for your information.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">meta</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/redcap_export_meta.html">redcap_export_meta</a></span><span class="op">(</span><span class="va">token</span>, <span class="va">url</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/choice_options.html">singlechoice_opts</a></span><span class="op">(</span><span class="va">meta</span><span class="op">$</span><span class="va">metadata</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/choice_options.html">singlechoice_opts</a></span><span class="op">(</span><span class="va">meta</span><span class="op">$</span><span class="va">metadata</span><span class="op">)</span></span>
 <span><span class="fu">mutlichoice_opts</span><span class="op">(</span><span class="va">meta</span><span class="op">$</span><span class="va">metadata</span><span class="op">)</span></span></code></pre></div>
+<p>Factors can be created easily with</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">prepped</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">data</span>, <span class="va">singlechoice_factor</span>, metadata <span class="op">=</span> <span class="va">meta</span><span class="op">$</span><span class="va">metadata</span><span class="op">)</span></span>
+<span><span class="va">prepped</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">prepped</span>, <span class="va">multichoice_factor</span>, metadata <span class="op">=</span> <span class="va">meta</span><span class="op">$</span><span class="va">metadata</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level4">
+<h4 id="create-dates-and-posix-variables">Create <code>Date</code>s and <code>POSIX</code> variables<a class="anchor" aria-label="anchor" href="#create-dates-and-posix-variables"></a>
+</h4>
+<p>As with single and multiple choice variables, <code>Date</code> and <code>POSIX</code> variables also need handling separately.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">prepped</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">prepped</span>, <span class="va">rc_dates</span>, metadata <span class="op">=</span> <span class="va">meta</span><span class="op">$</span><span class="va">metadata</span><span class="op">)</span></span>
+<span><span class="va">prepped</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">prepped</span>, <span class="va">rc_datetimes</span>, metadata <span class="op">=</span> <span class="va">meta</span><span class="op">$</span><span class="va">metadata</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
   </div>
@@ -128,7 +151,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>

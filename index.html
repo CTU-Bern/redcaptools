@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">redcaptools</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.2</span>
       </span>
     </div>
 
@@ -65,16 +65,37 @@
 <div class="page-header"><h1 id="redcaptools">redcaptools<a class="anchor" aria-label="anchor" href="#redcaptools"></a>
 </h1></div>
 <!-- badges: start -->
-<p><code>redcaptools</code> contains home-grown functions for working with REDCap data in R.</p>
+<!-- badges: end --><p><code>redcaptools</code> contains home-grown functions for working with REDCap data in R.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <p>You can install the development version of redcaptools from github with:</p>
 <!-- install.packages("redcaptools") --><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"CTU-Bern/redcaptools"</span><span class="op">)</span></span></code></pre></div>
-<p>or from CTU Bern’s universe with:</p>
+</div>
+<div class="section level2">
+<h2 id="export-data-from-redcap">Export data from REDCap<a class="anchor" aria-label="anchor" href="#export-data-from-redcap"></a>
+</h2>
+<p>REDCap offers (at least) two approaches for exporting a projects data - throught the web interface via clicking buttons, and the API, which allows programmatic access to a lot more information than is available through the web interface. In order to use the API, a token is required. The API token can be requested from the projects API page, accessible from the link in the applications section of the menu on the left side of the page.</p>
+<p><img src="reference/figures/api_link.png"></p>
+<p>If you do not see that link, consult with whoever is in charge of user management for the project to give you access to it.</p>
+<p>Once you have access, you can request a token, which a system administrator must approve. Once approved, the token is shown on the API page. Now you have everything to download data through the API. Because your token is essentially your username, password and a reference to a specific project, extra care must be taken with it. The <code>httr</code> package has a <a href="https://cran.r-project.org/web/packages/httr/vignettes/secrets.html" class="external-link">vignette on managing secrets</a>, which is relevant to the API token.</p>
+<p>The standard download can be replicated via</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"redcaptools"</span>, repos <span class="op">=</span> <span class="st">"https://ctu-bern.r-universe.dev"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># the URL ir the same as the website just with '/api/' on the end</span></span>
+<span><span class="va">url</span> <span class="op">&lt;-</span> <span class="st">"https://redcap.domain.something/api/"</span></span>
+<span><span class="va">token</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readLines.html" class="external-link">readLines</a></span><span class="op">(</span><span class="st">"path-to-file-containing-token"</span><span class="op">)</span> <span class="co"># or some other method</span></span>
+<span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/redcap_export_tbl.html">redcap_export_tbl</a></span><span class="op">(</span><span class="va">token</span>, <span class="va">url</span>, <span class="st">"record"</span><span class="op">)</span></span></code></pre></div>
+<p>More interesting is the <code>redcap_export_byform</code> function, which returns a list of dataframes, where each element of the list is a specific eCRF from the database.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">l</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/redcap_export_byform.html">redcap_export_byform</a></span><span class="op">(</span><span class="va">token</span>, <span class="va">url</span><span class="op">)</span></span></code></pre></div>
+<p>Some of the available metadata stored in REDCap is available via the <code>redcap_export_meta</code> function, including the data dictionary, which can also be downloaded via the website.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/redcap_export_meta.html">redcap_export_meta</a></span><span class="op">(</span><span class="va">token</span>, <span class="va">url</span><span class="op">)</span></span></code></pre></div>
+<p>Once you have the data and metadata, the <code>rc_prep</code> function can be used to reformat the data - convert variables to date, POSIX, factors, etc as appropriate.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">prepped</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/rc_prep.html">rc_prep</a></span><span class="op">(</span><span class="va">d</span>, <span class="va">m</span><span class="op">$</span><span class="va">metadata</span><span class="op">)</span></span>
+<span><span class="va">prepped_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">l</span>, <span class="va">rc_prep</span>, metadata <span class="op">=</span> <span class="va">m</span><span class="op">$</span><span class="va">metadata</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
   </div>
@@ -121,7 +142,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>

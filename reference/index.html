@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">redcaptools</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.2</span>
       </span>
     </div>
 
@@ -67,7 +67,7 @@
       </tr><tr><td>
           <p><code><a href="rc_prep.html">rc_prep()</a></code> </p>
         </td>
-        <td><p>Convert REDCap variable types (dates, datetimes, factors)</p></td>
+        <td><p>Convert REDCap variable types (dates, datetimes, factors) and apply labels</p></td>
       </tr><tr><td>
           <p><code><a href="redcap_export_byform.html">redcap_export_byform()</a></code> </p>
         </td>
@@ -81,9 +81,17 @@
         </td>
         <td><p>Export tables from REDCap</p></td>
       </tr><tr><td>
+          <p><code><a href="remove_empty_rows.html">remove_empty_rows()</a></code> </p>
+        </td>
+        <td><p>Analagous to `janitor::remove_empty(..., "rows")`, but allows ignoring specific variables</p></td>
+      </tr><tr><td>
           <p><code><a href="singlechoice_factor.html">singlechoice_factor()</a></code> </p>
         </td>
         <td><p>create factors for single choice variables</p></td>
+      </tr><tr><td>
+          <p><code><a href="split_by_form.html">split_by_form()</a></code> </p>
+        </td>
+        <td><p>Split a manually exported REDCap dataset into forms</p></td>
       </tr></tbody></table></div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -97,7 +105,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>
