@@ -18,6 +18,7 @@ dataframe
 Analagous to `janitor::remove_empty(..., "rows")`, but allows ignoring specific variables
 }
 \examples{
-x <- data.frame(a = 1:10, b = rep(c("b", NA), 5))
+x <- data.frame(a = c(1:9, NA), b = rep(c("b", NA), 5))
 remove_empty_rows(x, "a")
+remove_empty_rows(x, FALSE)
 }
