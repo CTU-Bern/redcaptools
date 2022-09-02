@@ -7,7 +7,7 @@
 redcap_export_meta(
   token,
   url,
-  tabs = c("metadata", "event", "formEventMapping"),
+  tabs = c("metadata", "event", "formEventMapping", "instrument"),
   ...
 )
 }

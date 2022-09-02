@@ -176,27 +176,44 @@ rc_datetimes <- function(data, metadata, replace = FALSE, append = "_datetime"){
 label_others <- function(data, metadata){
   tmp <- metadata[!metadata$field_type %in% c("checkbox", "radio", "dropdown") & !metadata$text_validation_type_or_show_slider_number %in% c("date_dmy", "datetime_dmy"), ]
   tmp <- tmp[tmp$field_name %in% names(data), ]
-  for(i in 1:nrow(tmp)){
-    var_label(data[, tmp$field_name[i]]) <- tmp$field_label[i]
+  if(nrow(tmp) > 0){
+    for(i in seq_along(tmp$field_type)){
+      var_label(data[, tmp$field_name[i]]) <- tmp$field_label[i]
+    }
   }
   return(data)
 }
 
 
-#' Convert REDCap variable types (dates, datetimes, factors)
+#' Convert REDCap variable types (dates, datetimes, factors) and apply labels
 #'
 #' @param data dataframe
 #' @param metadata data dictionary from REDCap
+#' @param rep_date,rep_datetime,rep_singlechoice,rep_multichoice replace the indicated variable type
+#' @param app_date,app_datetime,app_singlechoice,app_multichoice text to append to the newly generated variables name (if \code{rep_*} is FALSE)
 #'
 #' @return dataframe with converted factors, dates, POSIX, ...
 #' @export
 #'
-rc_prep <- function(data, metadata){
+rc_prep <- function(data, metadata,
+                    rep_date = FALSE, rep_datetime = FALSE,
+                    rep_singlechoice = FALSE, rep_multichoice = FALSE,
+                    app_date = "_date", app_datetime = "_datetime",
+                    app_singlechoice = "_factor", app_multichoice = "_factor"
+                    ){
 
-  tmp <- singlechoice_factor(data, metadata)
-  tmp <- multichoice_factor(tmp, metadata)
-  tmp <- rc_dates(tmp, metadata)
-  tmp <- rc_datetimes(tmp, metadata)
+  tmp <- singlechoice_factor(data, metadata,
+                             replace = rep_singlechoice,
+                             append = app_singlechoice)
+  tmp <- multichoice_factor(tmp, metadata,
+                            replace = rep_multichoice,
+                            append = app_multichoice)
+  tmp <- rc_dates(tmp, metadata,
+                  replace = rep_date,
+                  append = app_date)
+  tmp <- rc_datetimes(tmp, metadata,
+                      replace = rep_datetime,
+                      append = app_datetime)
   tmp <- label_others(tmp, metadata)
   return(tmp)
 

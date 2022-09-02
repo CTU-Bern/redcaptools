@@ -2,18 +2,33 @@
 % Please edit documentation in R/reformat.R
 \name{rc_prep}
 \alias{rc_prep}
-\title{Convert REDCap variable types (dates, datetimes, factors)}
+\title{Convert REDCap variable types (dates, datetimes, factors) and apply labels}
 \usage{
-rc_prep(data, metadata)
+rc_prep(
+  data,
+  metadata,
+  rep_date = FALSE,
+  rep_datetime = FALSE,
+  rep_singlechoice = FALSE,
+  rep_multichoice = FALSE,
+  app_date = "_date",
+  app_datetime = "_datetime",
+  app_singlechoice = "_factor",
+  app_multichoice = "_factor"
+)
 }
 \arguments{
 \item{data}{dataframe}
 
 \item{metadata}{data dictionary from REDCap}
+
+\item{rep_date, rep_datetime, rep_singlechoice, rep_multichoice}{replace the indicated variable type}
+
+\item{app_date, app_datetime, app_singlechoice, app_multichoice}{text to append to the newly generated variables name (if \code{rep_*} is FALSE)}
 }
 \value{
 dataframe with converted factors, dates, POSIX, ...
 }
 \description{
-Convert REDCap variable types (dates, datetimes, factors)
+Convert REDCap variable types (dates, datetimes, factors) and apply labels
 }
