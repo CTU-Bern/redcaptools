@@ -1,7 +1,7 @@
 Package: redcaptools
 Type: Package
 Title: Tools for exporting and working with REDCap data
-Version: 0.2.2
+Version: 0.2.3
 Authors@R: 
     c(
     person(given = "Alan G.", family = "Haynes", role = "cre",
@@ -17,7 +17,7 @@ Suggests:
     rmarkdown
 VignetteBuilder: knitr
 Depends:
-    httr2,
+    httr2 (>= 0.2.0),
     labelled,
     lubridate,
     magrittr

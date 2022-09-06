@@ -1,3 +1,7 @@
+# redcaptools 0.2.3
+
+* specify version of `httr2` that is required
+
 # redcaptools 0.2.2
 
 * better support for forms - removes empty rows during API export
