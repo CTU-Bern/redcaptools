@@ -1,6 +1,6 @@
 
-token <- Sys.getenv("RC_TOKEN")
-word <- Sys.getenv("SECRET_WORD")
+token <- get_token()
+word <- get_token2()
 url <- "https://redcap.ctu.unibe.ch/api/"
 
 print(word)
