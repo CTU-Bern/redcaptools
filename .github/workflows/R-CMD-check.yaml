@@ -19,6 +19,8 @@ jobs:
 
     name: ${{ matrix.config.os }} (${{ matrix.config.r }})
 
+    environment: ci
+
     strategy:
       fail-fast: false
       matrix:
@@ -42,8 +44,6 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
-      RC_TOKEN: ${{ secrets.RC_TOKEN }}
-      SECRET_WORD: ${{ secrets.SECRET_WORD }}
       REDCAPTOOLS_KEY: ${{ secrets.REDCAPTOOLS_KEY }}
 
     steps:
@@ -62,9 +62,6 @@ jobs:
           extra-packages: rcmdcheck
 
       - uses: r-lib/actions/check-r-package@v2
-        with:
-          RC_TOKEN: ${{ secrets.RC_TOKEN }}
-          SECRET_WORD: ${{ secrets.SECRET_WORD }}
 
       - name: Show testthat output
         if: always()
