@@ -1,6 +1,9 @@
 
 token <- Sys.getenv("RC_TOKEN")
+word <- Sys.getenv("SECRET_WORD")
 url <- "https://redcap.ctu.unibe.ch/api/"
+
+print(word)
 
 test_that("export_tbl record works", {
   x <- redcap_export_tbl(token, url, "record")
