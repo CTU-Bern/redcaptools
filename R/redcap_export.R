@@ -29,6 +29,7 @@ redcap_export_tbl <- function(token, url, content, ...){
                          content = content,
                          format = "csv",
                          ...)
+
   resp <- req %>% httr2::req_perform()
   if(httr2::resp_status(resp) == 200){
     body <- resp %>% httr2::resp_body_string()
@@ -90,6 +91,13 @@ redcap_export_byform <- function(token,
 
   if(is.null(meta)) meta <- redcap_export_meta(token, url)
 
+  # check meta includes the relevant elements
+  if(!"metadata" %in% names(meta)) stop("meta must contain 'metadata'")
+  if(!"instrument" %in% names(meta)) stop("meta must contain 'instrument'")
+  if(!"formEventMapping" %in% names(meta)) stop("meta must contain 'formEventMapping'")
+
+  idvar <- meta$metadata$field_name[1]
+
   db_sheets <- unique(meta$instrument$instrument_name)
 
   formmapping <- meta$formEventMapping
@@ -104,7 +112,7 @@ redcap_export_byform <- function(token,
                                      content = "record",
                                      forms = x,
                                      events = events,
-                                     'fields[0]' = "record_id",
+                                     'fields[0]' = idvar,
                                      ...)
 
                    if(remove_empty & !is.null(d)) d <- remove_empty_rows(d)
@@ -114,3 +122,4 @@ redcap_export_byform <- function(token,
 
   return(tabs)
 }
+

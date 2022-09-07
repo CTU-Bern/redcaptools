@@ -1,3 +1,8 @@
+# redcaptools 0.2.4
+
+* add some tests
+* support for different primary key (normally `record_id`)
+
 # redcaptools 0.2.3
 
 * specify version of `httr2` that is required
