@@ -44,6 +44,7 @@ jobs:
       R_KEEP_PKG_SOURCE: yes
       RC_TOKEN: ${{ secrets.RC_TOKEN }}
       SECRET_WORD: ${{ secrets.SECRET_WORD }}
+      REDCAPTOOLS_KEY: ${{ secrets.REDCAPTOOLS_KEY }}
 
     steps:
       - uses: actions/checkout@v2
