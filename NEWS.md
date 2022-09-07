@@ -1,3 +1,7 @@
+# redcaptools 0.2.4
+
+* add some tests
+
 # redcaptools 0.2.3
 
 * specify version of `httr2` that is required
