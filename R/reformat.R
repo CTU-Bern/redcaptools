@@ -142,9 +142,11 @@ rc_dates <- function(data, metadata, replace = FALSE, append = "_date"){
       ov <- tmp$field_name[i]
       # print(ov)
       v <- if(replace) ov else paste0(ov, append)
-      data[, v] <- as_date(data[, ov])
+      alreadydate <- class(data[, ov]) == "Date"
+      if(alreadydate) warning(paste(v, "is already a Date, only labelling"))
+      if(!alreadydate) data[, v] <- as_date(data[, ov])
       var_label(data[, ov]) <- tmp$field_label[i]
-      if(!replace) var_label(data[, v]) <- tmp$field_label[i]
+      if(!replace & !alreadydate) var_label(data[, v]) <- tmp$field_label[i]
     }
   }
   return(data)
