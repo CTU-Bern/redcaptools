@@ -195,6 +195,7 @@ label_others <- function(data, metadata){
 #' @param metadata data dictionary from REDCap
 #' @param rep_date,rep_datetime,rep_singlechoice,rep_multichoice replace the indicated variable type
 #' @param app_date,app_datetime,app_singlechoice,app_multichoice text to append to the newly generated variables name (if \code{rep_*} is FALSE)
+#' @param ... options passed to/from other methods
 #'
 #' @return dataframe with converted factors, dates, POSIX, ...
 #' @export
@@ -203,7 +204,8 @@ rc_prep <- function(data, metadata,
                     rep_date = FALSE, rep_datetime = FALSE,
                     rep_singlechoice = FALSE, rep_multichoice = FALSE,
                     app_date = "_date", app_datetime = "_datetime",
-                    app_singlechoice = "_factor", app_multichoice = "_factor"
+                    app_singlechoice = "_factor", app_multichoice = "_factor",
+                    ...
                     ){
 
   tmp <- singlechoice_factor(data, metadata,
@@ -211,7 +213,7 @@ rc_prep <- function(data, metadata,
                              append = app_singlechoice)
   tmp <- multichoice_factor(tmp, metadata,
                             replace = rep_multichoice,
-                            append = app_multichoice)
+                            append = app_multichoice, ...)
   tmp <- rc_dates(tmp, metadata,
                   replace = rep_date,
                   append = app_date)
