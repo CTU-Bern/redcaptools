@@ -14,7 +14,8 @@ rc_prep(
   app_date = "_date",
   app_datetime = "_datetime",
   app_singlechoice = "_factor",
-  app_multichoice = "_factor"
+  app_multichoice = "_factor",
+  ...
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ rc_prep(
 \item{rep_date, rep_datetime, rep_singlechoice, rep_multichoice}{replace the indicated variable type}
 
 \item{app_date, app_datetime, app_singlechoice, app_multichoice}{text to append to the newly generated variables name (if \code{rep_*} is FALSE)}
+
+\item{...}{options passed to/from other methods}
 }
 \value{
 dataframe with converted factors, dates, POSIX, ...
