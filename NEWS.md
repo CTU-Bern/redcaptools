@@ -1,3 +1,7 @@
+# redcaptools 0.2.5
+
+* option to include the variable label as well as the option label for multiple choice variables and to use a separator between them
+
 # redcaptools 0.2.4
 
 * add some tests

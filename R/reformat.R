@@ -96,16 +96,20 @@ singlechoice_factor <- function(data, metadata, replace = FALSE, append = "_fact
 #' @param metadata metadata/datadictionary
 #' @param replace whether to overwrite the existing data .
 #' @param append text to append to the variable name if not overwriting
+#' @param include_vlabel logical indicating whether to include the variable label before the value label
+#' @param vlabel_sep text to use for separating vlabel and label
 #'
 #' @return input data.frame with additional factor variables.
 #' @export
-multichoice_factor <- function(data, metadata, replace = FALSE, append = "_factor"){
+multichoice_factor <- function(data, metadata, replace = FALSE, append = "_factor",
+                               include_vlabel = FALSE, vlabel_sep = ": "){
   checks <- multichoice_opts(metadata)
   checks <- checks[checks$var %in% names(data), ]
   if(nrow(checks) > 0){
     for(i in 1:nrow(checks)){
       ov <- checks$var[i]
       l <- checks$label[i]
+      if(include_vlabel) l <- paste0(checks$vlabel[i], vlabel_sep, l)
       v <- if(replace) ov else paste0(ov, append)
       data[, v] <- factor(data[, ov], levels = c(0, 1), labels = c("No", "Yes"))
       var_label(data[, ov]) <- l

@@ -4,7 +4,14 @@
 \alias{multichoice_factor}
 \title{create factors for multiple choice variables}
 \usage{
-multichoice_factor(data, metadata, replace = FALSE, append = "_factor")
+multichoice_factor(
+  data,
+  metadata,
+  replace = FALSE,
+  append = "_factor",
+  include_vlabel = FALSE,
+  vlabel_sep = ": "
+)
 }
 \arguments{
 \item{data}{the data.frame to modify}
@@ -14,6 +21,10 @@ multichoice_factor(data, metadata, replace = FALSE, append = "_factor")
 \item{replace}{whether to overwrite the existing data .}
 
 \item{append}{text to append to the variable name if not overwriting}
+
+\item{include_vlabel}{logical indicating whether to include the variable label before the value label}
+
+\item{vlabel_sep}{text to use for separating vlabel and label}
 }
 \value{
 input data.frame with additional factor variables.
