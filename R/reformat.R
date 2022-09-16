@@ -135,7 +135,7 @@ multichoice_factor <- function(data, metadata, replace = FALSE, append = "_facto
 #' @importFrom lubridate as_date
 #' @export
 rc_dates <- function(data, metadata, replace = FALSE, append = "_date"){
-  tmp <- subset(metadata, metadata$text_validation_type_or_show_slider_number == "date_dmy")
+  tmp <- subset(metadata, metadata$text_validation_type_or_show_slider_number %in% c("date_dmy", "date_ymd"))
   tmp <- tmp[tmp$field_name %in% names(data), ]
   if(nrow(tmp) > 0){
     for(i in 1:nrow(tmp)){
@@ -154,7 +154,7 @@ rc_dates <- function(data, metadata, replace = FALSE, append = "_date"){
 #' @importFrom labelled var_label var_label<-
 #' @importFrom lubridate as_datetime
 rc_datetimes <- function(data, metadata, replace = FALSE, append = "_datetime"){
-  tmp <- subset(metadata, metadata$text_validation_type_or_show_slider_number == "datetime_dmy")
+  tmp <- subset(metadata, metadata$text_validation_type_or_show_slider_number %in% c("datetime_dmy", "datetime_ymd"))
   tmp <- tmp[tmp$field_name %in% names(data), ]
   if(nrow(tmp) > 0){
     for(i in 1:nrow(tmp)){
@@ -193,7 +193,7 @@ label_others <- function(data, metadata){
 #'
 #' @param data dataframe
 #' @param metadata data dictionary from REDCap
-#' @param rep replace variables
+#' @param rep replace variables. If FALSE, encoded versions of the variable will be created
 #' @param rep_date,rep_datetime,rep_singlechoice,rep_multichoice replace the indicated variable type
 #' @param app_date,app_datetime,app_singlechoice,app_multichoice text to append to the newly generated variables name (if \code{rep_*} is FALSE)
 #' @param ... options passed to/from other methods
