@@ -26,3 +26,17 @@ test_that("rc_dates works without replace", {
   expect_true(all(!c("datevar_date", "datevar2_date", "datevar3_date", "repdate_date") %in% names(y)))
   expect_true(all(sapply(y[, c("datevar", "datevar2", "datevar3", "repdate")], class) == "Date"))
 })
+
+
+
+token <- get_token()
+token2 <- get_token2()
+url <- "https://redcap.ctu.unibe.ch/api/"
+
+x <- redcap_export_tbl(token, url, "record")
+y <- redcap_export_tbl(token, url, "metadata")
+rc_prep(x,y, rep = TRUE, rep_date = FALSE)
+
+rc_datetimes(x, y)
+# str(rc_datetimes(x, y))
+# str(x)
