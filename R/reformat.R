@@ -153,17 +153,18 @@ rc_dates <- function(data, metadata, replace = FALSE, append = "_date"){
 }
 
 #' @describeIn rc_date input data.frame with date-time variables reformated to POSIX
+#' @param ... options passed to/from other methods
 #' @importFrom labelled var_label var_label<-
-#' @importFrom lubridate as_datetime
-rc_datetimes <- function(data, metadata, replace = FALSE, append = "_datetime"){
+#' @importFrom lubridate ymd_hm
+rc_datetimes <- function(data, metadata, replace = FALSE, append = "_datetime", ...){
   tmp <- subset(metadata, metadata$text_validation_type_or_show_slider_number %in% c("datetime_dmy", "datetime_ymd"))
   tmp <- tmp[tmp$field_name %in% names(data), ]
   if(nrow(tmp) > 0){
     for(i in 1:nrow(tmp)){
       ov <- tmp$field_name[i]
-      # print(ov)
+      print(ov)
       v <- if(replace) ov else paste0(ov, append)
-      data[, v] <- as_datetime(data[, ov])
+      data[, v] <- ymd_hm(data[, ov], ...)
       var_label(data[, ov]) <- unique(tmp$field_label[i])
       if(!replace) var_label(data[, v]) <- unique(tmp$field_label[i])
     }
@@ -223,7 +224,7 @@ rc_prep <- function(data, metadata,
                   append = app_date)
   tmp <- rc_datetimes(tmp, metadata,
                       replace = rep_datetime,
-                      append = app_datetime)
+                      append = app_datetime, ...)
   tmp <- label_others(tmp, metadata)
   return(tmp)
 
