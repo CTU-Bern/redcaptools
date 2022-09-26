@@ -7,7 +7,7 @@
 \usage{
 rc_dates(data, metadata, replace = FALSE, append = "_date")
 
-rc_datetimes(data, metadata, replace = FALSE, append = "_datetime")
+rc_datetimes(data, metadata, replace = FALSE, append = "_datetime", ...)
 }
 \arguments{
 \item{data}{the data.frame to modify}
@@ -17,6 +17,8 @@ rc_datetimes(data, metadata, replace = FALSE, append = "_datetime")
 \item{replace}{whether to overwrite the existing data .}
 
 \item{append}{text to append to the variable name if not overwriting}
+
+\item{...}{options passed to/from other methods}
 }
 \value{
 input data.frame with additional date variables/variables converted to dates.
