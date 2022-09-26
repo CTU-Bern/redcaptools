@@ -1,3 +1,8 @@
+# redcaptools 0.2.6
+
+* `redcap_export_byform` now allows exporting simple non-longitudinal projects
+* more testing
+
 # redcaptools 0.2.5
 
 * option to include the variable label as well as the option label for multiple choice variables and to use a separator between them
@@ -25,7 +30,7 @@
 
 # redcaptools 0.2.0
 
-* Functions for labeling and converting to factors and dates
+* Functions for labelling and converting to factors and dates
 
 # redcaptools 0.1.0
 

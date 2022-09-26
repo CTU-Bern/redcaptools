@@ -13,7 +13,7 @@ redcap_export_tbl(token, url, content, ...)
 
 \item{content}{content to download}
 
-\item{...}{other parameters passed to the API (see your REDCap API helpfile for options)}
+\item{...}{other parameters passed to the API (see your REDCap API documentation for options)}
 }
 \value{
 dataframe
