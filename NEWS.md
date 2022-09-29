@@ -2,6 +2,7 @@
 
 * `redcap_export_byform` now allows exporting simple non-longitudinal projects
 * more testing
+* addition of `convert_to_logical` for converting binary (e.g. variables coded 'Yes' and 'No') variables to logical
 
 # redcaptools 0.2.5
 
