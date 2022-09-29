@@ -18,7 +18,7 @@ This function also applies labels to the variable itself, based on the option la
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">redcaptools</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
       </span>
     </div>
 
@@ -52,7 +52,14 @@ This function also applies labels to the variable itself, based on the option la
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">multichoice_factor</span><span class="op">(</span><span class="va">data</span>, <span class="va">metadata</span>, replace <span class="op">=</span> <span class="cn">FALSE</span>, append <span class="op">=</span> <span class="st">"_factor"</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">multichoice_factor</span><span class="op">(</span></span>
+<span>  <span class="va">data</span>,</span>
+<span>  <span class="va">metadata</span>,</span>
+<span>  replace <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  append <span class="op">=</span> <span class="st">"_factor"</span>,</span>
+<span>  include_vlabel <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  vlabel_sep <span class="op">=</span> <span class="st">": "</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -71,6 +78,14 @@ This function also applies labels to the variable itself, based on the option la
 
 <dt>append</dt>
 <dd><p>text to append to the variable name if not overwriting</p></dd>
+
+
+<dt>include_vlabel</dt>
+<dd><p>logical indicating whether to include the variable label before the value label</p></dd>
+
+
+<dt>vlabel_sep</dt>
+<dd><p>text to use for separating vlabel and label</p></dd>
 
 </dl></div>
     <div id="value">

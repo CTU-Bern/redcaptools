@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">redcaptools</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
       </span>
     </div>
 
@@ -53,14 +53,16 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">rc_prep</span><span class="op">(</span></span>
 <span>  <span class="va">data</span>,</span>
 <span>  <span class="va">metadata</span>,</span>
-<span>  rep_date <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  rep_datetime <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  rep_singlechoice <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  rep_multichoice <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  rep <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  rep_date <span class="op">=</span> <span class="va">rep</span>,</span>
+<span>  rep_datetime <span class="op">=</span> <span class="va">rep</span>,</span>
+<span>  rep_singlechoice <span class="op">=</span> <span class="va">rep</span>,</span>
+<span>  rep_multichoice <span class="op">=</span> <span class="va">rep</span>,</span>
 <span>  app_date <span class="op">=</span> <span class="st">"_date"</span>,</span>
 <span>  app_datetime <span class="op">=</span> <span class="st">"_datetime"</span>,</span>
 <span>  app_singlechoice <span class="op">=</span> <span class="st">"_factor"</span>,</span>
-<span>  app_multichoice <span class="op">=</span> <span class="st">"_factor"</span></span>
+<span>  app_multichoice <span class="op">=</span> <span class="st">"_factor"</span>,</span>
+<span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -74,12 +76,20 @@
 <dd><p>data dictionary from REDCap</p></dd>
 
 
+<dt>rep</dt>
+<dd><p>replace variables. If FALSE, encoded versions of the variable will be created</p></dd>
+
+
 <dt>rep_date, rep_datetime, rep_singlechoice, rep_multichoice</dt>
 <dd><p>replace the indicated variable type</p></dd>
 
 
 <dt>app_date, app_datetime, app_singlechoice, app_multichoice</dt>
 <dd><p>text to append to the newly generated variables name (if <code>rep_*</code> is FALSE)</p></dd>
+
+
+<dt>...</dt>
+<dd><p>options passed to/from other methods</p></dd>
 
 </dl></div>
     <div id="value">
