@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# redcaptools
+# `redcaptools`
 
 <!-- badges: start -->
 
@@ -15,12 +15,19 @@ in R.
 
 ## Installation
 
-You can install the development version of redcaptools from github with:
+You can install the development version of `redcaptools` from github
+with:
 
 <!-- install.packages("redcaptools") -->
 
 ``` r
 remotes::install_github("CTU-Bern/redcaptools")
+```
+
+Or from CTU Bern’s package universe
+
+``` r
+install.packages("redcaptools", repos = "https://ctu-bern.r-universe.dev")
 ```
 
 ## Export data from REDCap
