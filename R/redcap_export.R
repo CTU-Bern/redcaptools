@@ -3,7 +3,7 @@
 #' @param token REDcap API token
 #' @param url address of the API
 #' @param content content to download
-#' @param ... other parameters passed to the API (see your REDCap API helpfile for options)
+#' @param ... other parameters passed to the API (see your REDCap API documentation for options)
 #'
 #' @return dataframe
 #' @export
@@ -13,10 +13,9 @@
 #' # token <- "some_really_long_string_provided_by_REDCap"
 #' # redcap_export_tbl(token, "https://www.some_redcap_url.com/api/", "record")
 redcap_export_tbl <- function(token, url, content, ...){
-
-  if(length(token) != 1) stop("'token' must have length 1")
-  if(length(url) != 1) stop("'url' must have length 1")
-  if(length(content) != 1) stop("'content' must have length 1")
+  check_token(token)
+  check_url(url)
+  check_content(content)
 
   if(!grepl("/$", url)){
     warning("url should end with '/'")
@@ -41,13 +40,39 @@ redcap_export_tbl <- function(token, url, content, ...){
 
 
 
-#' Export most important REDCap metadata tables
+#' Export the most important REDCap metadata tables
 #'
+#' The REDCap API has a large number of API endpoints. Those that are metadata-type
+#' details are listed on this page. The
+#'
+#' @details
+#' Allowed tabs are
+#' * `arm` - labels of a projects arms
+#' * `dag` - data access groups (DAGs)
+#' * `userDagMapping` - mapping between users and DAGs
+#' * `event` - list of events in the project (only
+#'    available for longitudinal projects)
+#' * `exportFieldNames` - list of the fields that the API returns
+#' * `instrument` - list of instruments (eCRFs/forms) in the project
+#' * `formEventMapping` - mapping between instruments (forms) and events (only
+#'    available for longitudinal projects)
+#' * `metadata` - the data dictionary
+#' * `project` - information on the project
+#' * `record` - the data itself. The method has many options. See the API help
+#'   page on your REDCap instance
+#' * `repeatingFormsEvents` - which forms can repeat on which events
+#' * `report` - access custom reports defined in REDCap
+#' * `version` - REDCap version
+#' * `user` - list of users
+#' * `userRole` - rights for each role
+#' * `userRoleMapping` - user-roll mapping
 #' @inheritParams redcap_export_tbl
-#' @param tabs tables to export
-#'
+#' @param tabs tables to export. `project` is always added.
+#' @note tables that are not relevant for non-longitudinal projects (e.g.
+#'   formEventMapping and event) are silently removed
 #' @return list of dataframes
 #' @export
+#' @md
 #'
 #' @examples
 #' # token <- "some_really_long_string_provided_by_REDCap"
@@ -56,6 +81,15 @@ redcap_export_meta <- function(token,
                                url,
                                tabs = c("metadata", "event", "formEventMapping", "instrument"),
                                ...){
+
+  proj <- redcap_export_tbl(token, url = url, "project")
+
+  if(proj$is_longitudinal == 0){
+    if(any(c("event", "formEventMapping") %in% tabs)){
+      tabs <- tabs[!tabs %in% c("event", "formEventMapping")]
+    }
+  }
+
   out <- sapply(tabs,
          function(x){
            redcap_export_tbl(token,
@@ -63,6 +97,8 @@ redcap_export_meta <- function(token,
                              content = x,
                              ...)
          })
+
+  out$project <- proj
 
   return(out)
 }
@@ -91,10 +127,9 @@ redcap_export_byform <- function(token,
 
   if(is.null(meta)) meta <- redcap_export_meta(token, url)
 
-  # check meta includes the relevant elements
-  if(!"metadata" %in% names(meta)) stop("meta must contain 'metadata'")
-  if(!"instrument" %in% names(meta)) stop("meta must contain 'instrument'")
-  if(!"formEventMapping" %in% names(meta)) stop("meta must contain 'formEventMapping'")
+  check_meta(meta)
+
+  longitudinal <- meta$project$is_longitudinal == 1
 
   idvar <- meta$metadata$field_name[1]
 
@@ -105,21 +140,31 @@ redcap_export_byform <- function(token,
   tabs <- sapply(db_sheets,
                  function(x){
 
-                   events <- subset(formmapping, formmapping$form == x)$unique_event_name
-                   events <- paste0(events, collapse = ",")
+                   if(longitudinal){
+                     events <- subset(formmapping, formmapping$form == x)$unique_event_name
+                     events <- paste0(events, collapse = ",")
 
-                   d <- redcap_export_tbl(token, url,
-                                     content = "record",
-                                     forms = x,
-                                     events = events,
-                                     'fields[0]' = idvar,
-                                     ...)
+                     d <- redcap_export_tbl(token, url,
+                                            content = "record",
+                                            forms = x,
+                                            events = events,
+                                            'fields[0]' = idvar,
+                                            ...)
 
-                   if(remove_empty & !is.null(d)) d <- remove_empty_rows(d)
+                     if(remove_empty & !is.null(d)) d <- remove_empty_rows(d)
+                   } else {
+                     d <- redcap_export_tbl(token, url,
+                                            content = "record",
+                                            forms = x,
+                                            'fields[0]' = idvar,
+                                            ...)
+                   }
 
                    return(d)
+
                    })
 
   return(tabs)
 }
+
 

@@ -96,16 +96,20 @@ singlechoice_factor <- function(data, metadata, replace = FALSE, append = "_fact
 #' @param metadata metadata/datadictionary
 #' @param replace whether to overwrite the existing data .
 #' @param append text to append to the variable name if not overwriting
+#' @param include_vlabel logical indicating whether to include the variable label before the value label
+#' @param vlabel_sep text to use for separating vlabel and label
 #'
 #' @return input data.frame with additional factor variables.
 #' @export
-multichoice_factor <- function(data, metadata, replace = FALSE, append = "_factor"){
+multichoice_factor <- function(data, metadata, replace = FALSE, append = "_factor",
+                               include_vlabel = FALSE, vlabel_sep = ": "){
   checks <- multichoice_opts(metadata)
   checks <- checks[checks$var %in% names(data), ]
   if(nrow(checks) > 0){
     for(i in 1:nrow(checks)){
       ov <- checks$var[i]
       l <- checks$label[i]
+      if(include_vlabel) l <- paste0(checks$vlabel[i], vlabel_sep, l)
       v <- if(replace) ov else paste0(ov, append)
       data[, v] <- factor(data[, ov], levels = c(0, 1), labels = c("No", "Yes"))
       var_label(data[, ov]) <- l
@@ -131,33 +135,36 @@ multichoice_factor <- function(data, metadata, replace = FALSE, append = "_facto
 #' @importFrom lubridate as_date
 #' @export
 rc_dates <- function(data, metadata, replace = FALSE, append = "_date"){
-  tmp <- subset(metadata, metadata$text_validation_type_or_show_slider_number == "date_dmy")
+  tmp <- subset(metadata, metadata$text_validation_type_or_show_slider_number %in% c("date_dmy", "date_ymd"))
   tmp <- tmp[tmp$field_name %in% names(data), ]
   if(nrow(tmp) > 0){
     for(i in 1:nrow(tmp)){
       ov <- tmp$field_name[i]
       # print(ov)
       v <- if(replace) ov else paste0(ov, append)
-      data[, v] <- as_date(data[, ov])
+      alreadydate <- class(data[, ov]) == "Date"
+      if(alreadydate) warning(paste(v, "is already a Date, only labelling"))
+      if(!alreadydate) data[, v] <- as_date(data[, ov])
       var_label(data[, ov]) <- tmp$field_label[i]
-      if(!replace) var_label(data[, v]) <- tmp$field_label[i]
+      if(!replace & !alreadydate) var_label(data[, v]) <- tmp$field_label[i]
     }
   }
   return(data)
 }
 
 #' @describeIn rc_date input data.frame with date-time variables reformated to POSIX
+#' @param ... options passed to/from other methods
 #' @importFrom labelled var_label var_label<-
-#' @importFrom lubridate as_datetime
-rc_datetimes <- function(data, metadata, replace = FALSE, append = "_datetime"){
-  tmp <- subset(metadata, metadata$text_validation_type_or_show_slider_number == "datetime_dmy")
+#' @importFrom lubridate ymd_hm
+rc_datetimes <- function(data, metadata, replace = FALSE, append = "_datetime", ...){
+  tmp <- subset(metadata, metadata$text_validation_type_or_show_slider_number %in% c("datetime_dmy", "datetime_ymd"))
   tmp <- tmp[tmp$field_name %in% names(data), ]
   if(nrow(tmp) > 0){
     for(i in 1:nrow(tmp)){
       ov <- tmp$field_name[i]
-      # print(ov)
+      print(ov)
       v <- if(replace) ov else paste0(ov, append)
-      data[, v] <- as_datetime(data[, ov])
+      data[, v] <- ymd_hm(data[, ov], ...)
       var_label(data[, ov]) <- unique(tmp$field_label[i])
       if(!replace) var_label(data[, v]) <- unique(tmp$field_label[i])
     }
@@ -189,17 +196,21 @@ label_others <- function(data, metadata){
 #'
 #' @param data dataframe
 #' @param metadata data dictionary from REDCap
+#' @param rep replace variables. If FALSE, encoded versions of the variable will be created
 #' @param rep_date,rep_datetime,rep_singlechoice,rep_multichoice replace the indicated variable type
 #' @param app_date,app_datetime,app_singlechoice,app_multichoice text to append to the newly generated variables name (if \code{rep_*} is FALSE)
+#' @param ... options passed to/from other methods
 #'
 #' @return dataframe with converted factors, dates, POSIX, ...
 #' @export
 #'
 rc_prep <- function(data, metadata,
-                    rep_date = FALSE, rep_datetime = FALSE,
-                    rep_singlechoice = FALSE, rep_multichoice = FALSE,
+                    rep = FALSE,
+                    rep_date = rep, rep_datetime = rep,
+                    rep_singlechoice = rep, rep_multichoice = rep,
                     app_date = "_date", app_datetime = "_datetime",
-                    app_singlechoice = "_factor", app_multichoice = "_factor"
+                    app_singlechoice = "_factor", app_multichoice = "_factor",
+                    ...
                     ){
 
   tmp <- singlechoice_factor(data, metadata,
@@ -207,13 +218,13 @@ rc_prep <- function(data, metadata,
                              append = app_singlechoice)
   tmp <- multichoice_factor(tmp, metadata,
                             replace = rep_multichoice,
-                            append = app_multichoice)
+                            append = app_multichoice, ...)
   tmp <- rc_dates(tmp, metadata,
                   replace = rep_date,
                   append = app_date)
   tmp <- rc_datetimes(tmp, metadata,
                       replace = rep_datetime,
-                      append = app_datetime)
+                      append = app_datetime, ...)
   tmp <- label_others(tmp, metadata)
   return(tmp)
 

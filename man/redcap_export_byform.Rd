@@ -16,7 +16,7 @@ redcap_export_byform(token, url, meta = NULL, remove_empty = TRUE, ...)
 \item{remove_empty}{should empty rows be removed from the dataset (REDCap automatically
 creates all forms for an event when any form in the event is created)}
 
-\item{...}{other parameters passed to the API (see your REDCap API helpfile for options)}
+\item{...}{other parameters passed to the API (see your REDCap API documentation for options)}
 }
 \value{
 list of dataframes

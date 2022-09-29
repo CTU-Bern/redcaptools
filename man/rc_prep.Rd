@@ -7,14 +7,16 @@
 rc_prep(
   data,
   metadata,
-  rep_date = FALSE,
-  rep_datetime = FALSE,
-  rep_singlechoice = FALSE,
-  rep_multichoice = FALSE,
+  rep = FALSE,
+  rep_date = rep,
+  rep_datetime = rep,
+  rep_singlechoice = rep,
+  rep_multichoice = rep,
   app_date = "_date",
   app_datetime = "_datetime",
   app_singlechoice = "_factor",
-  app_multichoice = "_factor"
+  app_multichoice = "_factor",
+  ...
 )
 }
 \arguments{
@@ -22,9 +24,13 @@ rc_prep(
 
 \item{metadata}{data dictionary from REDCap}
 
+\item{rep}{replace variables. If FALSE, encoded versions of the variable will be created}
+
 \item{rep_date, rep_datetime, rep_singlechoice, rep_multichoice}{replace the indicated variable type}
 
 \item{app_date, app_datetime, app_singlechoice, app_multichoice}{text to append to the newly generated variables name (if \code{rep_*} is FALSE)}
+
+\item{...}{options passed to/from other methods}
 }
 \value{
 dataframe with converted factors, dates, POSIX, ...

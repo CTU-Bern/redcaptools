@@ -17,6 +17,7 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 
+`r badger::badge_custom("dev version", as.character(packageVersion("redcaptools")), "blue", "https://github.com/CTU-Bern/redcaptools")`
 [![R-CMD-check](https://github.com/CTU-Bern/redcaptools/workflows/R-CMD-check/badge.svg)](https://github.com/CTU-Bern/redcaptools/actions)
 
 <!-- badges: end -->

@@ -2,7 +2,7 @@
 % Please edit documentation in R/redcap_export.R
 \name{redcap_export_meta}
 \alias{redcap_export_meta}
-\title{Export most important REDCap metadata tables}
+\title{Export the most important REDCap metadata tables}
 \usage{
 redcap_export_meta(
   token,
@@ -16,15 +16,44 @@ redcap_export_meta(
 
 \item{url}{address of the API}
 
-\item{tabs}{tables to export}
+\item{tabs}{tables to export. \code{project} is always added.}
 
-\item{...}{other parameters passed to the API (see your REDCap API helpfile for options)}
+\item{...}{other parameters passed to the API (see your REDCap API documentation for options)}
 }
 \value{
 list of dataframes
 }
 \description{
-Export most important REDCap metadata tables
+The REDCap API has a large number of API endpoints. Those that are metadata-type
+details are listed on this page. The
+}
+\details{
+Allowed tabs are
+\itemize{
+\item \code{arm} - labels of a projects arms
+\item \code{dag} - data access groups (DAGs)
+\item \code{userDagMapping} - mapping between users and DAGs
+\item \code{event} - list of events in the project (only
+available for longitudinal projects)
+\item \code{exportFieldNames} - list of the fields that the API returns
+\item \code{instrument} - list of instruments (eCRFs/forms) in the project
+\item \code{formEventMapping} - mapping between instruments (forms) and events (only
+available for longitudinal projects)
+\item \code{metadata} - the data dictionary
+\item \code{project} - information on the project
+\item \code{record} - the data itself. The method has many options. See the API help
+page on your REDCap instance
+\item \code{repeatingFormsEvents} - which forms can repeat on which events
+\item \code{report} - access custom reports defined in REDCap
+\item \code{version} - REDCap version
+\item \code{user} - list of users
+\item \code{userRole} - rights for each role
+\item \code{userRoleMapping} - user-roll mapping
+}
+}
+\note{
+tables that are not relevant for non-longitudinal projects (e.g.
+formEventMapping and event) are silently removed
 }
 \examples{
 # token <- "some_really_long_string_provided_by_REDCap"
