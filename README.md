@@ -1,10 +1,11 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# redcaptools
+# `redcaptools`
 
 <!-- badges: start -->
 
+[![](https://img.shields.io/badge/dev%20version-0.2.6-blue.svg)](https://github.com/CTU-Bern/redcaptools)
 [![R-CMD-check](https://github.com/CTU-Bern/redcaptools/workflows/R-CMD-check/badge.svg)](https://github.com/CTU-Bern/redcaptools/actions)
 
 <!-- badges: end -->
@@ -14,12 +15,19 @@ in R.
 
 ## Installation
 
-You can install the development version of redcaptools from github with:
+You can install the development version of `redcaptools` from github
+with:
 
 <!-- install.packages("redcaptools") -->
 
 ``` r
 remotes::install_github("CTU-Bern/redcaptools")
+```
+
+Or from CTU Bern’s package universe
+
+``` r
+install.packages("redcaptools", repos = "https://ctu-bern.r-universe.dev")
 ```
 
 ## Export data from REDCap
