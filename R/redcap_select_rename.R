@@ -44,8 +44,8 @@ redcap_select_rename <- function(import_data,
 
 
   # open log-file
-  log_file <- file("redcap_select_rename_code.txt")
-  code <- "output_file <- select(import_data"
+  log_file <- "redcap_select_rename_code.txt"
+  write.table("output_file <- select(import_data", log_file, quote = FALSE, row.names = FALSE, col.names = FALSE)
 
 
   # prepare output variables
@@ -63,12 +63,12 @@ redcap_select_rename <- function(import_data,
     ans <- 3
     if (any(str_detect(rc_vars$field_name,imp_vars[i]))) {                                   # if variable name found in REDCap dictionnary
       cat(paste("Variable name found in REDCap:", bold(underline(imp_vars[i]))))
-      cat("\nShould the variable be imported with this name? \n 1 = YES\n 0 = NO")
+      cat("\nShould the variable be kept with this name? \n 1 = YES\n 0 = NO \n 'exit' = stop loop")
       ans <- 3
       while (ans != 1 && ans != 0 && ans != 'exit') {
         ans <- readline(prompt="Answer= ")
         if (ans != 1 && ans != 0 && ans != 'exit') {
-          cat("Please type only '1' or '0'")
+          cat("Please check your answer! \n 1 = YES\n 0 = NO \n 'exit' = stop loop")
         }
       }
 
@@ -80,7 +80,8 @@ redcap_select_rename <- function(import_data,
         vars_rename[[length(vars_rename)+1]] <- imp_vars[i]                                 # import variable without renaming
         imp_vars_nonewname <- c(imp_vars_nonewname,imp_vars[i])
         rc_vars <- filter(rc_vars,field_name != imp_vars[i])
-        code[[length(code)+1]] <- imp_vars[i]
+        write.table(paste0(",",imp_vars[i]), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
+
         next
       }
     }
@@ -90,50 +91,50 @@ redcap_select_rename <- function(import_data,
     }
 
     if (!any(str_detect(rc_vars$field_name,imp_vars[i])) | as.integer(ans) == 0) {           # if variable name is not found in REDCap dictionnairy or should not be imported with same name
-      cat("\nShould the variable be imported at all? \n 1 = YES\n 0 = NO")
+      cat("\nShould the variable be imported at all? \n 1 = YES\n 0 = NO \n 'exit' = stop loop")
       ans <- 3
       while (ans != 1 && ans != 0 && ans != 'exit') {
         ans <- readline(prompt="Answer= ")
         if (ans != 1 && ans != 0 && ans != 'exit') {
-          cat("Please type only '1' or '0'")
+          cat("Please check your answer! \n 1 = YES\n 0 = NO \n 'exit' = stop loop")
         }
       }
 
-      if (ans == 'exit') {
-        break
-      }
+      if (ans == 'exit') {                                                                     # check answers:
+        break                                                                                     # exit
 
-      if (as.integer(ans) == 0) {                                                             # do not import variable
+      } else if (as.integer(ans) == 0) {                                                          # do not import variable
         imp_vars_out <- c(imp_vars_out,imp_vars[i])
         next
 
-      } else {
-        print(rc_vars)                                                                        # import it with renaming
+      } else if (as.integer(ans) == 1) {
+        print(rc_vars)                                                                            # import with renaming
         cat("Please choose REDCap name from list above for:")
         cat(paste("\n",bold(underline(imp_vars[i]))))
-        cat("\n Type the name or choose the respective number!")
+        cat("\n Type the name or choose the respective number!\n 'exit' = do Not select and stop loop \n 'skip' = do NOT select and move to next item")
         ans <- "-999"
-        while (!any(grepl(paste0("^",ans,"$"),rc_vars$field_name)) && !any(grepl(paste0("^",ans,"$"),rownames(rc_vars))) && ans != 'exit') {
+        while (!any(grepl(paste0("^",ans,"$"),rc_vars$field_name)) && !any(grepl(paste0("^",ans,"$"),rownames(rc_vars))) && ans != 'exit' && ans != 'skip') {
           ans <- readline(prompt="Answer= ")
-          if (!any(grepl(paste0("^",ans,"$"),rc_vars$field_name)) && !any(grepl(paste0("^",ans,"$"),rownames(rc_vars))) && ans !='exit') {
-            cat("Variable name not recognized: Please try again!")
+          if (!any(grepl(paste0("^",ans,"$"),rc_vars$field_name)) && !any(grepl(paste0("^",ans,"$"),rownames(rc_vars))) && ans !='exit' && ans != 'skip') {
+            cat("Variable name not recognized: Please try again!\n 'exit' = do Not select and stop loop \n 'skip' = do NOT select and move to next item")
           }
         }
-        if (ans == 'exit') {
-          break
-        }
-
-        if (!is.na(as.integer(ans))) {
-          new_name <- rc_vars$field_name[as.integer(ans)]
+        if (ans == 'exit') {                                                                    # check answers:
+          break                                                                                    # exit
+        } else if (ans == 'skip') {
+          imp_vars_out <- c(imp_vars_out,imp_vars[i])
+          next                                                                                     # skip
+        } else if (suppressWarnings(!is.na(as.integer(ans)))) {
+          new_name <- rc_vars$field_name[as.integer(ans)]                                          # nbr has been entered
         } else {
-          new_name <- ans
+          new_name <- ans                                                                          # name has been entered
         }
 
         vars_rename[[length(vars_rename)+1]] <- imp_vars[i]
         names(vars_rename)[length(vars_rename)] <- new_name
         imp_vars_rename <- c(imp_vars_rename,paste(imp_vars[i],"=",new_name))
         rc_vars <- filter(rc_vars,field_name != new_name)
-        code[[length(code)+1]] <- imp_vars_rename[length(imp_vars_rename)]
+        write.table(paste0(",",new_name,"=",imp_vars[i]), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
 
       }
     }
@@ -142,10 +143,8 @@ redcap_select_rename <- function(import_data,
   # select variables from import file
   output_file <- select(import_data, !!!vars_rename)
 
-  # close log-file
-  full_code <- paste0(paste(code,collapse=",\n"),")")
-  writeLines(full_code, log_file)
-  close(log_file)
+  # finalize log-file
+  write.table(")", log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
 
 
 
