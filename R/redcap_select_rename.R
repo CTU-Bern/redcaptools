@@ -80,7 +80,7 @@ redcap_select_rename <- function(import_data,
         vars_rename[[length(vars_rename)+1]] <- imp_vars[i]                                 # import variable without renaming
         imp_vars_nonewname <- c(imp_vars_nonewname,imp_vars[i])
         rc_vars <- filter(rc_vars,field_name != imp_vars[i])
-        write.table(paste0(",",imp_vars[i]), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
+        write.table(paste0(", ",imp_vars[i]), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
 
         next
       }
@@ -134,7 +134,7 @@ redcap_select_rename <- function(import_data,
         names(vars_rename)[length(vars_rename)] <- new_name
         imp_vars_rename <- c(imp_vars_rename,paste(imp_vars[i],"=",new_name))
         rc_vars <- filter(rc_vars,field_name != new_name)
-        write.table(paste0(",",new_name,"=",imp_vars[i]), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
+        write.table(paste0(", ",new_name," = ",imp_vars[i]), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
 
       }
     }
@@ -146,7 +146,7 @@ redcap_select_rename <- function(import_data,
   # finalize log-file
   write.table(")", log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
 
-  write.table(paste("\nThe following Variables have been selected:"), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
+  write.table(paste("\nSUMMARY:\nThe following Variables have been selected without renaming:"), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
   write.table(paste(imp_vars_nonewname, sep="\n"), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
 
   write.table(paste("\nThe following Variables have been selected and renamed:"), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
@@ -155,10 +155,11 @@ redcap_select_rename <- function(import_data,
   write.table(paste("\nThe following Variables have not been selected:"), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
   write.table(paste(imp_vars_out, sep="\n"), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
 
-  write.table("\n--------------------------------------------------------------------------------------------------\n\n", log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
+  write.table("\n--------------------------------------------------------------------------------------------------\n", log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
 
 
   # Return Outputfile
+  cat("ALL DONE!!!")
   return(output_file)
 
 
