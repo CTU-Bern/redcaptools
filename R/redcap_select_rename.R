@@ -45,7 +45,7 @@ redcap_select_rename <- function(import_data,
 
   # open log-file
   log_file <- "redcap_select_rename_code.txt"
-  write.table("output_file <- select(import_data", log_file, quote = FALSE, row.names = FALSE, col.names = FALSE)
+  write.table(paste0(Sys.time(),":\n\noutput_file <- select(import_data"), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
 
 
   # prepare output variables
@@ -146,23 +146,19 @@ redcap_select_rename <- function(import_data,
   # finalize log-file
   write.table(")", log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
 
+  write.table(paste("\nThe following Variables have been selected:"), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
+  write.table(paste(imp_vars_nonewname, sep="\n"), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
+
+  write.table(paste("\nThe following Variables have been selected and renamed:"), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
+  write.table(paste(imp_vars_rename, sep="\n"), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
+
+  write.table(paste("\nThe following Variables have not been selected:"), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
+  write.table(paste(imp_vars_out, sep="\n"), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
+
+  write.table("\n--------------------------------------------------------------------------------------------------\n\n", log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
 
 
-
-
-
-  # print summary
-  cat("ALL DONE!!!")
-  cat(paste("\nThe following Variables have been selected: \n"))
-  cat(paste("- ",imp_vars_nonewname), sep="\n")
-
-  cat(paste("\nThe following Variables have been selected and renamed: \n"))
-  cat(paste("-",imp_vars_rename), sep="\n")
-
-  cat(paste("\nThe following Variables have not been selected: \n"))
-  cat(paste("-",imp_vars_out), sep="\n")
-
-
+  # Return Outputfile
   return(output_file)
 
 
