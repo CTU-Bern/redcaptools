@@ -17,7 +17,8 @@ Suggests:
     rmarkdown,
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
-Depends:
+Imports:
+    dplyr,
     httr2 (>= 0.2.0),
     labelled,
     lubridate,
