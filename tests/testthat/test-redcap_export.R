@@ -37,4 +37,26 @@ test_that("export_byform record works", {
   expect_error(redcap_export_byform(token2, url, "foo"))
 })
 
+test_that("batched export works", {
+  expect_error(redcap_export_batch(token, url), NULL)
+  expect_error(redcap_export_batch(token, url, byform = TRUE), NULL)
 
+  x <- redcap_export_batch(token, url)
+  expect_s3_class(x, "data.frame")
+
+  x <- redcap_export_batch(token, url, byform = TRUE)
+  expect_type(x, "list")
+  expect_equal(length(x), 3)
+})
+
+test_that("batched byform comparible to export_byform", {
+  x <- redcap_export_batch(token, url, byform = TRUE, batchsize = 2)
+  y <- redcap_export_byform(token, url)
+  expect_equal(x, y, ignore_attr = TRUE)
+})
+
+test_that("batched byform comparible to export_tbl", {
+  x <- redcap_export_batch(token, url, byform = FALSE, batchsize = 2)
+  y <- redcap_export_tbl(token, url, "record")
+  expect_equal(x, y, ignore_attr = TRUE)
+})
