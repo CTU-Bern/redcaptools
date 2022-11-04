@@ -9,6 +9,7 @@
 #' @export
 #' @importFrom httr2 request req_headers req_body_form req_perform resp_status resp_body_string
 #' @importFrom magrittr %>%
+#' @importFrom utils read.csv
 #'
 #' @examples
 #' # token <- "some_really_long_string_provided_by_REDCap"

@@ -38,8 +38,8 @@ test_that("export_byform record works", {
 })
 
 test_that("batched export works", {
-  expect_error(redcap_export_batch(token, url), NULL)
-  expect_error(redcap_export_batch(token, url, byform = TRUE), NULL)
+  expect_error(redcap_export_batch(token, url), NA)
+  expect_error(redcap_export_batch(token, url, byform = TRUE), NA)
 
   x <- redcap_export_batch(token, url)
   expect_s3_class(x, "data.frame")
