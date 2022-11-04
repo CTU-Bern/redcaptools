@@ -4,7 +4,14 @@
 \alias{redcap_export_byform}
 \title{Export REDCap data by form}
 \usage{
-redcap_export_byform(token, url, meta = NULL, remove_empty = TRUE, ...)
+redcap_export_byform(
+  token,
+  url,
+  meta = NULL,
+  remove_empty = TRUE,
+  wait = 0.2,
+  ...
+)
 }
 \arguments{
 \item{token}{REDcap API token}
@@ -15,6 +22,8 @@ redcap_export_byform(token, url, meta = NULL, remove_empty = TRUE, ...)
 
 \item{remove_empty}{should empty rows be removed from the dataset (REDCap automatically
 creates all forms for an event when any form in the event is created)}
+
+\item{wait}{seconds to wait between API calls}
 
 \item{...}{other parameters passed to the API (see your REDCap API documentation for options)}
 }
