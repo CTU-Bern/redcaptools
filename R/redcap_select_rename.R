@@ -5,8 +5,9 @@
 #'needed to download the variable names from REDCap.Variables with matching
 #'names in REDCap can simply be selected without renaming, variables without
 #'matching names can be selected and renamed. The function returns a data frame
-#'with the selected/renamed variables and writes a summary together with the
-#'executed code to a log-file for copy-pasting and adjusting/reusing.
+#'with the selected/renamed variables, writes an overview csv-table, and a short
+#'summary together with the executed code to a log-file for copy-pasting and
+#'adjusting/reusing.
 #'
 #'
 #'@param import_data Data frame to be imported
@@ -49,12 +50,16 @@ redcap_select_rename <- function(import_data,
   rc_vars$field_label <- strtrim(rc_vars$field_label,50)
 
 
-  # open log-file
+  # open log-files
   log_file <- "redcap_select_rename_code.txt"
   write.table(paste0(Sys.time(),":\n\nselected_data <- select(import_data"), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
+
   log_table <- "redcap_select_rename_overview.csv"
+  if (!file.exists(log_table)) {
+    write.table("Date,Old Name,New Name\n", log_table, quote = FALSE, row.names = FALSE, col.names = FALSE)
+  }
   write.table(Sys.time(), log_table, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
-  write.table("Old Name:,New Name:", log_table, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
+
 
   # prepare output variables
   vars_rename <- list()
