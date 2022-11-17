@@ -13,23 +13,31 @@ redcap_select_rename(
 )
 }
 \arguments{
-\item{import_data}{data to be imported}
+\item{import_data}{Data frame to be imported}
 
 \item{rc_token}{REDCap API token}
 
-\item{url}{link to REDCap API}
+\item{url}{Link to REDCap API. Default: https://redcap.ctu.unibe.ch/api/}
 
-\item{dict}{data dictionary (e.g. as downloaded from REDCap or via
+\item{dict}{Data dictionary (e.g. as downloaded from REDCap or via
 \code{redcap_export_meta(rc_token, url)$meta}). If not supplied, this will
 be downloaded from the API using \code{rc_token}.}
 
-\item{forms}{list of REDCap forms of which variable names will be displayed. Default = all forms.}
+\item{forms}{List of REDCap forms of which variable names will be displayed.
+Default = all forms.}
 }
 \value{
-???
+Data frame with selected/renamed data. Log-file with executed code.
 }
 \description{
-REDCap Select and Rename
+This function loops through all the variable names of a data set and lets the
+user compare them with the variable names set up in REDCap. An API token is
+needed to download the variable names from REDCap.Variables with matching
+names in REDCap can simply be selected without renaming, variables without
+matching names can be selected and renamed. The function returns a data frame
+with the selected/renamed variables, writes an overview csv-table, and a short
+summary together with the executed code to a log-file for copy-pasting and
+adjusting/reusing.
 }
 \examples{
 token <- "xxxxx"
