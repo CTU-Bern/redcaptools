@@ -6,28 +6,35 @@
 \usage{
 redcap_select_rename(
   import_data,
-  rc_token,
-  url = "https://redcap.ctu.unibe.ch/api/",
   dict = NULL,
-  forms = NULL
+  rc_token,
+  rc_url,
+  forms = NULL,
+  auto = TRUE
 )
 }
 \arguments{
 \item{import_data}{Data frame to be imported}
 
+\item{dict}{Data dictionary (e.g. as
+downloaded from REDCap or via \code{redcap_export_meta(rc_token,
+rc_url)$meta}). If not supplied, this will be downloaded from the API using
+\code{rc_token} and \code{rc_url}.}
+
 \item{rc_token}{REDCap API token}
 
-\item{url}{Link to REDCap API. Default: https://redcap.ctu.unibe.ch/api/}
-
-\item{dict}{Data dictionary (e.g. as downloaded from REDCap or via
-\code{redcap_export_meta(rc_token, url)$meta}). If not supplied, this will
-be downloaded from the API using \code{rc_token}.}
+\item{rc_url}{Link to REDCap API.}
 
 \item{forms}{List of REDCap forms of which variable names will be displayed.
 Default = all forms.}
+
+\item{auto}{if TRUE, variables with matching names will be automatically
+selected. If FALSE, the user can decide if the variable shall be imported or
+not. Default = TRUE.}
 }
 \value{
 Data frame with selected/renamed data. Log-file with executed code.
+ CSV-table with overview.
 }
 \description{
 This function loops through all the variable names of a data set and lets the
@@ -40,7 +47,13 @@ summary together with the executed code to a log-file for copy-pasting and
 adjusting/reusing.
 }
 \examples{
-token <- "xxxxx"
-file <- "inst/data.csv"
-redcap_select(file, token)
+data(importdemo)
+data(meta)
+redcap_select_rename(importdemo, meta)
+
+# if using local data:
+# token <- "xxxxx"
+# url <- "xxxxx"
+# file <- "data.csv"
+# redcap_recode(file, rc_token = token, rc_url = url)
 }
