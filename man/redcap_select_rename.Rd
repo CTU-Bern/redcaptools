@@ -47,13 +47,13 @@ summary together with the executed code to a log-file for copy-pasting and
 adjusting/reusing.
 }
 \examples{
-data(importdemo)
-data(meta)
-redcap_select_rename(importdemo, meta)
+# data(importdemo)
+# data(meta)
+# redcap_select_rename(importdemo, meta)
 
 # if using local data:
 # token <- "xxxxx"
 # url <- "xxxxx"
 # file <- "data.csv"
-# redcap_recode(file, rc_token = token, rc_url = url)
+# redcap_select_rename(file, rc_token = token, rc_url = url)
 }

@@ -1,3 +1,8 @@
+# redcaptools 0.2.8
+
+* addition of `redcap_select_rename`: a user-guided loop to select and rename variables for a REDCap import.
+* addition of `redcap_recode`: a user-guided loop to reformat and recode variables for a REDCap import.
+
 # redcaptools 0.2.7
 
 * addition of `redcap_export_batch` for those times when data gets too big to export with other methods. It can be used to return either a single dataframe (as per `redcap_export_tbl`) or a list of forms (as per `redcap_export_byform`).

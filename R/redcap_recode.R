@@ -13,9 +13,9 @@
 #'
 #'@param selected_data Data to be recoded
 #'@param rc_token REDCap API token
-#'@param url Link to REDCap API. Default: https://redcap.ctu.unibe.ch/api/
+#'@param rc_url Link to REDCap API. Default: https://redcap.ctu.unibe.ch/api/
 #'@param dict Data dictionary (e.g. as downloaded from REDCap or via
-#'  \code{redcap_export_meta(rc_token, url)$meta}). If not supplied, this will
+#'  \code{redcap_export_meta(rc_token, rc_url)$meta}). If not supplied, this will
 #'  be downloaded from the API using \code{rc_token}.
 #'
 #'@return Data frame with recoded data. Log-file with executed code.
@@ -23,25 +23,33 @@
 #'@importFrom stringr str_split
 #'@importFrom crayon bold underline blue red
 #'@importFrom dplyr select mutate
+#'@importFrom utils str write.table
 #'
 #' @examples
-#' token <- "xxxxx"
-#' file <- "inst/data.csv"
-#' redcap_recode(file, token)
+#' # data(importdemo)
+#' # data(meta)
+#' # redcap_recode(importdemo, meta)
 #'
+#' # if using local data:
+#' # token <- "xxxxx"
+#' # url <- "xxxxx"
+#' # file <- "data.csv"
+#' # redcap_recode(file, rc_token = token, rc_url = url)
 
 
 
 redcap_recode <- function(selected_data,
+                          dict = NULL,
                           rc_token,
-                          url = "https://redcap.ctu.unibe.ch/api/",
-                          dict = NULL) {
+                          rc_url) {
+
+  field_name <- field_type <- select_choices_or_calculations <- text_validation_type_or_show_slider_number <- NULL
 
 
   # load data
   name_vars <- colnames(selected_data)
 
-  if(is.null(dict)) dict <- redcap_export_meta(rc_token, url)$meta
+  if(is.null(dict)) dict <- redcap_export_meta(rc_token, rc_url)$meta
   rc_spec <- select(dict,
                     field_name,
                     field_type,
@@ -353,9 +361,9 @@ redcap_recode <- function(selected_data,
             cat("\n\nCodebook:\n\n")
             print(coded_options)
             cat("\n\nSummary before recoding:\n\n")
-            print(summary(new_var))
-            cat("\n\nSummary with recoded options:\n\n")
-            print(summary(recoded_var))
+            print(table(original = new_var, recoded = recoded_var, useNA = "ifany"))
+            # cat("\n\nSummary with recoded options:\n\n")
+            # print(summary(recoded_var))
 
             cat("\nContinue?
           1 = YES

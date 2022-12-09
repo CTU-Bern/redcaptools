@@ -29,17 +29,18 @@
 #'@importFrom stringr str_detect
 #'@importFrom crayon bold underline blue italic
 #'@importFrom dplyr select filter
+#'@importFrom utils write.table
 #'
 #' @examples
-#' data(importdemo)
-#' data(meta)
-#' redcap_select_rename(importdemo, meta)
+#' # data(importdemo)
+#' # data(meta)
+#' # redcap_select_rename(importdemo, meta)
 #'
 #' # if using local data:
 #' # token <- "xxxxx"
 #' # url <- "xxxxx"
 #' # file <- "data.csv"
-#' # redcap_recode(file, rc_token = token, rc_url = url)
+#' # redcap_select_rename(file, rc_token = token, rc_url = url)
 
 
 
@@ -51,6 +52,9 @@ redcap_select_rename <- function(import_data,
                                  forms = NULL,
                                  auto = TRUE) {
 
+  form_name <- field_name <- field_label <- NULL
+
+  italic <- crayon::italic
 
   # load data
 
