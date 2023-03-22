@@ -1,3 +1,6 @@
+# redcaptools 0.2.8
+* export additional dataprep helpers (see #15)
+
 # redcaptools 0.2.7
 
 * addition of `redcap_export_batch` for those times when data gets too big to export with other methods. It can be used to return either a single dataframe (as per `redcap_export_tbl`) or a list of forms (as per `redcap_export_byform`).
