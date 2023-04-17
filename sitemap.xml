@@ -31,10 +31,16 @@
     <loc>/reference/convert_to_logical.html</loc>
   </url>
   <url>
+    <loc>/reference/importdemo.html</loc>
+  </url>
+  <url>
     <loc>/reference/index.html</loc>
   </url>
   <url>
     <loc>/reference/label_others.html</loc>
+  </url>
+  <url>
+    <loc>/reference/meta.html</loc>
   </url>
   <url>
     <loc>/reference/multichoice_factor.html</loc>
@@ -44,6 +50,9 @@
   </url>
   <url>
     <loc>/reference/rc_prep.html</loc>
+  </url>
+  <url>
+    <loc>/reference/redcap_dates.html</loc>
   </url>
   <url>
     <loc>/reference/redcap_export_batch.html</loc>
@@ -56,6 +65,12 @@
   </url>
   <url>
     <loc>/reference/redcap_export_tbl.html</loc>
+  </url>
+  <url>
+    <loc>/reference/redcap_recode.html</loc>
+  </url>
+  <url>
+    <loc>/reference/redcap_select_rename.html</loc>
   </url>
   <url>
     <loc>/reference/remove_empty_rows.html</loc>
