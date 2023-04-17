@@ -40,6 +40,7 @@ singlechoice_opts <- function(metadata){
 #' the data itself), \code{vlabel} (the variable label), \code{vals} (possible
 #' values for the variable) and \code{labs} (the labels related to each value in
 #' \code{vals})
+#' @export
 multichoice_opts <- function(metadata){
   tmp <- metadata[metadata$field_type == "checkbox", ]
   fn <- function(var, choices, label){
@@ -72,6 +73,7 @@ multichoice_opts <- function(metadata){
 #'
 #' @return dataframe with factor variables
 #' @importFrom labelled var_label var_label<-
+#' @export
 singlechoice_factor <- function(data, metadata, replace = FALSE, append = "_factor"){
   radios <- singlechoice_opts(metadata)
   radios <- radios[radios$var %in% names(data), ]
@@ -156,6 +158,7 @@ rc_dates <- function(data, metadata, replace = FALSE, append = "_date"){
 #' @param ... options passed to/from other methods
 #' @importFrom labelled var_label var_label<-
 #' @importFrom lubridate ymd_hm
+#' @export
 rc_datetimes <- function(data, metadata, replace = FALSE, append = "_datetime", ...){
   tmp <- subset(metadata, metadata$text_validation_type_or_show_slider_number %in% c("datetime_dmy", "datetime_ymd"))
   tmp <- tmp[tmp$field_name %in% names(data), ]
