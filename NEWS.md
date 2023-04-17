@@ -1,4 +1,10 @@
+# redcaptools 0.2.9
+
+* addition of `redcap_select_rename`: a user-guided loop to select and rename variables for a REDCap import.
+* addition of `redcap_recode`: a user-guided loop to reformat and recode variables for a REDCap import.
+
 # redcaptools 0.2.8
+
 * export additional dataprep helpers (see #15)
 
 # redcaptools 0.2.7
