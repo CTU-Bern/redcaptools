@@ -4,7 +4,7 @@
 \alias{redcap_dates}
 \title{REDCap Date Conversion}
 \usage{
-redcap_dates(var, unk_day = "01", unk_month = "01")
+redcap_dates(var, unk_day = "01", unk_month = "01", unk_cent = "20")
 }
 \arguments{
 \item{var}{variable to convert}
@@ -14,6 +14,9 @@ redcap_dates(var, unk_day = "01", unk_month = "01")
 
 \item{unk_month}{Month to use if unknown, i.e. if only the year is found. The
 default is 01 (2022 -> 2022-01-01).}
+
+\item{unk_cent}{Century to use if unknown, i.e. if only the year is found.
+The default is 20 (22 -> 2022)}
 }
 \value{
 converted variable

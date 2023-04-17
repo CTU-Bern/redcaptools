@@ -9,6 +9,8 @@
 #'   + year is found. The default is 01 (2022 -> 2022-01-01).
 #' @param unk_month Month to use if unknown, i.e. if only the year is found. The
 #'   default is 01 (2022 -> 2022-01-01).
+#' @param unk_cent Century to use if unknown, i.e. if only the year is found.
+#' The default is 20 (22 -> 2022)
 #'
 #' @return converted variable
 #' @export
@@ -22,7 +24,8 @@
 
 redcap_dates <- function(var,
                          unk_day = "01",
-                         unk_month = "01") {
+                         unk_month = "01",
+                         unk_cent = "20") {
 
   # (as.Date() does not work in ifelse statement -> as.character(as.Date()) does!)
   # (^ .... $ for exact match)
@@ -48,28 +51,31 @@ redcap_dates <- function(var,
   var <- ifelse(grepl("^[1-2]{1}[0-9]{3}$",var),                                          # yyyy
                 as.character(as.Date(paste0(unk_day,".",unk_month,".",var),format = "%d.%m.%Y")),
                 var)
+  var <- ifelse(grepl("^[0-9]{2}$",var),                                                  # yy
+                as.character(as.Date(paste0(unk_day,".",unk_month,".",unk_cent,var),format = "%d.%m.%Y")),
+                var)
 
   # if only month and year was entered, append accordingly ("01.2011" -> "01.01.2011")
   var <- ifelse(grepl("^[1-9]{1}\\.[1-2]{1}[0-9]{3}$",var) |                              # m.yyyy
-                  grepl("^[0-1]{1}[0-9]{1}\\.[1-2]{1}[0-9]{3}$",var),                     # mm.yyyy
+                  grepl("^[0-1]{1}[0-2]{1}\\.[1-2]{1}[0-9]{3}$",var),                     # mm.yyyy
                 as.character(as.Date(paste0(unk_day,".",var),format = "%d.%m.%Y")),
                 var)
   var <- ifelse(grepl("^[1-9]{1}\\.[0-9]{2}",var) |                                       # m.yy
-                  grepl("^[0-1]{1}[0-9]{1}\\.[0-9]{2}$",var),                             # mm.yy
+                  grepl("^[0-1]{1}[0-2]{1}\\.[0-9]{2}$",var),                             # mm.yy
                 as.character(as.Date(paste0(unk_day,".",var),format = "%d.%m.%y")),
                 var)
 
   # if regular date was entered
   var <- ifelse(grepl("^[1-9]{1}\\.[1-9]{1}\\.[1-2]{1}[0-9]{3}$",var) |                   # d.m.yyyy
-                  grepl("^[1-9]{1}\\.[0-1]{1}[0-9]{1}\\.[1-2]{1}[0-9]{3}$",var) |         # d.mm.yyyy
+                  grepl("^[1-9]{1}\\.[0-1]{1}[0-2]{1}\\.[1-2]{1}[0-9]{3}$",var) |         # d.mm.yyyy
                   grepl("^[0-3]{1}[0-9]{1}\\.[1-9]{1}\\.[1-2]{1}[0-9]{3}$",var) |         # dd.m.yyyy
-                  grepl("^[0-3]{1}[0-9]{1}\\.[0-1]{1}[0-9]{1}\\.[1-2]{1}[0-9]{3}$",var),  # dd.mm.yyyy
+                  grepl("^[0-3]{1}[0-9]{1}\\.[0-1]{1}[0-2]{1}\\.[1-2]{1}[0-9]{3}$",var),  # dd.mm.yyyy
                 as.character(as.Date(var,format = "%d.%m.%Y")),
                 var)
   var <- ifelse(grepl("^[1-9]{1}\\.[1-9]{1}\\.[0-9]{2}$",var) |                           # d.m.yy
-                  grepl("^[1-9]{1}\\.[0-1]{1}[0-9]{1}\\.[0-9]{2}$",var) |                 # d.mm.yy
+                  grepl("^[1-9]{1}\\.[0-1]{1}[0-2]{1}\\.[0-9]{2}$",var) |                 # d.mm.yy
                   grepl("^[0-3]{1}[0-9]{1}\\.[1-9]{1}\\.[0-9]{2}$",var) |                 # dd.m.yy
-                  grepl("^[0-3]{1}[0-9]{1}\\.[0-1]{1}[0-9]{1}\\.[0-9]{2}$",var),          # dd.mm.yy
+                  grepl("^[0-3]{1}[0-9]{1}\\.[0-1]{1}[0-2]{1}\\.[0-9]{2}$",var),          # dd.mm.yy
                 as.character(as.Date(var,format = "%d.%m.%y")),
                 var)
 
