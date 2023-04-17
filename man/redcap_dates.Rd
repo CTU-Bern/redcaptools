@@ -4,20 +4,26 @@
 \alias{redcap_dates}
 \title{REDCap Date Conversion}
 \usage{
-redcap_dates(var)
+redcap_dates(var, unk_day = "01", unk_month = "01")
 }
 \arguments{
 \item{var}{variable to convert}
+
+\item{unk_day}{Day to use if unknown, i.e. if only the year or only the month
++ year is found. The default is 01 (2022 -> 2022-01-01).}
+
+\item{unk_month}{Month to use if unknown, i.e. if only the year is found. The
+default is 01 (2022 -> 2022-01-01).}
 }
 \value{
 converted variable
 }
 \description{
-This function is trying to take all (most)
-possibilities to enter dates into account and converts them to as.Date
-format.
+This function is used to prepare date fields in a data table for import in
+REDCap. The function tries to take all (most)possibilities to enter dates
+into account and converts them to as.Date format.
 }
 \examples{
-var <- "dataframe$var"
+var <-c("01.12.2022", "12.2022", "2022", "01/12/2022")
 redcap_dates(var)
 }

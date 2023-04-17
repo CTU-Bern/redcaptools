@@ -1,10 +1,14 @@
 #' REDCap Date Conversion
 #'
-#' This function is trying to take all (most)
-#' possibilities to enter dates into account and converts them to as.Date
-#' format.
+#' This function is used to prepare date fields in a data table for import in
+#' REDCap. The function tries to take all (most)possibilities to enter dates
+#' into account and converts them to as.Date format.
 #'
 #' @param var variable to convert
+#' @param unk_day Day to use if unknown, i.e. if only the year or only the month
+#'   + year is found. The default is 01 (2022 -> 2022-01-01).
+#' @param unk_month Month to use if unknown, i.e. if only the year is found. The
+#'   default is 01 (2022 -> 2022-01-01).
 #'
 #' @return converted variable
 #' @export
@@ -12,11 +16,13 @@
 
 #'
 #' @examples
-#' var <- "dataframe$var"
+#' var <-c("01.12.2022", "12.2022", "2022", "01/12/2022")
 #' redcap_dates(var)
 
 
-redcap_dates <- function(var) {
+redcap_dates <- function(var,
+                         unk_day = "01",
+                         unk_month = "01") {
 
   # (as.Date() does not work in ifelse statement -> as.character(as.Date()) does!)
   # (^ .... $ for exact match)
@@ -27,29 +33,30 @@ redcap_dates <- function(var) {
   # (e.g., 01.01. with %m = '01.01.' but 1.1. with %D = '01.10.')
 
   cat(red(bold(underline("Warning:"),
-               "\nThis conversion is only valid with the european date format (days before months) and will lead to wrong results otherwise!!",
-               "\nIf only the year is found, 01.01. is prefixed!",
-               "\nIf only the month and year is found, 01. is prefixed!")))
+               "\nThis conversion is (currently) only valid with the european date format (days before months) and will lead to wrong results otherwise!!\n\n"
+            )))
 
   # convert to character
   var <- as.character(var)
 
   # sometimes entries are separated with / -> replace with .
   var <- gsub("/",".",var)
+  # sometimes entries are separated with - -> replace with .
+  var <- gsub("-",".",var)
 
-  # if only year was entered, append 01.01. ("2011" -> "01.01.2011")
+  # if only year was entered, append accordingly ("2011" -> "01.01.2011")
   var <- ifelse(grepl("^[1-2]{1}[0-9]{3}$",var),                                          # yyyy
-                as.character(as.Date(paste0("01.01.",var),format = "%d.%m.%Y")),
+                as.character(as.Date(paste0(unk_day,".",unk_month,".",var),format = "%d.%m.%Y")),
                 var)
 
-  # if only month and year was entered, append 01. ("01.2011" -> "01.01.2011")
+  # if only month and year was entered, append accordingly ("01.2011" -> "01.01.2011")
   var <- ifelse(grepl("^[1-9]{1}\\.[1-2]{1}[0-9]{3}$",var) |                              # m.yyyy
                   grepl("^[0-1]{1}[0-9]{1}\\.[1-2]{1}[0-9]{3}$",var),                     # mm.yyyy
-                as.character(as.Date(paste0("01.",var),format = "%d.%m.%Y")),
+                as.character(as.Date(paste0(unk_day,".",var),format = "%d.%m.%Y")),
                 var)
   var <- ifelse(grepl("^[1-9]{1}\\.[0-9]{2}",var) |                                       # m.yy
                   grepl("^[0-1]{1}[0-9]{1}\\.[0-9]{2}$",var),                             # mm.yy
-                as.character(as.Date(paste0("01.",var),format = "%d.%m.%y")),
+                as.character(as.Date(paste0(unk_day,".",var),format = "%d.%m.%y")),
                 var)
 
   # if regular date was entered
