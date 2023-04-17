@@ -5,10 +5,10 @@ Version: 0.2.9
 Authors@R: 
     c(
     person(given = "Alan G.", family = "Haynes", role = "cre",
-    email = "alan.haynes@ctu.unibe.ch"),
+    email = "alan.haynes@unibe.ch"),
     person(given = "Dominik", family = "Güntensperger", role = "aut",
-    email = "dominik.guentensperger@ctu.unibe.ch"))
-Maintainer: Alan G Haynes <alan.haynes@ctu.unibe.ch>
+    email = "dominik.guentensperger@unibe.ch"))
+Maintainer: Alan G Haynes <alan.haynes@unibe.ch>
 Description: Tools for exporting and working with REDCap data (e.g. adding labels, formatting dates).
 License: MIT + file LICENSE
 Encoding: UTF-8
