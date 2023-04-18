@@ -20,3 +20,14 @@
 #' @format A data frame with 32 variable specifications.
 #'
 "meta"
+
+
+#' Example meta data
+#'
+#' Simulated complete meta data for the most common REDCap field types and
+#' validations.
+#'
+#' @format A list of 3 with metadata (data dictionary), instrument (CRF specifications),
+#' and project (global project settings).
+#'
+"proj"
