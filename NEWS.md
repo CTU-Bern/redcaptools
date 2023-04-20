@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # redcaptools 0.3.1
 
 * addition of `redcap_export_batch`  for batch downloading of large data sets
