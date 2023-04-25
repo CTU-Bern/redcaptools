@@ -27,7 +27,7 @@ test_that("get_vartypes multiple choice", {
   cb_nbr <- proj$metadata |>
     filter(field_type == "checkbox") |>
     mutate(n=str_count(select_choices_or_calculations,pattern = '\\|')+cb,1) |>
-    summarise_at("n", sum) |>
+    summarise(n = sum(n)) |>
     pull(n)
   cb_class <- get_vartypes(proj) |> filter(field_name %in% cb_var) |> pull(class)
   expect_equal(cb_class,rep("integer",cb_nbr))
