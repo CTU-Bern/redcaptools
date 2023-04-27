@@ -3,18 +3,19 @@
 #' @param token REDcap API token
 #' @param url address of the API
 #' @param content content to download
+#' @param vartypes vector of variable classes (e.g., via \code{get_vartypes(proj)})
 #' @param ... other parameters passed to the API (see your REDCap API documentation for options)
 #'
 #' @return dataframe
 #' @export
 #' @importFrom httr2 request req_headers req_body_form req_perform resp_status resp_body_string
-#' @importFrom magrittr %>%
-#' @importFrom utils read.csv
+#' @importFrom readr read_csv
 #'
 #' @examples
 #' # token <- "some_really_long_string_provided_by_REDCap"
 #' # redcap_export_tbl(token, "https://www.some_redcap_url.com/api/", "record")
-redcap_export_tbl <- function(token, url, content, ...){
+
+redcap_export_tbl <- function(token, url, content, vartypes = NULL, ...){
   check_token(token)
   check_url(url)
   check_content(content)
@@ -24,18 +25,29 @@ redcap_export_tbl <- function(token, url, content, ...){
     url <- paste0(url, "/")
   }
 
-  req <- httr2::request(url) %>%
-    httr2::req_headers() %>%
+  req <- httr2::request(url) |>
+    httr2::req_headers() |>
     httr2::req_body_form(token = token,
                          content = content,
                          format = "csv",
                          ...)
 
-  resp <- req %>% httr2::req_perform()
+  resp <- req |> httr2::req_perform()
   if(httr2::resp_status(resp) == 200){
-    body <- resp %>% httr2::resp_body_string()
+    body <- resp |> httr2::resp_body_string()
+
     if(nchar(body) > 1){
-      return(read.csv(textConnection(body), na.strings = c("NA", "")))
+
+      if(is.null(vartypes)){
+        tmp <- read_csv(body, na = c("NA", ""), guess_max = 100000, show_col_types = FALSE)
+        } else {
+        tmp <- read_csv(body,
+                     na = c("NA", ""),
+                     col_types = paste0(substr(vartypes, 1, 1), collapse = "")
+                     )
+      }
+
+      return(tmp)
     }
   }
 }
@@ -141,10 +153,16 @@ redcap_export_byform <- function(token,
 
   formmapping <- meta$formEventMapping
 
+  vartypes <- get_vartypes(meta)
+
   tabs <- sapply(db_sheets,
                  function(x){
 
                    Sys.sleep(wait)
+
+                   if(!is.null(vartypes)){
+                     vartypes <- subset(vartypes, vartypes$form_name == x | is.na(vartypes$form_name))$class
+                   }
 
                    if(longitudinal){
                      events <- subset(formmapping, formmapping$form == x)$unique_event_name
@@ -155,6 +173,7 @@ redcap_export_byform <- function(token,
                                             forms = x,
                                             events = events,
                                             'fields[0]' = idvar,
+                                            vartypes = vartypes,
                                             ...)
 
                      if(remove_empty & !is.null(d)) d <- remove_empty_rows(d)
@@ -163,6 +182,7 @@ redcap_export_byform <- function(token,
                                             content = "record",
                                             forms = x,
                                             'fields[0]' = idvar,
+                                            vartypes = vartypes,
                                             ...)
                    }
 
@@ -211,33 +231,49 @@ redcap_export_batch <- function(token,
   batches <- rep(1:nbatch, each = batchsize)
   batches <- batches[1:length(ids)]
 
+  message(paste0(nbatch," batches to download\n\nStarting download...\n"))
+
+  vartypes <- get_vartypes(meta)
+
   if(byform){
 
     db_sheets <- unique(meta$instrument$instrument_name)
 
+    counter <- 1
     tmp <- tapply(ids, batches, function(x){
+      message(paste0("Downloading batch ",counter, " of ",nbatch))
       ids <- paste(x, collapse = ",")
-      redcap_export_byform(token, url, meta,
+      counter <<- counter + 1
+      return(
+        redcap_export_byform(token, url, meta,
                            # ...,
                            records = ids)
+      )
     })
 
     out <- sapply(db_sheets, function(x){
       lapply(tmp, function(y){
         tmp <- "[["(y, x)
-        out <- if(nrow(tmp) > 0){tmp} else {NULL}
+        out <- if(!is.null(tmp) && nrow(tmp) > 0){tmp} else {NULL}
         out
-      }) %>% bind_rows
+      }) |> bind_rows()
     })
 
   } else {
+    counter <- 1
     out <- tapply(ids, batches, function(x){
+      message(paste0("Downloading batch ",counter, " of ",nbatch))
       ids <- paste(x, collapse = ",")
-      redcap_export_tbl(token, url, "record", records = ids)
-    }) %>% bind_rows()
+      counter <<- counter + 1
+      return(
+        redcap_export_tbl(token, url, "record", records = ids,
+                        vartypes = vartypes$class)
+      )
+    }) |> bind_rows()
 
   }
 
+  message("DOWNLOAD FINISHED!")
   return(out)
 
 }
