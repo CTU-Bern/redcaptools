@@ -1,8 +1,7 @@
 Package: redcaptools
 Type: Package
 Title: Tools for exporting and working with REDCap data
-Version: 0.4.0
-Depends: R (>= 4.1)
+Version: 0.3.0
 Authors@R: 
     c(
     person(given = "Alan G.", family = "Haynes", role = "cre",
@@ -26,8 +25,6 @@ Imports:
     httr2 (>= 0.2.0),
     labelled,
     lubridate,
-    stringr,
-    purrr,
-    readr,
-    tidyr
+    magrittr,
+    stringr
 Config/testthat/edition: 3

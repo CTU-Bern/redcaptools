@@ -1,8 +1,3 @@
-# redcaptools 0.3.1
-
-* addition of `redcap_export_batch`  for batch downloading of large data sets
-* addition of `get_vartypes` to determine variable classes from the project meta information
-
 # redcaptools 0.3.0
 
 * addition of `redcap_select_rename`: a user-guided loop to select and rename variables for a REDCap import.

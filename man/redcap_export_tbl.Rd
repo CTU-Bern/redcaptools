@@ -4,7 +4,7 @@
 \alias{redcap_export_tbl}
 \title{Export tables from REDCap}
 \usage{
-redcap_export_tbl(token, url, content, vartypes = NULL, ...)
+redcap_export_tbl(token, url, content, ...)
 }
 \arguments{
 \item{token}{REDcap API token}
@@ -12,8 +12,6 @@ redcap_export_tbl(token, url, content, vartypes = NULL, ...)
 \item{url}{address of the API}
 
 \item{content}{content to download}
-
-\item{vartypes}{vector of variable classes (e.g., via \code{get_vartypes(proj)})}
 
 \item{...}{other parameters passed to the API (see your REDCap API documentation for options)}
 }
