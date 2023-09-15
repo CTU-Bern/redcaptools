@@ -10,6 +10,7 @@ redcap_export_batch(
   batchsize = 1000,
   meta = NULL,
   byform = FALSE,
+  remove_empty = TRUE,
   ...
 )
 }
@@ -23,6 +24,9 @@ redcap_export_batch(
 \item{meta}{metadata from \code{redcap_export_meta} (will be downloaded if not provided)}
 
 \item{byform}{logical. Download data by form (see \link{redcap_export_byform})}
+
+\item{remove_empty}{when using byform: should empty rows be removed from the dataset (REDCap automatically
+creates all forms for an event when any form in the event is created)}
 
 \item{...}{other parameters passed to the API (see your REDCap API documentation for options)}
 }
