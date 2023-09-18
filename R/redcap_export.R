@@ -93,12 +93,12 @@ redcap_export_meta <- function(token,
   }
 
   out <- sapply(tabs,
-         function(x){
-           redcap_export_tbl(token,
-                             url,
-                             content = x,
-                             ...)
-         })
+                function(x){
+                  redcap_export_tbl(token,
+                                    url,
+                                    content = x,
+                                    ...)
+                })
 
   out$project <- proj
 
@@ -168,7 +168,7 @@ redcap_export_byform <- function(token,
 
                    return(d)
 
-                   })
+                 })
 
   return(tabs)
 }
@@ -183,6 +183,8 @@ redcap_export_byform <- function(token,
 #' @inheritParams redcap_export_byform
 #' @param batchsize number of records per batch
 #' @param byform logical. Download data by form (see \link{redcap_export_byform})
+#' @param remove_empty when using byform: should empty rows be removed from the dataset (REDCap automatically
+#' creates all forms for an event when any form in the event is created)
 #'
 #' @return depending on \code{byform}, either a list of dataframes or a single dataframe
 #' @export
@@ -200,44 +202,94 @@ redcap_export_batch <- function(token,
                                 batchsize = 1000,
                                 meta = NULL,
                                 byform = FALSE,
+                                remove_empty = TRUE,
                                 ...){
 
   if(is.null(meta)) meta <- redcap_export_meta(token, url)
-  idvar <- meta$metadata$field_name[1]
+  check_meta(meta)
 
+  idvar <- meta$metadata$field_name[1]
   ids <- redcap_export_tbl(token, url, "record", fields = idvar)
   ids <- unique(ids[[idvar]])
   nbatch <- ceiling(length(ids)/batchsize)
   batches <- rep(1:nbatch, each = batchsize)
   batches <- batches[1:length(ids)]
+  split_ids <- split(ids, batches)
+
 
   if(byform){
 
+    longitudinal <- meta$project$is_longitudinal == 1
+    formmapping <- meta$formEventMapping
     db_sheets <- unique(meta$instrument$instrument_name)
 
-    tmp <- tapply(ids, batches, function(x){
-      ids <- paste(x, collapse = ",")
-      redcap_export_byform(token, url, meta,
-                           # ...,
-                           records = ids)
-    })
+    out <- list()
 
-    out <- sapply(db_sheets, function(x){
-      lapply(tmp, function(y){
-        tmp <- "[["(y, x)
-        out <- if(nrow(tmp) > 0){tmp} else {NULL}
-        out
-      }) %>% bind_rows
-    })
+    for (s in 1:length(db_sheets)) {
+
+      sheet <- db_sheets[s]
+      events <- subset(formmapping, formmapping$form == sheet)$unique_event_name
+      events <- paste0(events, collapse = ",")
+
+      message(paste0("Form: ",sheet))
+      tempfile <- tempfile()
+
+      for (i in 1:nbatch) {
+        message(paste0("Downloading batch ",i, " of ",nbatch))
+        records <- split_ids[[i]]
+        records <- paste(records, collapse = ",")
+        if(longitudinal) {
+          csv <- redcap_export_tbl(token,url,"record",
+                                 records = records,
+                                 events = events,
+                                 forms = sheet,
+                                 'fields[0]' = idvar)
+          if(remove_empty & !is.null(csv)) csv <- remove_empty_rows(csv)
+        } else {csv <- redcap_export_tbl(token,url,"record",
+                                         records = records,
+                                         forms = sheet,
+                                         'fields[0]' = idvar)
+        }
+
+        if (i == 1){
+          write.table(csv, tempfile, sep = ",", row.names = FALSE, col.names = TRUE)
+        } else {
+          write.table(csv, tempfile,  sep = ",", row.names = FALSE, col.names = FALSE, append = TRUE)
+        }
+
+      }
+
+      out[[s]] <- read.csv(tempfile, na.strings = c("NA", ""))
+      names(out)[s] <- sheet
+      unlink(tempfile)
+
+    }
+
 
   } else {
-    out <- tapply(ids, batches, function(x){
-      ids <- paste(x, collapse = ",")
-      redcap_export_tbl(token, url, "record", records = ids)
-    }) %>% bind_rows()
+
+    tempfile <- tempfile()
+
+    for(i in 1:nbatch){
+      message(paste0("Downloading batch ",i, " of ",nbatch))
+      records <- split_ids[[i]]
+      records <- paste(records, collapse = ",")
+      csv <- redcap_export_tbl(token,url,"record",records = records)
+
+      if (i == 1){
+        write.table(csv, tempfile, sep = ",", row.names = FALSE, col.names = TRUE)
+      } else {
+        write.table(csv, tempfile,  sep = ",", row.names = FALSE, col.names = FALSE, append = TRUE)
+      }
+
+    }
+
+    out <- read.csv(tempfile, na.strings = c("NA", ""))
+    unlink(tempfile)
 
   }
 
+  message("DOWNLOAD FINISHED!")
   return(out)
 
 }

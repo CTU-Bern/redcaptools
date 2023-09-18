@@ -1,3 +1,7 @@
+# redcaptools 0.3.1
+
+* bugfix for `redcap_export_batch`: caused an error if detected variable types in batches differed. 
+
 # redcaptools 0.3.0
 
 * addition of `redcap_select_rename`: a user-guided loop to select and rename variables for a REDCap import.
