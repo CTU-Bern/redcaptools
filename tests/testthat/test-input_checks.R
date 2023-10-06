@@ -18,3 +18,34 @@ test_that("check_meta", {
   expect_error(check_meta(list(project = list(is_longitudinal = 1),
                                instrument = "")), "formEventMapping")
 })
+test_that("check_dict", {
+  expect_error(check_dict(c(2, 4)))
+  expect_error(check_dict(data.frame(x = "")), "field_name")
+  expect_error(check_dict(data.frame(field_name = "")), "form_name")
+  expect_error(check_dict(data.frame(field_name = "", form_name = "")), "field_type")
+  expect_error(check_dict(data.frame(field_name = "", form_name = "",
+                                     field_type = "")), "field_label")
+  expect_error(check_dict(data.frame(field_name = "", form_name = "",
+                                     field_type = "", field_label = "")), "select_choices_or_calculations")
+  expect_error(check_dict(data.frame(field_name = "", form_name = "",
+                                     field_type = "", field_label = "",
+                                     select_choices_or_calculations = "")), "text_validation_type_or_show_slider_number")
+  expect_error(check_dict(data.frame(field_name = "", form_name = "",
+                                     field_type = "", field_label = "",
+                                     select_choices_or_calculations = "",
+                                     text_validation_type_or_show_slider_number = "")), "text_validation_min")
+  expect_error(check_dict(data.frame(field_name = "", form_name = "",
+                                     field_type = "", field_label = "",
+                                     select_choices_or_calculations = "",
+                                     text_validation_type_or_show_slider_number = "",
+                                     text_validation_min = "")), "text_validation_max")
+  expect_error(check_dict(data.frame(field_name = "", form_name = "",
+                                     field_type = "", field_label = "",
+                                     select_choices_or_calculations = "",
+                                     text_validation_type_or_show_slider_number = "",
+                                     text_validation_min = "", text_validation_max = "")), "branching_logic")
+
+})
+test_that("check_forms", {
+  expect_error(check_forms(c(1, 2)))
+})

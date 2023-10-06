@@ -39,9 +39,9 @@
 #'@importFrom utils write.table
 #'
 #' @examples
-#' # data(importdemo)
-#' # data(meta)
-#' # redcap_import_select(importdemo, meta)
+#' # data(importdemo_data)
+#' # data(importdemo_dict)
+#' # redcap_import_select(importdemo_data, importdemo_dict)
 #'
 #' # if using local data:
 #' # token <- "xxxxx"
@@ -62,6 +62,39 @@ redcap_import_select <- function(import_data,
                                  wait = 2) {
 
   form_name <- field_name <- field_label <- NULL
+
+
+
+  # data prep
+
+  imp_vars <- colnames(import_data)
+
+  if(is.null(dict)) {
+
+    check_token(rc_token)
+    check_url(rc_url)
+    dict <- redcap_export_meta(rc_token, rc_url)$meta
+
+  }
+  check_dict(dict)
+
+
+  if(!is.null(forms)) {
+
+    check_forms(forms)
+    if(!all(forms %in% dict$form_name)) {
+      stop(paste0("The following forms have not been found in the data dictionary:\n",paste(setdiff(forms,dict$form_name),collapse = "\n")))
+    }
+    dict <- filter(dict, form_name %in% forms)
+
+  }
+
+
+  rc_vars <- select(dict,c(field_name,field_label,form_name))
+  rc_vars$field_label <- strtrim(rc_vars$field_label,50)
+  rc_vars$form_name <- strtrim(rc_vars$form_name,10)
+
+
 
 
   # intro
@@ -119,18 +152,6 @@ redcap_import_select <- function(import_data,
     cat("\n-----------------------------------------------------------------\n\n")
     Sys.sleep(wait)
   }
-
-
-  # data prep
-
-  imp_vars <- colnames(import_data)
-
-  if(is.null(dict)) dict <- redcap_export_meta(rc_token, rc_url)$meta
-  if(!is.null(forms)) dict <- filter(dict, form_name %in% forms)
-
-  rc_vars <- select(dict,c(field_name,field_label,form_name))
-  rc_vars$field_label <- strtrim(rc_vars$field_label,50)
-  rc_vars$form_name <- strtrim(rc_vars$form_name,10)
 
 
   # open log-files
