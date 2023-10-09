@@ -32,9 +32,9 @@ recoded variables and writes the executed code to a log-file for copy-pasting
 and adjusting/reusing.
 }
 \examples{
-# data(importdemo)
-# data(meta)
-# redcap_recode(importdemo, meta)
+# data(importdemo_data)
+# data(importdemo_dict)
+# redcap_recode(importdemo_data, importdemo_dict)
 
 # if using local data:
 # token <- "xxxxx"
