@@ -49,3 +49,6 @@ test_that("check_dict", {
 test_that("check_forms", {
   expect_error(check_forms(c(1, 2)))
 })
+test_that("check_data", {
+  expect_error(check_data(c(1, 2)))
+})

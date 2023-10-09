@@ -23,12 +23,20 @@
 #'@param rc_url Link to REDCap API
 #'@param forms Character vector of the forms as set up in REDCap of which
 #'  variable names will be displayed. Default = all forms.
-#'@param auto if TRUE, variables with matching names will be automatically
+#'@param auto_match If TRUE, variables with matching names will be automatically
 #'  selected. If FALSE, the user can decide if the variable shall be imported or
 #'  not. Default = TRUE.
-#'@param skip_intro If set to true the introduction messages will be skipped.
+#'@param auto_skip_nomatch If TRUE, variables without matching names will be
+#'  automatically skipped. If FALSE, the user can decide to select and rename
+#'  the variable. Default = FALSE.
+#'@param skip_intro If set to TRUE, the introduction messages will be skipped.
 #'  Default = FALSE
-#'@param wait Allows you to set the latency time between the steps. Default = 2s.
+#'@param suppress_txt If set TRUE, all text output will be supressed (not
+#'  recommended). Default = FALSE.
+#'@param log If TRUE, an overview csv-table, and a log-file are stored in the
+#'  working directory. Default = TRUE.
+#'@param wait Allows you to set the latency time between the steps. Default =
+#'  2s.
 #'
 #'@return Data frame with selected/renamed data. Log-file with executed code.
 #'  CSV-table with overview.
@@ -57,42 +65,44 @@ redcap_import_select <- function(import_data,
                                  rc_token,
                                  rc_url,
                                  forms = NULL,
-                                 auto = TRUE,
+                                 auto_match = TRUE,
+                                 auto_skip_nomatch = FALSE,
                                  skip_intro = FALSE,
+                                 suppress_txt = FALSE,
+                                 log = TRUE,
                                  wait = 2) {
 
   form_name <- field_name <- field_label <- NULL
 
 
 
-  # data prep
+  # evaluate inputs
 
+  check_data(import_data)
   imp_vars <- colnames(import_data)
 
   if(is.null(dict)) {
-
     check_token(rc_token)
     check_url(rc_url)
     dict <- redcap_export_meta(rc_token, rc_url)$meta
-
   }
   check_dict(dict)
 
 
   if(!is.null(forms)) {
-
     check_forms(forms)
     if(!all(forms %in% dict$form_name)) {
       stop(paste0("The following forms have not been found in the data dictionary:\n",paste(setdiff(forms,dict$form_name),collapse = "\n")))
     }
     dict <- filter(dict, form_name %in% forms)
-
   }
 
-
-  rc_vars <- select(dict,c(field_name,field_label,form_name))
-  rc_vars$field_label <- strtrim(rc_vars$field_label,50)
-  rc_vars$form_name <- strtrim(rc_vars$form_name,10)
+  if(!is.logical(auto_match)) stop("auto_match should be logical (TRUE/FALSE)")
+  if(!is.logical(auto_skip_nomatch)) stop("auto_skip_nomatch should be logical (TRUE/FALSE)")
+  if(!is.logical(skip_intro)) stop("skip_intro should be logical (TRUE/FALSE)")
+  if(!is.logical(suppress_txt)) stop("suppress_txt should be logical (TRUE/FALSE)")
+  if(!is.logical(log)) stop("log should be logical (TRUE/FALSE)")
+  if(!is.numeric(wait) || length(wait) != 1) stop("wait should be a single number")
 
 
 
@@ -107,15 +117,20 @@ redcap_import_select <- function(import_data,
     Sys.sleep(wait+1)
 
     cat("This script will loop you through the variable names in the provided data table and compares them with the names in a REDCap data dictionary.\n\n")
-    if (auto) {
-      cat("Auto-selecting has been turned on! (To turn it off, set 'auto = FALSE')\n")
-      cat("If a matching variable name is found in the REDCap dictionary, the variable will be automatically selected without renaming.\n")
+    if (auto_match) {
+      cat("Auto-selecting of matching variables has been turned on! (To turn it off, set 'auto_match = FALSE')\n")
+      cat("If a matching variable name is found in the REDCap dictionary, the variable will be automatically selected without renaming.\n\n")
     } else {
-      cat("Auto-selecting has been turned off! (To turn it on set 'auto = TRUE')\n")
-      cat("If a matching variable name is found in the REDCap dictionary, you can decide to not select this variable at all or to select and rename it.\n")
+      cat("Auto-selecting of matching variables has been turned off! (To turn it on set 'auto_match = TRUE')\n")
+      cat("If a matching variable name is found in the REDCap dictionary, you can decide to not select this variable at all or to select and rename it.\n\n")
     }
-
-    cat("If no matching variable name is found in the REDCap disctionary, you will be prompted to decide either to not select the variable at all or to select and rename it.\n\n")
+    if (auto_skip_nomatch) {
+      cat("Auto-skipping of non-matching variables has been turned on! (To turn it off, set 'auto_skip_nomatch = FALSE')\n")
+      cat("If a variable name is found with no matching name in the REDCap dictionary, the variable will be automatically skipped.\n\n")
+    } else {
+      cat("Auto-selecting of non-matching variables has been turned off! (To turn it on set 'auto_skip_nomatch = TRUE')\n")
+      cat("If a matching variable name is found with no matching name in the REDCap dictionary, you can decide to not select this variable at all or to select and rename it.\n\n")
+    }
 
     cat(bold("PLEASE BE CAREFUL WITH YOUR CHOICES AS IT IS NOT POSSIBLE TO GO BACK IN THE LOOP!!\n\n"))
 
@@ -156,17 +171,22 @@ redcap_import_select <- function(import_data,
 
   # open log-files
 
-  log_file <- "redcap_select_rename_code.txt"
-  write.table(paste0(Sys.time(),":\n\nselected_data <- select(import_data"), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
+  if(log) {
+    log_file <- "redcap_select_rename_code.txt"
+    write.table(paste0(format(Sys.time(), "%Y-%m-%d %H:%M:%S"),":\n\nselected_data <- select(import_data"), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
 
-  log_table <- "redcap_select_rename_overview.csv"
-  if (!file.exists(log_table)) {
-    write.table("Date,Old Name,New Name\n", log_table, quote = FALSE, row.names = FALSE, col.names = FALSE)
+    log_table <- "redcap_select_rename_overview.csv"
+    if (!file.exists(log_table)) {
+      write.table("Date,Old Name,New Name\n", log_table, quote = FALSE, row.names = FALSE, col.names = FALSE)
+    }
+    write.table(format(Sys.time(), "%Y-%m-%d %H:%M:%S"), log_table, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
   }
-  write.table(Sys.time(), log_table, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
 
+  # read dict, prepare output variables
 
-  # prepare output variables
+  rc_vars <- select(dict,c(field_name,field_label,form_name))
+  rc_vars$field_label <- strtrim(rc_vars$field_label,50)
+  rc_vars$form_name <- strtrim(rc_vars$form_name,10)
 
   vars_rename <- list()
   imp_vars_out <- character()
@@ -174,14 +194,13 @@ redcap_import_select <- function(import_data,
   imp_vars_rename <- character()
 
 
-
-
+  # start loop
 
   for (i in seq_along(imp_vars)) {
     ans <- ""
-    if (any(str_detect(rc_vars$field_name,paste0("^",imp_vars[i],"$")))) {                                    # if variable name found in REDCap dictionary
-      cat(paste("Variable name found in REDCap:", blue(bold(underline(imp_vars[i])))))
-      if (!auto) {                                                                                            # if auto-import is set to FALSE
+    if (any(str_detect(rc_vars$field_name,paste0("^",imp_vars[i],"$")))) {                                          # if variable name found in REDCap dictionary
+      if(!suppress_txt) cat(paste("Variable name found in REDCap:", blue(bold(underline(imp_vars[i])))))
+      if (!auto_match) {                                                                                            # if auto-import is set to FALSE
         cat("\nShould the variable be kept with this name? \n 1 = YES\n 0 = NO \n 'exit' = stop loop")
         ans <- ""
         while (ans != 1 && ans != 0 && ans != 'exit') {
@@ -195,44 +214,51 @@ redcap_import_select <- function(import_data,
 
       if (ans == 'exit') {
         break
-      } else if ((ans == '1') || auto) {
-        vars_rename[[length(vars_rename)+1]] <- imp_vars[i]                                 # import variable without renaming
+      } else if ((ans == '1') || auto_match) {
+        vars_rename[[length(vars_rename)+1]] <- imp_vars[i]                                                         # import variable without renaming
         imp_vars_nonewname <- c(imp_vars_nonewname,imp_vars[i])
         rc_vars <- filter(rc_vars,field_name != imp_vars[i])
-        write.table(paste0(", ",imp_vars[i]), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
-        write.table(paste("",imp_vars[i], sep = ","), log_table, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
-
-        cat(italic("\n\nVariable will be imported without renaming!\n"))
-        cat("\n-----------------------------------------------------------------\n")
+        if(log){
+          write.table(paste0(", ",imp_vars[i]), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
+          write.table(paste("",imp_vars[i], sep = ","), log_table, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
+        }
+        if(!suppress_txt) {
+          cat(italic("\n\nVariable will be imported without renaming!\n"))
+          cat("\n-----------------------------------------------------------------\n")
+        }
         Sys.sleep(wait)
 
         next
       }
     }
 
-    if (!any(str_detect(rc_vars$field_name,paste0("^",imp_vars[i],"$")))) {                        # if variable name is not found in REDCap dictionary
-      cat(paste("\nVariable name", underline("NOT"),"found in REDCap:", blue(bold(underline(imp_vars[i])))),"\n\n")
+    if (!any(str_detect(rc_vars$field_name,paste0("^",imp_vars[i],"$")))) {                                         # if variable name is not found in REDCap dictionary
+      if(!suppress_txt) cat(paste("\nVariable name", underline("NOT"),"found in REDCap:", blue(bold(underline(imp_vars[i])))),"\n\n")
       Sys.sleep(wait)
     }
 
-    if (!any(str_detect(rc_vars$field_name,paste0("^",imp_vars[i],"$"))) | ans == '0') {           # if variable name is not found in REDCap dictionary or should not be imported with same name
-      print(rc_vars)
-      cat(paste("\n\nPlease choose REDCap name from list above for:", blue(bold(underline(imp_vars[i])))),"\n")
-      cat("\n Type the name or choose the respective number!\n 'skip' = do NOT select and move to next item \n 'exit' = do Not select and stop loop \n ")
+    if (!any(str_detect(rc_vars$field_name,paste0("^",imp_vars[i],"$"))) | ans == '0') {                            # if variable name is not found in REDCap dictionary or matching var should not be imported with same name
+      if(!auto_skip_nomatch) {                                                                                      # if auto-skip is set to FALSE
+        print(rc_vars)
+        cat(paste("\n\nPlease choose REDCap name from list above for:", blue(bold(underline(imp_vars[i])))),"\n")
+        cat("\n Type the name or choose the respective number!\n 'skip' = do NOT select and move to next item \n 'exit' = do Not select and stop loop \n ")
 
-      ans <- ""
-      while (!any(grepl(paste0("^",ans,"$"),rc_vars$field_name)) && !any(grepl(paste0("^",ans,"$"),rownames(rc_vars))) && ans != 'exit' && ans != 'skip') {
-        ans <- readline(prompt="Answer= ")
-        if (!any(grepl(paste0("^",ans,"$"),rc_vars$field_name)) && !any(grepl(paste0("^",ans,"$"),rownames(rc_vars))) && ans !='exit' && ans != 'skip') {
-          cat("Variable name not recognized: Please try again!\n 'skip' = do NOT select and move to next item \n 'exit' = do Not select and stop loop \n ")
+        ans <- ""
+        while (!any(grepl(paste0("^",ans,"$"),rc_vars$field_name)) && !any(grepl(paste0("^",ans,"$"),rownames(rc_vars))) && ans != 'exit' && ans != 'skip') {
+          ans <- readline(prompt="Answer= ")
+          if (!any(grepl(paste0("^",ans,"$"),rc_vars$field_name)) && !any(grepl(paste0("^",ans,"$"),rownames(rc_vars))) && ans !='exit' && ans != 'skip') {
+            cat("Variable name not recognized: Please try again!\n 'skip' = do NOT select and move to next item \n 'exit' = do Not select and stop loop \n ")
+          }
         }
       }
-      if (ans == 'exit') {                                                                    # check answers:
+      if (ans == 'exit') {                                                                       # check answers:
         break                                                                                    # exit
-      } else if (ans == 'skip') {
+      } else if (ans == 'skip' || auto_skip_nomatch) {
         imp_vars_out <- c(imp_vars_out,imp_vars[i])
-        cat(italic("\nVariable will not be be selected!\n"))
-        cat("\n-----------------------------------------------------------------\n")
+        if(!suppress_txt) {
+          cat(italic("\nVariable will not be be selected!\n"))
+          cat("\n-----------------------------------------------------------------\n")
+        }
         Sys.sleep(wait)
         next                                                                                     # skip
       } else if (suppressWarnings(!is.na(as.integer(ans)))) {
@@ -245,9 +271,10 @@ redcap_import_select <- function(import_data,
       names(vars_rename)[length(vars_rename)] <- new_name
       imp_vars_rename <- c(imp_vars_rename,paste(imp_vars[i],"=",new_name))
       rc_vars <- filter(rc_vars,field_name != new_name)
-      write.table(paste0(", ",new_name," = ",imp_vars[i]), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
-      write.table(paste("",imp_vars[i],new_name, sep = ","), log_table, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
-
+      if(log) {
+        write.table(paste0(", ",new_name," = ",imp_vars[i]), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
+        write.table(paste("",imp_vars[i],new_name, sep = ","), log_table, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
+      }
       cat(italic(paste0("\nVariable will be selected and renamed:\n\n Old Name = ",imp_vars[i],"\n New Name = ",new_name)))
       cat("\n\n-----------------------------------------------------------------\n")
       Sys.sleep(wait)
@@ -261,22 +288,24 @@ redcap_import_select <- function(import_data,
   selected_data <- select(import_data, !!!vars_rename)
 
   # finalize log-file
-  write.table(")", log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
+  if(log) {
+    write.table(")", log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
 
-  write.table(paste("\nSUMMARY:\nThe following Variables have been selected without renaming:"), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
-  write.table(paste(imp_vars_nonewname, sep="\n"), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
+    write.table(paste("\nSUMMARY:\nThe following Variables have been selected without renaming:"), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
+    write.table(paste(imp_vars_nonewname, sep="\n"), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
 
-  write.table(paste("\nThe following Variables have been selected and renamed:"), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
-  write.table(paste(imp_vars_rename, sep="\n"), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
+    write.table(paste("\nThe following Variables have been selected and renamed:"), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
+    write.table(paste(imp_vars_rename, sep="\n"), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
 
-  write.table(paste("\nThe following Variables have not been selected:"), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
-  write.table(paste(imp_vars_out, sep="\n"), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
+    write.table(paste("\nThe following Variables have not been selected:"), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
+    write.table(paste(imp_vars_out, sep="\n"), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
 
-  write.table("\n-----------------------------------------------------------------\n", log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
-  write.table("\n\n", log_table, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
+    write.table("\n-----------------------------------------------------------------\n", log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
+    write.table("\n\n", log_table, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
 
+  }
   # Return Output
-  cat("\nALL DONE!!!\n\n")
+  if(!suppress_txt) cat("\nALL DONE!!!\n\nThanks for using this script!\nIf you encountered any problems while running the script, please let me know!\n\n")
   return(selected_data)
 
 

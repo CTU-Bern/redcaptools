@@ -10,8 +10,11 @@ redcap_import_select(
   rc_token,
   rc_url,
   forms = NULL,
-  auto = TRUE,
+  auto_match = TRUE,
+  auto_skip_nomatch = FALSE,
   skip_intro = FALSE,
+  suppress_txt = FALSE,
+  log = TRUE,
   wait = 2
 )
 }
@@ -30,14 +33,25 @@ rc_url)$meta}). If not supplied, this will be downloaded from the API using
 \item{forms}{Character vector of the forms as set up in REDCap of which
 variable names will be displayed. Default = all forms.}
 
-\item{auto}{if TRUE, variables with matching names will be automatically
+\item{auto_match}{If TRUE, variables with matching names will be automatically
 selected. If FALSE, the user can decide if the variable shall be imported or
 not. Default = TRUE.}
 
-\item{skip_intro}{If set to true the introduction messages will be skipped.
+\item{auto_skip_nomatch}{If TRUE, variables without matching names will be
+automatically skipped. If FALSE, the user can decide to select and rename
+the variable. Default = FALSE.}
+
+\item{skip_intro}{If set to TRUE, the introduction messages will be skipped.
 Default = FALSE}
 
-\item{wait}{Allows you to set the latency time between the steps. Default = 2s.}
+\item{suppress_txt}{If set TRUE, all text output will be supressed (not
+recommended). Default = FALSE.}
+
+\item{log}{If TRUE, an overview csv-table, and a log-file are stored in the
+working directory. Default = TRUE.}
+
+\item{wait}{Allows you to set the latency time between the steps. Default =
+2s.}
 }
 \value{
 Data frame with selected/renamed data. Log-file with executed code.
@@ -58,9 +72,9 @@ an overview csv-table, and a short summary with the executed code to a
 log-file for copy-pasting and adjusting/reusing.
 }
 \examples{
-# data(importdemo)
-# data(meta)
-# redcap_import_select(importdemo, meta)
+# data(importdemo_data)
+# data(importdemo_dict)
+# redcap_import_select(importdemo_data, importdemo_dict)
 
 # if using local data:
 # token <- "xxxxx"

@@ -47,3 +47,7 @@ check_dict <- function(x) {
 check_forms <- function(x) {
   if(!is.character(x)) stop("forms should be a character vector")
 }
+
+check_data <- function(x) {
+  if(!is.data.frame(x)) stop("import data should be a data frame")
+}
