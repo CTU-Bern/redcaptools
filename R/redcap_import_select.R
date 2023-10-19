@@ -31,7 +31,7 @@
 #'  the variable. Default = FALSE.
 #'@param skip_intro If set to TRUE, the introduction messages will be skipped.
 #'  Default = FALSE
-#'@param suppress_txt If set TRUE, all text output will be supressed (not
+#'@param suppress_txt If set TRUE, all text output will be suppressed (not
 #'  recommended). Default = FALSE.
 #'@param log If TRUE, an overview csv-table, and a log-file are stored in the
 #'  working directory. Default = TRUE.
@@ -172,10 +172,10 @@ redcap_import_select <- function(import_data,
   # open log-files
 
   if(log) {
-    log_file <- "redcap_select_rename_code.txt"
+    log_file <- "redcap_import_select_code.txt"
     write.table(paste0(format(Sys.time(), "%Y-%m-%d %H:%M:%S"),":\n\nselected_data <- select(import_data"), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
 
-    log_table <- "redcap_select_rename_overview.csv"
+    log_table <- "redcap_import_select_overview.csv"
     if (!file.exists(log_table)) {
       write.table("Date,Old Name,New Name\n", log_table, quote = FALSE, row.names = FALSE, col.names = FALSE)
     }

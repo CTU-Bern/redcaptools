@@ -1,3 +1,8 @@
+# redcaptools 0.3.2
+
+* rename `redcap_select_rename` to `redcap_import_select` and `redcap_recode` to `redcap_import_recode`
+* finalizing `redcap_import_select` with user-friendly introduction, more automated options and tests
+
 # redcaptools 0.3.1
 
 * bugfix for `redcap_export_batch`: caused an error if detected variable types in batches differed. 
