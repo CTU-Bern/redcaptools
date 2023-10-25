@@ -15,6 +15,8 @@ redcap_import_select(
   skip_intro = FALSE,
   suppress_txt = FALSE,
   log = TRUE,
+  log_code = "redcap_import_select_code.txt",
+  log_table = "redcap_import_select_overview.txt",
   wait = 2
 )
 }
@@ -44,11 +46,17 @@ the variable. Default = FALSE.}
 \item{skip_intro}{If set to TRUE, the introduction messages will be skipped.
 Default = FALSE}
 
-\item{suppress_txt}{If set TRUE, all text output will be supressed (not
+\item{suppress_txt}{If set TRUE, all text output will be suppressed (not
 recommended). Default = FALSE.}
 
 \item{log}{If TRUE, an overview csv-table, and a log-file are stored in the
 working directory. Default = TRUE.}
+
+\item{log_code}{Name and location of the log-file containing the executed
+code. Default = redcap_import_select_code.txt.}
+
+\item{log_table}{Name and location of the csv.table containing the tabular
+overview. Default = redcap_import_select_overview.csv.}
 
 \item{wait}{Allows you to set the latency time between the steps. Default =
 2s.}

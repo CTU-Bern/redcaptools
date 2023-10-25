@@ -1,7 +1,7 @@
 # redcaptools 0.3.2
 
-* rename `redcap_select_rename` to `redcap_import_select` and `redcap_recode` to `redcap_import_recode`
 * finalizing `redcap_import_select` with user-friendly introduction, more automated options and tests
+* new function `redcap_import_recode`
 
 # redcaptools 0.3.1
 

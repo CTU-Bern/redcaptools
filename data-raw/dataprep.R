@@ -1,4 +1,4 @@
-token <- read.table("O:/Projects/RC_TOKENS/redcaptools_basic.txt")$V1
+token <- get_token()
 url <- "https://redcap.ctu.unibe.ch/api/"
 importdemo_dict <- redcap_export_meta(token, url)$meta
 save(importdemo_dict, file = "data/importdemo_dict.RData")
