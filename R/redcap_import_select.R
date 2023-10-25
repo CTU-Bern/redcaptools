@@ -35,6 +35,10 @@
 #'  recommended). Default = FALSE.
 #'@param log If TRUE, an overview csv-table, and a log-file are stored in the
 #'  working directory. Default = TRUE.
+#'@param log_code Name and location of the log-file containing the executed
+#'  code. Default = redcap_import_select_code.txt.
+#'@param log_table Name and location of the csv.table containing the tabular
+#'  overview. Default = redcap_import_select_overview.csv.
 #'@param wait Allows you to set the latency time between the steps. Default =
 #'  2s.
 #'
@@ -70,6 +74,8 @@ redcap_import_select <- function(import_data,
                                  skip_intro = FALSE,
                                  suppress_txt = FALSE,
                                  log = TRUE,
+                                 log_code = 'redcap_import_select_code.txt',
+                                 log_table = 'redcap_import_select_overview.txt',
                                  wait = 2) {
 
   form_name <- field_name <- field_label <- NULL
@@ -102,6 +108,8 @@ redcap_import_select <- function(import_data,
   if(!is.logical(skip_intro)) stop("skip_intro should be logical (TRUE/FALSE)")
   if(!is.logical(suppress_txt)) stop("suppress_txt should be logical (TRUE/FALSE)")
   if(!is.logical(log)) stop("log should be logical (TRUE/FALSE)")
+  if(!is.character(log_code) || length(log_code) != 1) stop("please provide a valid path for code-file")
+  if(!is.character(log_table) || length(log_table) != 1) stop("please provide a valid path for csv-table")
   if(!is.numeric(wait) || length(wait) != 1) stop("wait should be a single number")
 
 
@@ -172,10 +180,10 @@ redcap_import_select <- function(import_data,
   # open log-files
 
   if(log) {
-    log_file <- "redcap_import_select_code.txt"
+    log_file <- log_code
     write.table(paste0(format(Sys.time(), "%Y-%m-%d %H:%M:%S"),":\n\nselected_data <- select(import_data"), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
 
-    log_table <- "redcap_import_select_overview.csv"
+    log_table <- log_table
     if (!file.exists(log_table)) {
       write.table("Date,Old Name,New Name\n", log_table, quote = FALSE, row.names = FALSE, col.names = FALSE)
     }
