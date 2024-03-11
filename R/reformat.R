@@ -10,19 +10,26 @@
 singlechoice_opts <- function(metadata){
   radio <- metadata[metadata$field_type %in% c("radio", "dropdown", "yesno"), ]
   radio$select_choices_or_calculations[radio$field_type == "yesno"] <- "0, No | 1, Yes"
-  fn <- function(var, choices, label){
-    opts <- choices
-    opts <- trimws(unlist(strsplit(opts, "|", fixed = TRUE)))
-    n <- length(opts)
-    opts2 <- strsplit(opts, ",")
+  if(nrow(radio) > 0){
+    fn <- function(var, choices, label){
+      opts <- choices
+      opts <- trimws(unlist(strsplit(opts, "|", fixed = TRUE)))
+      n <- length(opts)
+      opts2 <- strsplit(opts, ",")
 
-    vals <- trimws(sapply(opts2, function(x) x[1], simplify = TRUE))
-    labs <- trimws(sapply(opts2, function(x) paste(x[-1], collapse = ","), simplify = TRUE))
-    labvals <- data.frame(var = rep(var, n), label = rep(label, n), val = vals, lab = labs)
-    labvals
+      vals <- trimws(sapply(opts2, function(x) x[1], simplify = TRUE))
+      labs <- trimws(sapply(opts2, function(x) paste(x[-1], collapse = ","), simplify = TRUE))
+      labvals <- data.frame(var = rep(var, n), label = rep(label, n), val = vals, lab = labs)
+      labvals
+    }
+    radio_labs <- do.call("rbind", apply(radio, 1, function(x) fn(x["field_name"], x["select_choices_or_calculations"], x["field_label"])))
+    row.names(radio_labs) <- NULL
+  } else {
+    radio_labs <- data.frame(var = character(0),
+                             label = character(0),
+                             val = character(0),
+                             lab = character(0))
   }
-  radio_labs <- do.call("rbind", apply(radio, 1, function(x) fn(x["field_name"], x["select_choices_or_calculations"], x["field_label"])))
-  row.names(radio_labs) <- NULL
   return(radio_labs)
 }
 
@@ -43,20 +50,28 @@ singlechoice_opts <- function(metadata){
 #' @export
 multichoice_opts <- function(metadata){
   tmp <- metadata[metadata$field_type == "checkbox", ]
-  fn <- function(var, choices, label){
-    opts <- choices
-    opts <- trimws(unlist(strsplit(opts, "|", fixed = TRUE)))
-    n <- length(opts)
-    opts2 <- strsplit(opts, ",")
+  if(nrow(tmp) > 0){
+    fn <- function(var, choices, label){
+      opts <- choices
+      opts <- trimws(unlist(strsplit(opts, "|", fixed = TRUE)))
+      n <- length(opts)
+      opts2 <- strsplit(opts, ",")
 
-    vals <- trimws(sapply(opts2, function(x) x[1], simplify = TRUE))
-    labs <- trimws(sapply(opts2, function(x) paste(x[-1], collapse = ","), simplify = TRUE))
-    labvals <- data.frame(ovar = rep(var, n), var = rep(var, n), vlabel = rep(label, n), val = vals, label = labs)
-    labvals
+      vals <- trimws(sapply(opts2, function(x) x[1], simplify = TRUE))
+      labs <- trimws(sapply(opts2, function(x) paste(x[-1], collapse = ","), simplify = TRUE))
+      labvals <- data.frame(ovar = rep(var, n), var = rep(var, n), vlabel = rep(label, n), val = vals, label = labs)
+      labvals
+    }
+    tmp_labs <- do.call("rbind", apply(tmp, 1, function(x) fn(x["field_name"], x["select_choices_or_calculations"], x["field_label"])))
+    row.names(tmp_labs) <- NULL
+    tmp_labs$var <- paste0(tmp_labs$var, "___", tmp_labs$val)
+  } else {
+    tmp_labs <- data.frame(ovar = character(0),
+                           var = character(0),
+                           vlabel = character(0),
+                           val = character(0),
+                           label = character(0))
   }
-  tmp_labs <- do.call("rbind", apply(tmp, 1, function(x) fn(x["field_name"], x["select_choices_or_calculations"], x["field_label"])))
-  row.names(tmp_labs) <- NULL
-  tmp_labs$var <- paste0(tmp_labs$var, "___", tmp_labs$val)
   return(tmp_labs)
 }
 
