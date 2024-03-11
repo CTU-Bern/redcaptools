@@ -20,7 +20,6 @@
 #'
 #'
 #' @importFrom dplyr if_else pull filter mutate select everything across where slice
-#' @importFrom glue glue
 #'
 #' @examples
 #' data <- readRDS(system.file("extdata/test.rda", package = "redcaptools"))

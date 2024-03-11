@@ -1,6 +1,7 @@
 # redcaptools 0.3.2
 
 * improved support for when no single or multiple choice variables exist in a database
+* addition of `redcap_toform` which converts splits a dataframe into a list of dataframes, one for each form
 
 # redcaptools 0.3.1
 
