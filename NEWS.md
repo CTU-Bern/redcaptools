@@ -1,3 +1,7 @@
+# redcaptools 0.3.2
+
+* improved support for when no single or multiple choice variables exist in a database
+
 # redcaptools 0.3.1
 
 * bugfix for `redcap_export_batch`: caused an error if detected variable types in batches differed. 
