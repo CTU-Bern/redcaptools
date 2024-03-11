@@ -20,7 +20,7 @@
 #'
 #'
 #' @importFrom dplyr if_else pull filter mutate select everything across where slice
-#'
+#' @export
 #' @examples
 #' data <- readRDS(system.file("extdata/test.rda", package = "redcaptools"))
 #' metadata <- readRDS(system.file("extdata/meta.rda", package = "redcaptools"))
