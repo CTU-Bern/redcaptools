@@ -14,10 +14,12 @@ redcap_toform(data, datadict = NULL, metadata = NULL, guess_events = TRUE, ...)
 \item{metadata}{metadata downloaded from REDCap API}
 
 \item{guess_events}{restrict forms to events (rows) where data exists (see details)}
+
+\item{...}{additional arguments passed to other functions (currently unused)}
 }
 \description{
 Similar to \code{redcap_export_byform}, this function tries to split a
-manually downloaded dataset into it's consitituent forms. While use of the API
+manually downloaded dataset into it's constituent forms. While use of the API
 allows individual forms to be downloaded, with a manual download, only the data
 dictionary is available as auxillary information.
 }
@@ -31,7 +33,7 @@ will be removed from the dataset.
 \examples{
 data <- readRDS(system.file("extdata/test.rda", package = "redcaptools"))
 metadata <- readRDS(system.file("extdata/meta.rda", package = "redcaptools"))
-dd <- read.csv(system.file("extdata/DataDictionary.csv", package = "redcaptools"), stringsAsFactors = TRUE)
+dd <- read.csv(system.file("extdata/DataDictionary.csv", package = "redcaptools"))
 redcap_toform(data, dd)
 redcap_toform(data, metadata = metadata)
 }

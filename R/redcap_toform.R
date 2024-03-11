@@ -24,7 +24,7 @@
 #' @examples
 #' data <- readRDS(system.file("extdata/test.rda", package = "redcaptools"))
 #' metadata <- readRDS(system.file("extdata/meta.rda", package = "redcaptools"))
-#' dd <- read.csv(system.file("extdata/DataDictionary.csv", package = "redcaptools"), stringsAsFactors = TRUE)
+#' dd <- read.csv(system.file("extdata/DataDictionary.csv", package = "redcaptools"))
 #' redcap_toform(data, dd)
 #' redcap_toform(data, metadata = metadata)
 redcap_toform <- function(data,
