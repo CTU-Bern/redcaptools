@@ -1,9 +1,7 @@
-meta <- redcap_export_meta(token, url)$meta
-meta <- meta[-c(33:38),]
-save(meta, file = "data/meta.RData")
+token <- get_token()
+url <- "https://redcap.ctu.unibe.ch/api/"
+importdemo_dict <- redcap_export_meta(token, url)$meta
+save(importdemo_dict, file = "data/importdemo_dict.RData")
 
-importdemo <- read.csv("data/importdemo.csv", na.strings = "", strip.white = TRUE, fileEncoding = "UTF-8-BOM")
-save(importdemo, file = "data/importdemo.RData")
-
-
-
+importdemo_data <- read.csv("data-raw/importdemo_data.csv", na.strings = "", strip.white = TRUE, fileEncoding = "UTF-8-BOM")
+save(importdemo_data, file = "data/importdemo_data.RData")
