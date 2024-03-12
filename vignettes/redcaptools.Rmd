@@ -44,17 +44,17 @@ record <- redcap_export_tbl(token, url, "record")
 
 To make the data more usable in R, it's often nice to label data, create factor, convert dates etc. `redcaptools` has functions to help with that too. Each of the following functions also label variables.
 
-The `rc_prep` function is the easiest to use. It wraps all of the functions in the following section.
+The `redcap_prep` function is the easiest to use. It wraps all of the functions in the following section.
 
 ```{r, eval = FALSE}
 meta <- redcap_export_meta(token, url)
 # could also use a data dictionary exported manually
 
 # where all data is in a single dataframe
-prepped <- rc_prep(record, meta$metadata)
+prepped <- redcap_prep(record, meta$metadata)
 
 # for data split by forms, use sapply
-prepped <- sapply(data, rc_prep, metadata = meta$metadata)
+prepped <- sapply(data, redcap_prep, metadata = meta$metadata)
 ```
 
 
@@ -82,8 +82,8 @@ prepped <- sapply(prepped, multichoice_factor, metadata = meta$metadata)
 As with single and multiple choice variables, `Date` and `POSIX` variables also need handling separately.
 
 ```{r, eval = FALSE}
-prepped <- sapply(prepped, rc_dates, metadata = meta$metadata)
-prepped <- sapply(prepped, rc_datetimes, metadata = meta$metadata)
+prepped <- sapply(prepped, redcap_prep_dates, metadata = meta$metadata)
+prepped <- sapply(prepped, redcap_prep_datetimes, metadata = meta$metadata)
 ```
 
 

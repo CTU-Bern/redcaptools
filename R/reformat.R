@@ -141,7 +141,7 @@ multichoice_factor <- function(data, metadata, replace = FALSE, append = "_facto
 #' Converts the string values returned from REDCap to Dates.
 #' This function also applies labels to the variable itself, based on the option label.
 #'
-#' @rdname rc_date
+#' @rdname redcap_date
 #' @param data the data.frame to modify
 #' @param metadata metadata/datadictionary
 #' @param replace whether to overwrite the existing data .
@@ -151,7 +151,7 @@ multichoice_factor <- function(data, metadata, replace = FALSE, append = "_facto
 #' @importFrom labelled var_label var_label<-
 #' @importFrom lubridate as_date
 #' @export
-rc_dates <- function(data, metadata, replace = FALSE, append = "_date"){
+redcap_prep_dates <- function(data, metadata, replace = FALSE, append = "_date"){
   tmp <- subset(metadata, metadata$text_validation_type_or_show_slider_number %in% c("date_dmy", "date_ymd"))
   tmp <- tmp[tmp$field_name %in% names(data), ]
   if(nrow(tmp) > 0){
@@ -169,12 +169,13 @@ rc_dates <- function(data, metadata, replace = FALSE, append = "_date"){
   return(data)
 }
 
-#' @describeIn rc_date input data.frame with date-time variables reformated to POSIX
+
+#' @describeIn redcap_date input data.frame with date-time variables reformated to POSIX
 #' @param ... options passed to/from other methods
 #' @importFrom labelled var_label var_label<-
 #' @importFrom lubridate ymd_hm
 #' @export
-rc_datetimes <- function(data, metadata, replace = FALSE, append = "_datetime", ...){
+redcap_prep_datetimes <- function(data, metadata, replace = FALSE, append = "_datetime", ...){
   tmp <- subset(metadata, metadata$text_validation_type_or_show_slider_number %in% c("datetime_dmy", "datetime_ymd"))
   tmp <- tmp[tmp$field_name %in% names(data), ]
   if(nrow(tmp) > 0){
@@ -189,7 +190,6 @@ rc_datetimes <- function(data, metadata, replace = FALSE, append = "_datetime", 
   }
   return(data)
 }
-
 
 #' Label non-single/multiple choice/date(time) fields
 #' \code{singlechoice_factor}, \code{multichoice_factor}, \code{rc_date} and \code{rc_datetime}
@@ -222,15 +222,13 @@ label_others <- function(data, metadata){
 #' @return dataframe with converted factors, dates, POSIX, ...
 #' @export
 #'
-rc_prep <- function(data, metadata,
-                    rep = FALSE,
-                    rep_date = rep, rep_datetime = rep,
-                    rep_singlechoice = rep, rep_multichoice = rep,
-                    app_date = "_date", app_datetime = "_datetime",
-                    app_singlechoice = "_factor", app_multichoice = "_factor",
-                    ...
-                    ){
-
+redcap_prep <- function(data, metadata,
+                        rep = FALSE,
+                        rep_date = rep, rep_datetime = rep,
+                        rep_singlechoice = rep, rep_multichoice = rep,
+                        app_date = "_date", app_datetime = "_datetime",
+                        app_singlechoice = "_factor", app_multichoice = "_factor",
+                        ...){
   tmp <- singlechoice_factor(data, metadata,
                              replace = rep_singlechoice,
                              append = app_singlechoice)
@@ -245,5 +243,6 @@ rc_prep <- function(data, metadata,
                       append = app_datetime, ...)
   tmp <- label_others(tmp, metadata)
   return(tmp)
-
 }
+
+
