@@ -5,7 +5,8 @@
   * `rc_dates` is now `redcap_prep_dates`
   * `rc_datetimes` is now `redcap_prep_datetimes`
 * improved support for when no single or multiple choice variables exist in a database
-* addition of `redcap_toform` which splits a dataframe into a list of dataframes, one for each form
+* addition of `redcap_toform` which splits a dataframe into a list of dataframes, one for each form.
+* addition of a new vignette covering some details on the API endpoints offered by REDCap.
 
 # redcaptools 0.3.2
 
