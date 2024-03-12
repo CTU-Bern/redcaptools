@@ -1,3 +1,7 @@
+template:
+  # package: tidytemplate
+  bootstrap: 5
+
 reference:
 - title: Exporting data
   desc: >
@@ -27,6 +31,7 @@ reference:
   - multichoice_factor
   - label_others
   - convert_to_logical
+  - remove_empty_rows
 
 - title: Exploring metadata
   desc: >
@@ -44,6 +49,11 @@ reference:
   - redcap_import_select
   - redcap_import_recode
   - redcap_dates
+
+- subtitle: Demonstration datasets
+  contents:
+  - importdemo_data
+  - importdemo_dict
 
 - title: Deprecated functions
   contents:
