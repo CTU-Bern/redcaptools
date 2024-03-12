@@ -1,3 +1,8 @@
+# redcaptools 0.3.2
+
+* finalizing `redcap_import_select` with user-friendly introduction, more automated options and tests
+* new function `redcap_import_recode`
+
 # redcaptools 0.3.1
 
 * bugfix for `redcap_export_batch`: caused an error if detected variable types in batches differed. 

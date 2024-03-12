@@ -35,9 +35,7 @@ redcap_dates <- function(var,
   # for months and days always %d or %m should be used
   # (e.g., 01.01. with %m = '01.01.' but 1.1. with %D = '01.10.')
 
-  cat(red(bold(underline("Warning:"),
-               "\nThis conversion is (currently) only valid with the european date format (days before months) and will lead to wrong results otherwise!!\n\n"
-            )))
+  warning("This conversion is (currently) only valid with the european date format (days before months) and will lead to wrong results otherwise!!\n\n")
 
   # convert to character
   var <- as.character(var)

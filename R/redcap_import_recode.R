@@ -26,19 +26,19 @@
 #'@importFrom utils str write.table
 #'
 #' @examples
-#' # data(importdemo)
-#' # data(meta)
-#' # redcap_recode(importdemo, meta)
+#' # data(importdemo_data)
+#' # data(importdemo_dict)
+#' # redcap_import_recode(importdemo_data, importdemo_dict)
 #'
 #' # if using local data:
 #' # token <- "xxxxx"
 #' # url <- "xxxxx"
 #' # file <- "data.csv"
-#' # redcap_recode(file, rc_token = token, rc_url = url)
+#' # redcap_import_recode(file, rc_token = token, rc_url = url)
 
 
 
-redcap_recode <- function(selected_data,
+redcap_import_recode <- function(selected_data,
                           dict = NULL,
                           rc_token,
                           rc_url) {
@@ -57,7 +57,7 @@ redcap_recode <- function(selected_data,
                     validation = text_validation_type_or_show_slider_number)
 
   # open log-file
-  log_file <- "redcap_recode.txt"
+  log_file <- "redcap_import_recode.txt"
   write.table(paste0(Sys.time(),":\n\nrecoded_data <- mutate(selected_data"), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
 
   # prepare output variables
