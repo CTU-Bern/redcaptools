@@ -5,6 +5,7 @@
 \alias{rc_prep}
 \alias{rc_dates}
 \alias{rc_datetimes}
+\alias{split_by_form}
 \title{Deprecated functions
 These functions have been renamed to be more consistent with the rest of the package. They may be removed in a future version.}
 \usage{
@@ -26,11 +27,13 @@ rc_prep(
 rc_dates(data, metadata, replace = FALSE, append = "_date")
 
 rc_datetimes(data, metadata, replace = FALSE, append = "_datetime", ...)
+
+split_by_form(data, metadata)
 }
 \arguments{
 \item{data}{dataframe}
 
-\item{metadata}{data dictionary from REDCap}
+\item{metadata}{datadictionary as exported from REDCap or downloaded from the API}
 
 \item{rep}{replace variables. If FALSE, encoded versions of the variable will be created}
 
@@ -44,6 +47,9 @@ rc_datetimes(data, metadata, replace = FALSE, append = "_datetime", ...)
 
 \item{append}{text to append to the newly generated variables name (if \code{replace} is TRUE)}
 }
+\value{
+list of dataframes
+}
 \description{
 Deprecated functions
 These functions have been renamed to be more consistent with the rest of the package. They may be removed in a future version.
@@ -55,5 +61,8 @@ These functions have been renamed to be more consistent with the rest of the pac
 \item \code{rc_dates()}: original function name for \code{redcap_dates}
 
 \item \code{rc_datetimes()}: original function name for \code{redcap_datetimes}
+
+\item \code{split_by_form()}: deprecated in favour of \code{redcap_toform}
+Split a manually exported REDCap dataset into forms
 
 }}
