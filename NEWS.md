@@ -2,8 +2,8 @@
 
 * some data preparation functions have been renamed to improve consistency and clarity. The old functions remain to work, but issue a warning about deprecation.
   * `rc_prep` is now `redcap_prep`
-  * `redcap_dates` is now `redcap_prep_dates`
-  * `redcap_datetimes` is now `redcap_prep_datetimes`
+  * `rc_dates` is now `redcap_prep_dates`
+  * `rc_datetimes` is now `redcap_prep_datetimes`
 * improved support for when no single or multiple choice variables exist in a database
 * addition of `redcap_toform` which splits a dataframe into a list of dataframes, one for each form
 
