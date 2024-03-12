@@ -72,9 +72,9 @@ Some of the available metadata stored in REDCap is available via the `redcap_exp
 m <- redcap_export_meta(token, url)
 ```
 
-Once you have the data and metadata, the `rc_prep` function can be used to reformat the data - convert variables to date, POSIX, factors, etc as appropriate.
+Once you have the data and metadata, the `redcap_prep` function can be used to reformat the data - convert variables to date, POSIX, factors, etc as appropriate.
 
 ``` r
-prepped <- rc_prep(d, m$metadata)
-prepped_list <- sapply(l, rc_prep, metadata = m$metadata)
+prepped <- redcap_prep(d, m$metadata)
+prepped_list <- sapply(l, redcap_prep, metadata = m$metadata)
 ```
