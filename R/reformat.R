@@ -141,7 +141,7 @@ multichoice_factor <- function(data, metadata, replace = FALSE, append = "_facto
 #' Converts the string values returned from REDCap to Dates.
 #' This function also applies labels to the variable itself, based on the option label.
 #'
-#' @rdname redcap_date
+#' @rdname redcap_prep_dates
 #' @param data the data.frame to modify
 #' @param metadata metadata/datadictionary
 #' @param replace whether to overwrite the existing data .
@@ -170,7 +170,7 @@ redcap_prep_dates <- function(data, metadata, replace = FALSE, append = "_date")
 }
 
 
-#' @describeIn redcap_date input data.frame with date-time variables reformated to POSIX
+#' @describeIn redcap_prep_dates input data.frame with date-time variables reformated to POSIX
 #' @param ... options passed to/from other methods
 #' @importFrom labelled var_label var_label<-
 #' @importFrom lubridate ymd_hm
