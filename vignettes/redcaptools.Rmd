@@ -39,6 +39,20 @@ Other export functions are `redcap_export_meta` (for downloading various metadat
 record <- redcap_export_tbl(token, url, "record")
 ```
 
+#### Using manual exports
+
+REDCap also allows exporting data manually through the web interface. While `redcaptools` is primarily intended to used with the API, there much of it will also work with manually exported datasets. Important to note is that the data dictionary must be provided manually in this case. 
+
+For example, the `redcap_toform` function tries to split a manually downloaded dataset into it's constituent forms. As less information is available, it's not as robust as the API version, but it may still be useful.
+
+```{r, eval = FALSE}
+# a small manually downloaded testing dataset
+data <- readRDS(system.file("extdata/test.rda", package = "redcaptools"))
+# the data dictionary
+dd <- read.csv(system.file("extdata/DataDictionary.csv", package = "redcaptools"))
+
+formdata <- redcap_toform(data, dd)
+``` 
 
 ### Processing REDCap data
 
