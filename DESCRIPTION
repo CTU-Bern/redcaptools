@@ -26,5 +26,6 @@ Imports:
     labelled,
     lubridate,
     magrittr,
-    stringr
+    stringr,
+    tidyr
 Config/testthat/edition: 3

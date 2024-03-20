@@ -3,7 +3,9 @@
 #' Similar to \code{redcap_export_byform}, this function tries to split a
 #' manually downloaded dataset into it's constituent forms. While use of the API
 #' allows individual forms to be downloaded, with a manual download, only the data
-#' dictionary is available as auxillary information.
+#' dictionary is available as auxillary information. If no data dictionary is
+#' available, the function will use the variable names to guess the forms (see
+#' details).
 #'
 #' @param data imported REDCap data
 #' @param datadict data dictionary downloaded manually from REDCap
@@ -18,8 +20,15 @@
 #' variables (i.e. those that do not start with \code{redcap}) are empty, the row
 #' will be removed from the dataset.
 #'
+#' If neither \code{datadict} nor \code{metadata} are provided, the function will
+#' attempt to guess the forms based on the variable names, specifically the
+#' \code{form_complete} variables which denote the state of the form. This is
+#' not a foolproof method: there may be other variables in the data that end with
+#' \code{_complete}.
 #'
 #' @importFrom dplyr if_else pull filter mutate select everything across where slice
+#' @importFrom tidyr fill
+#' @importFrom stringr str_detect str_extract
 #' @export
 #' @examples
 #' data <- readRDS(system.file("extdata/test.rda", package = "redcaptools"))
@@ -27,18 +36,30 @@
 #' dd <- read.csv(system.file("extdata/DataDictionary.csv", package = "redcaptools"))
 #' redcap_toform(data, dd)
 #' redcap_toform(data, metadata = metadata)
+#' redcap_toform(data)
 redcap_toform <- function(data,
                           datadict = NULL,
                           metadata = NULL,
                           guess_events = TRUE,
                           ...){
-  if(is.null(datadict) & is.null(metadata))
-    stop("one of \"datadict\" or \"metadata\" must be provided")
   if(!is.null(datadict)){
     # a manually downloaded data dictionary has different variable names to the
     #   API version
     metadata <- harmonize_datadict(datadict)
   }
+  if(is.null(datadict) & is.null(metadata)){
+    warning("No metadata provided, guessing forms based on variable names")
+    metadata <- data.frame(field_name = names(data)) |>
+      mutate(complete = str_detect(field_name, "_complete$"),
+             form_name = str_extract(field_name, ".*(?=_complete)"),
+             field_type = "") |>
+      fill(form_name, .direction = "up")
+
+    metadata <- metadata |>
+      filter(!grepl("^redcap", field_name))
+  }
+
+
 
   forms <- metadata$form_name |> unique()
   names(forms) <- forms

@@ -21,7 +21,9 @@ redcap_toform(data, datadict = NULL, metadata = NULL, guess_events = TRUE, ...)
 Similar to \code{redcap_export_byform}, this function tries to split a
 manually downloaded dataset into it's constituent forms. While use of the API
 allows individual forms to be downloaded, with a manual download, only the data
-dictionary is available as auxillary information.
+dictionary is available as auxillary information. If no data dictionary is
+available, the function will use the variable names to guess the forms (see
+details).
 }
 \details{
 In a longitudinal data collection with many forms, a REDCap dataset will have
@@ -29,6 +31,12 @@ a large degree of empty cells. The \code{guess_events} argument uses missingness
 as an indicator of a row not being part of the form in question. If all user
 variables (i.e. those that do not start with \code{redcap}) are empty, the row
 will be removed from the dataset.
+
+If neither \code{datadict} nor \code{metadata} are provided, the function will
+attempt to guess the forms based on the variable names, specifically the
+\code{form_complete} variables which denote the state of the form. This is
+not a foolproof method: there may be other variables in the data that end with
+\code{_complete}.
 }
 \examples{
 data <- readRDS(system.file("extdata/test.rda", package = "redcaptools"))
