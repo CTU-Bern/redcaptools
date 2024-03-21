@@ -1,0 +1,109 @@
+---
+title: "REDCap API endpoints"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{REDCap API endpoints}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(redcaptools)
+```
+
+REDCap has a long list of API endpoints (types of information) that can be extracted. Here we list the most important ones (in our opinion), and give an indication of how to access them via `redcaptools`.
+
+`redcap_export_tbl` is the real workhorse of `redcaptools`. It is the primary interface to the API. Other export functions all wrap this in some form.  
+
+### Records
+
+The most important is arguably the `record` endpoint, which allows you to download the actual data. 
+
+``` r
+redcap_export_tbl(token, url, "record")
+```
+
+### Data dictionary (Metadata)
+
+Without the data dictionary, it's often difficult to tell what a variable is.
+
+``` r
+redcap_export_tbl(token, url, "metadata")
+```
+
+This is one of the three pieces of metadata downloaded by default by the `redcap_export_meta` function.
+
+``` r
+redcap_export_meta(token, url)$metadata
+```
+
+The data dictionary is also really important for the functions which format and label variables (e.g. `redcap_prep`, `singlechoice_ops`, `singlechoice_factor` and co)
+
+
+### Instruments
+
+The list of eCRFs (known as instruments in REDCap). This provides a link between the data dictionary and the instrument labels as seen in REDCap.
+
+``` r
+redcap_export_tbl(token, url, "instrument")
+```
+
+### Events
+
+The list of events (visits)
+
+``` r
+redcap_export_tbl(token, url, "event")
+```
+
+This is one of the three pieces of metadata downloaded by the `redcap_export_meta` function.
+
+``` r
+redcap_export_meta(token, url)$event
+```
+
+### Form-event mapping
+
+This endpoint lists which forms are available in which events/visits.
+
+``` r
+redcap_export_tbl(token, url, "formEventMapping")
+```
+
+This is one of the three pieces of metadata downloaded by the `redcap_export_meta` function.
+
+``` r
+redcap_export_meta(token, url)$formEventMapping
+```
+
+### Repeating forms and events
+
+This is of use when repeated forms and/or events are used.
+
+``` r
+redcap_export_tbl(token, url, "repeatingFormsEvents")
+```
+
+### Arms
+
+Arms allow different groups of participants (records) to have different visit structures. In the export, they are visible in the `redcap_event_name` variable as e.g. `form_name_arm_1`. The `arm` API endpoint allows one to retrieve the labels for the arms.
+
+``` r
+redcap_export_tbl(token, url, "arm")
+```
+
+### Export List of Export Field Names 
+
+This endpoint lists the variable names as they are exported from REDCap. It matches the data dictionary, except for the case of multiple choice variables which are exported as x___1, x___2, etc.
+
+``` r
+redcap_export_tbl(token, url, "exportFieldNames")
+```
+

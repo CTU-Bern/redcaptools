@@ -1,0 +1,62 @@
+template:
+  # package: tidytemplate
+  bootstrap: 5
+
+reference:
+- title: Exporting data
+  desc: >
+    Functions for communicating with the REDCap API
+  contents:
+  - redcap_export_tbl
+  - redcap_export_byform
+  - redcap_export_batch
+  - redcap_export_meta
+
+- title: Working with manually exported datasets
+  desc: >
+    REDcap can export data through the web interface too. These functions may be
+    helpful in such cases.
+  contents:
+  - redcap_toform
+
+- title: Preparing data for analysis
+  desc: >
+    Functions for converting from REDCap's data representation to a more useful
+    format for analysis
+  contents:
+  - redcap_prep
+  - redcap_prep_dates
+  - redcap_prep_datetimes
+  - singlechoice_factor
+  - multichoice_factor
+  - label_others
+  - convert_to_logical
+  - remove_empty_rows
+
+- title: Exploring metadata
+  desc: >
+    Functions for exploring the metadata of a REDCap project
+  contents:
+  - singlechoice_opts
+  - multichoice_opts
+
+- title: Preparing data for import INTO REDCap
+  desc: >
+    REDCap expects data to be in a specific format for import. These functions
+    help to format the data appropriately, including guiding the user through
+    converting from an old data format to the REDCap format.
+  contents:
+  - redcap_import_select
+  - redcap_import_recode
+  - redcap_dates
+
+- subtitle: Demonstration datasets
+  contents:
+  - importdemo_data
+  - importdemo_dict
+
+- title: Deprecated functions
+  contents:
+  - rc_prep
+  - rc_dates
+  - rc_datetimes
