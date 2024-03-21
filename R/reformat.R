@@ -235,12 +235,12 @@ redcap_prep <- function(data, metadata,
   tmp <- multichoice_factor(tmp, metadata,
                             replace = rep_multichoice,
                             append = app_multichoice, ...)
-  tmp <- rc_dates(tmp, metadata,
-                  replace = rep_date,
-                  append = app_date)
-  tmp <- rc_datetimes(tmp, metadata,
-                      replace = rep_datetime,
-                      append = app_datetime, ...)
+  tmp <- redcap_prep_dates(tmp, metadata,
+                           replace = rep_date,
+                           append = app_date)
+  tmp <- redcap_prep_datetimes(tmp, metadata,
+                               replace = rep_datetime,
+                               append = app_datetime, ...)
   tmp <- label_others(tmp, metadata)
   return(tmp)
 }
