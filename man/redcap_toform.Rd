@@ -44,4 +44,5 @@ metadata <- readRDS(system.file("extdata/meta.rda", package = "redcaptools"))
 dd <- read.csv(system.file("extdata/DataDictionary.csv", package = "redcaptools"))
 redcap_toform(data, dd)
 redcap_toform(data, metadata = metadata)
+redcap_toform(data)
 }
