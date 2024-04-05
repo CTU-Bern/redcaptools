@@ -1,11 +1,11 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# `redcaptools`
+# `redcaptools` <img src='man/figures/logo.png' align="right" width="200">
 
 <!-- badges: start -->
 
-[![](https://img.shields.io/badge/dev%20version-0.3.0-blue.svg)](https://github.com/CTU-Bern/redcaptools)
+[![](https://img.shields.io/badge/dev%20version-0.4.0-blue.svg)](https://github.com/CTU-Bern/redcaptools)
 [![R-CMD-check](https://github.com/CTU-Bern/redcaptools/workflows/R-CMD-check/badge.svg)](https://github.com/CTU-Bern/redcaptools/actions)
 
 <!-- badges: end -->
@@ -79,11 +79,11 @@ also be downloaded via the website.
 m <- redcap_export_meta(token, url)
 ```
 
-Once you have the data and metadata, the `rc_prep` function can be used
-to reformat the data - convert variables to date, POSIX, factors, etc as
-appropriate.
+Once you have the data and metadata, the `redcap_prep` function can be
+used to reformat the data - convert variables to date, POSIX, factors,
+etc as appropriate.
 
 ``` r
-prepped <- rc_prep(d, m$metadata)
-prepped_list <- sapply(l, rc_prep, metadata = m$metadata)
+prepped <- redcap_prep(d, m$metadata)
+prepped_list <- sapply(l, redcap_prep, metadata = m$metadata)
 ```
