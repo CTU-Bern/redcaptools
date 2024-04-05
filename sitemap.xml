@@ -10,6 +10,9 @@
     <loc>/LICENSE.html</loc>
   </url>
   <url>
+    <loc>/articles/api_endpoints.html</loc>
+  </url>
+  <url>
     <loc>/articles/index.html</loc>
   </url>
   <url>
@@ -31,7 +34,13 @@
     <loc>/reference/convert_to_logical.html</loc>
   </url>
   <url>
-    <loc>/reference/importdemo.html</loc>
+    <loc>/reference/deprecated.html</loc>
+  </url>
+  <url>
+    <loc>/reference/importdemo_data.html</loc>
+  </url>
+  <url>
+    <loc>/reference/importdemo_dict.html</loc>
   </url>
   <url>
     <loc>/reference/index.html</loc>
@@ -40,16 +49,7 @@
     <loc>/reference/label_others.html</loc>
   </url>
   <url>
-    <loc>/reference/meta.html</loc>
-  </url>
-  <url>
     <loc>/reference/multichoice_factor.html</loc>
-  </url>
-  <url>
-    <loc>/reference/rc_date.html</loc>
-  </url>
-  <url>
-    <loc>/reference/rc_prep.html</loc>
   </url>
   <url>
     <loc>/reference/redcap_dates.html</loc>
@@ -67,18 +67,24 @@
     <loc>/reference/redcap_export_tbl.html</loc>
   </url>
   <url>
-    <loc>/reference/redcap_recode.html</loc>
+    <loc>/reference/redcap_import_recode.html</loc>
   </url>
   <url>
-    <loc>/reference/redcap_select_rename.html</loc>
+    <loc>/reference/redcap_import_select.html</loc>
+  </url>
+  <url>
+    <loc>/reference/redcap_prep.html</loc>
+  </url>
+  <url>
+    <loc>/reference/redcap_prep_dates.html</loc>
+  </url>
+  <url>
+    <loc>/reference/redcap_toform.html</loc>
   </url>
   <url>
     <loc>/reference/remove_empty_rows.html</loc>
   </url>
   <url>
     <loc>/reference/singlechoice_factor.html</loc>
-  </url>
-  <url>
-    <loc>/reference/split_by_form.html</loc>
   </url>
 </urlset>
