@@ -27,7 +27,7 @@ remotes::install_github("CTU-Bern/redcaptools")
 Or from CTU Bern’s package universe
 
 ``` r
-install.packages("redcaptools", repos = "https://ctu-bern.r-universe.dev")
+install.packages("redcaptools", repos = c('https://ctu-bern.r-universe.dev', 'https://cloud.r-project.org'))
 ```
 
 ## Export data from REDCap
