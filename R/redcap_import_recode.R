@@ -17,6 +17,14 @@
 #'@param dict Data dictionary (e.g. as downloaded from REDCap or via
 #'  \code{redcap_export_meta(rc_token, rc_url)$meta}). If not supplied, this will
 #'  be downloaded from the API using \code{rc_token}.
+#'@param skip_intro If set to TRUE, the introduction messages will be skipped.
+#'  Default = FALSE
+#'@param suppress_txt If set TRUE, all text output will be suppressed (not
+#'  recommended). Default = FALSE.
+#'@param log If TRUE, an overview csv-table, and a log-file are stored in the
+#'  working directory. Default = TRUE.
+#'@param wait Allows you to set the latency time between the steps. Default =
+#'  2s.
 #'
 #'@return Data frame with recoded data. Log-file with executed code.
 #'@export
@@ -41,26 +49,70 @@
 redcap_import_recode <- function(selected_data,
                           dict = NULL,
                           rc_token,
-                          rc_url) {
+                          rc_url,
+                          skip_intro = FALSE,
+                          suppress_txt = FALSE,
+                          log = TRUE,
+                          wait = 2) {
 
   field_name <- field_type <- select_choices_or_calculations <- text_validation_type_or_show_slider_number <- NULL
 
-
-  # load data
+  # evaluate inputs
+  check_data(selected_data)
   name_vars <- colnames(selected_data)
 
-  if(is.null(dict)) dict <- redcap_export_meta(rc_token, rc_url)$meta
-  rc_spec <- select(dict,
-                    field_name,
-                    field_type,
-                    choices = select_choices_or_calculations,
-                    validation = text_validation_type_or_show_slider_number)
+
+  if(is.null(dict)) {
+    check_token(rc_token)
+    check_url(rc_url)
+    dict <- redcap_export_meta(rc_token, rc_url)$meta
+  }
+  check_dict(dict)
+
+  if(!is.logical(skip_intro)) stop("skip_intro should be logical (TRUE/FALSE)")
+  if(!is.logical(suppress_txt)) stop("suppress_txt should be logical (TRUE/FALSE)")
+  if(!is.logical(log)) stop("log should be logical (TRUE/FALSE)")
+  if(!is.numeric(wait) || length(wait) != 1) stop("wait should be a single number")
+
+  # intro
+
+  if (!skip_intro) {
+    cat("\nHello and welcome!\n\n")
+    cat("Let's start with some info about this script and your selections.\n")
+    cat("It's best to use fullscreen while working with this script.\n")
+    cat("(To turn off this introduction, set 'skip_intro = TRUE')\n\n\n\n")
+    Sys.sleep(wait+1)
+
+
+    cat("Are you ready to begin? \n 1 = YES\n'esc' = STOP")
+    ans <- ""
+    while (ans != 1) {
+      ans <- readline(prompt="Answer= ")
+      if (ans != 1) {
+        cat("Please check your answer! \n 1 = YES\n'esc' = STOP")
+      }
+    }
+
+    cat("\nGreat! Let's begin!\n")
+    cat("\n-----------------------------------------------------------------\n\n")
+    Sys.sleep(wait)
+  }
+
 
   # open log-file
-  log_file <- "redcap_import_recode.txt"
-  write.table(paste0(Sys.time(),":\n\nrecoded_data <- mutate(selected_data"), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
+  if(log) {
+    log_file <- "redcap_import_recode.txt"
+    write.table(paste0(Sys.time(),":\n\nrecoded_data <- mutate(selected_data"), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
+  }
 
-  # prepare output variables
+  # read dict, prepare output variables
+
+  rc_spec <- dict |>
+    select(field_name,
+           field_type,
+           choices = select_choices_or_calculations,
+           validation = text_validation_type_or_show_slider_number)
+
   vars_recode <- list()
 
   for (i in seq_along(name_vars)) {
@@ -68,22 +120,41 @@ redcap_import_recode <- function(selected_data,
     goback = TRUE                                                                  # initiate go-back option
     for_break = FALSE
     for_skip = FALSE
-    while (goback) {
 
+    while (goback) {
 
       var <- selected_data[,i]
       name <- name_vars[i]
+      cat(paste0("\n",blue(bold(underline(name)))))
+
+      if (!any(str_detect(rc_spec$field_name,paste0("^",name_vars[i],"$")))) {
+        cat("\n\nThis variable is NOT part of the data dictionary you provided and will be skipped.\n")
+        cat("Please run redcap_import_select() to choose and rename variables before recoding.\n\n")
+        # SKIP EINFÜGEN!!
+      }
+
+
       rc_class <- rc_spec$field_type[grep(paste0("^",name,"$"),rc_spec$field_name)]
       rc_val <- rc_spec$validation[grep(paste0("^",name,"$"),rc_spec$field_name)]
       choices <- rc_spec$choices[grep(paste0("^",name,"$"),rc_spec$field_name)]
 
-      cat(paste0("\n",blue(bold(underline(name)))))
+
       cat("\n\nSummary:\n")
       print(summary(var))
       cat(str(var))
 
       cat(paste0("\nCurrent Class: ", class(var)))
       cat(paste0("\nType according to REDCap: ", rc_class," ",rc_val,"\n"))
+
+
+      # hier anfangen mit auto-konversion
+      # record_id ->
+      # text
+      # nummer
+      # single-choice
+      # option zum überprüfen einrichten
+      #
+
 
       cat("\nWould you like to change the type/class?
       1 = YES

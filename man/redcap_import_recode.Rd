@@ -4,7 +4,16 @@
 \alias{redcap_import_recode}
 \title{REDCap Recode}
 \usage{
-redcap_import_recode(selected_data, dict = NULL, rc_token, rc_url)
+redcap_import_recode(
+  selected_data,
+  dict = NULL,
+  rc_token,
+  rc_url,
+  skip_intro = FALSE,
+  suppress_txt = FALSE,
+  log = TRUE,
+  wait = 2
+)
 }
 \arguments{
 \item{selected_data}{Data to be recoded}
@@ -16,6 +25,18 @@ be downloaded from the API using \code{rc_token}.}
 \item{rc_token}{REDCap API token}
 
 \item{rc_url}{Link to REDCap API. Default: https://redcap.ctu.unibe.ch/api/}
+
+\item{skip_intro}{If set to TRUE, the introduction messages will be skipped.
+Default = FALSE}
+
+\item{suppress_txt}{If set TRUE, all text output will be suppressed (not
+recommended). Default = FALSE.}
+
+\item{log}{If TRUE, an overview csv-table, and a log-file are stored in the
+working directory. Default = TRUE.}
+
+\item{wait}{Allows you to set the latency time between the steps. Default =
+2s.}
 }
 \value{
 Data frame with recoded data. Log-file with executed code.
