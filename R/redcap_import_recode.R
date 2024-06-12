@@ -47,17 +47,18 @@
 
 
 redcap_import_recode <- function(selected_data,
-                          dict = NULL,
-                          rc_token,
-                          rc_url,
-                          skip_intro = FALSE,
-                          suppress_txt = FALSE,
-                          log = TRUE,
-                          wait = 2) {
+                                 dict = NULL,
+                                 rc_token,
+                                 rc_url,
+                                 auto_conv = FALSE,
+                                 skip_intro = FALSE,
+                                 suppress_txt = FALSE,
+                                 log = TRUE,
+                                 wait = 2) {
 
   field_name <- field_type <- select_choices_or_calculations <- text_validation_type_or_show_slider_number <- NULL
 
-  # evaluate inputs
+  # evaluate inputs ----
   check_data(selected_data)
   name_vars <- colnames(selected_data)
 
@@ -74,7 +75,9 @@ redcap_import_recode <- function(selected_data,
   if(!is.logical(log)) stop("log should be logical (TRUE/FALSE)")
   if(!is.numeric(wait) || length(wait) != 1) stop("wait should be a single number")
 
-  # intro
+
+
+  # intro ----
 
   if (!skip_intro) {
     cat("\nHello and welcome!\n\n")
@@ -94,264 +97,418 @@ redcap_import_recode <- function(selected_data,
     }
 
     cat("\nGreat! Let's begin!\n")
-    cat("\n-----------------------------------------------------------------\n\n")
+    cat("\n--------------------------------------------------------------------------\n\n")
     Sys.sleep(wait)
   }
 
 
-  # open log-file
+  # open log-file ----
   if(log) {
     log_file <- "redcap_import_recode.txt"
     write.table(paste0(Sys.time(),":\n\nrecoded_data <- mutate(selected_data"), log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
   }
 
-  # read dict, prepare output variables
+  # read dict, prepare output variables ----
 
   rc_spec <- dict |>
     select(field_name,
+           field_label,
            field_type,
            choices = select_choices_or_calculations,
            validation = text_validation_type_or_show_slider_number)
 
   vars_recode <- list()
 
+  # start loop ----
+
   for (i in seq_along(name_vars)) {
 
-    goback = TRUE                                                                  # initiate go-back option
+    ## initiate go-back option ----
+    goback = TRUE
     for_break = FALSE
     for_skip = FALSE
 
     while (goback) {
 
+      ## summarise data and rc dict ----
+
       var <- selected_data[,i]
       name <- name_vars[i]
-      cat(paste0("\n",blue(bold(underline(name)))))
+      cat(paste0("\n",blue(bold(underline(name))),"\n\n"))
+
+      cat("--------------------------------- REDCap ---------------------------------")
 
       if (!any(str_detect(rc_spec$field_name,paste0("^",name_vars[i],"$")))) {
         cat("\n\nThis variable is NOT part of the data dictionary you provided and will be skipped.\n")
         cat("Please run redcap_import_select() to choose and rename variables before recoding.\n\n")
-        # SKIP EINFÜGEN!!
+        for_skip = TRUE
+        break
       }
 
-
-      rc_class <- rc_spec$field_type[grep(paste0("^",name,"$"),rc_spec$field_name)]
+      cat("\n\nVariable found in REDCap!")
+      rc_label <- rc_spec$field_label[grep(paste0("^",name,"$"),rc_spec$field_name)]
+      rc_type <- rc_spec$field_type[grep(paste0("^",name,"$"),rc_spec$field_name)]
       rc_val <- rc_spec$validation[grep(paste0("^",name,"$"),rc_spec$field_name)]
       choices <- rc_spec$choices[grep(paste0("^",name,"$"),rc_spec$field_name)]
 
 
-      cat("\n\nSummary:\n")
+      cat(paste0("\n\nVariable Label: ",italic(rc_label)))
+      cat(paste0("\nField Type: ", italic(rc_type)))
+      if (rc_type == "text") cat(paste0("\nField Validation: ",italic(rc_val)))
+
+      cat("\n\n\n")
+      Sys.sleep(wait)
+      cat("------------------------------- Data File -------------------------------")
+      cat(paste0("\n\nClass in Data File: ", italic(class(var))))
+      cat("\n\nData Summary:\n")
       print(summary(var))
       cat(str(var))
-
-      cat(paste0("\nCurrent Class: ", class(var)))
-      cat(paste0("\nType according to REDCap: ", rc_class," ",rc_val,"\n"))
-
-
-      # hier anfangen mit auto-konversion
-      # record_id ->
-      # text
-      # nummer
-      # single-choice
-      # option zum überprüfen einrichten
-      #
+      cat("\n\n")
+      cat("-------------------------------------------------------------------------")
+      Sys.sleep(wait)
 
 
-      cat("\nWould you like to change the type/class?
-      1 = YES
-      0 = NO
-      'exit' = stop loop")
-      ans <- ""
-      while (ans != '1' && ans != '0' && ans != 'exit') {                          # input for change type/class
-        ans <- readline(prompt="Answer= ")
-        if (ans != '1' && ans != '0' && ans != 'exit') {
-          cat("Please check your answer!
-          1 = YES
-          0 = NO
-          'exit' = stop loop")
+      ## auto conversion ----
+      conv <- ''
+
+      ### character ----
+      if (rc_type == "text" && is.na(rc_val)) {
+        conv <- "char"
+        conv_label <- "Character"
+      }
+
+
+      ### factor ----
+      if (rc_type == "truefalse") {
+        conv <- "fct"
+        conv_label <- "Factor"
+      }
+
+
+      cat(bold(paste0("\n\nSuggested conversion to Class: ",italic(conv_label))))
+      cat("\n\n\n")
+
+
+      ## manual conversion ----
+
+      ### INPUT ----
+
+      if (!auto_conv) {
+
+        cat("Would you like to convert or manually change the type/class?")
+        cat("\n 1 = convert as suggested")
+        cat("\n 0 = change manually")
+        cat("\n 'skip' = skip this variable")
+        cat("\n 'exit' = stop loop")
+        ans <- ""
+
+        while (ans != '1' &&
+               ans != '0' &&
+               ans != 'skip' &&
+               ans != 'exit') {
+
+          ans <- readline(prompt="Answer= ")
+
+          if (ans != '1' &&
+              ans != '0' &&
+              ans != 'skip' &&
+              ans != 'exit') {
+
+            cat("Please check your answer!")
+            cat("\n 1 = convert as suggested")
+            cat("\n 0 = change manually")
+            cat("\n 'skip' = skip this variable")
+            cat("\n 'exit' = stop loop")
+            ans <- ""
+          }
+        }
+      } else {
+        cat("Auto-conversion has been turned on! (To turn it off, set 'auto_conv = FALSE')\n\n\n")
+        Sys.sleep(wait)
+      }
+
+
+      ### EVALUATE ----
+
+      #### exit ----
+      # (break while-loop here, for-loop will be broken below)
+
+      if (ans == 'exit') {
+        for_break = TRUE
+        break
+      }
+
+      #### skip ----
+      # do not change type/class
+      # (break while-loop here, for-loop will be nexted below)
+
+      if (ans == "skip") {
+        for_skip = TRUE
+        break
+      }
+
+      #### change manually ----
+
+      ##### INPUT ----
+      if (ans == "0") {
+
+        cat("\nWhat should the new type/class be?\n")
+        cat(" 'char' = character\n")
+        cat(" 'fct' = factor (e.g., Radiobutton)\n")
+        cat(" 'int' = integer\n")
+        cat(" 'num' = number\n")
+        cat(" 'num1' = number with 1 decimal place\n")
+        cat(" 'num2' = number with 2 decimal places\n")
+        cat(" 'num3' = number with 3 decimal places\n")
+        cat(" 'num4' = number with 4 decimal places\n")
+        cat(" 'dt1' = date (D-M-Y)\n")
+        cat(" 'dt2' = date (Y-M-D)\n")
+        cat(" 'dt_tm1' = datetime (D-M-Y H:M)\n")
+        cat(" 'dt_tm2' = datetime (Y-M-D H:M)\n")
+        cat(" 'tm1' = time (HH:MM:SS)\n")
+        cat(" 'tm2' = time (HH:MM)\n")
+        cat(" 'tm3' = time (MM:SS)\n")
+        cat(" 'exit' = do NOT change and stop loop\n")
+        cat(" 'skip' = do NOT change and move to next item")
+        conv <- ""
+
+        while (conv != 'char' &&
+               conv != 'int' &&
+               conv != 'num' &&
+               conv != 'num1' &&
+               conv != 'num2' &&
+               conv != 'num3' &&
+               conv != 'num4' &&
+               conv != 'dt1' &&
+               conv != 'dt2' &&
+               conv != 'dt_tm1' &&
+               conv != 'dt_tm2' &&
+               conv != 'tm1' &&
+               conv != 'tm2' &&
+               conv != 'tm3' &&
+               conv != 'fct' &&
+               conv != 'skip' &&
+               conv != 'exit') {
+
+          conv <- readline(prompt="Answer= ")                                         # input for change type/class
+
+          if (conv != 'char' &&
+              conv != 'int' &&
+              conv != 'num' &&
+              conv != 'num1' &&
+              conv != 'num2' &&
+              conv != 'num3' &&
+              conv != 'num4' &&
+              conv != 'dt1' &&
+              conv != 'dt2' &&
+              conv != 'dt_tm1' &&
+              conv != 'dt_tm2' &&
+              conv != 'tm1' &&
+              conv != 'tm2' &&
+              conv != 'tm3' &&
+              conv != 'fct' &&
+              conv != 'skip' &&
+              conv != 'exit') {
+
+            cat("Please check your answer! \n")
+            cat(" 'char' = character\n")
+            cat(" 'fct' = factor (e.g., Radiobutton)\n")
+            cat(" 'int' = integer\n")
+            cat(" 'num' = number\n")
+            cat(" 'num1' = number with 1 decimal place\n")
+            cat(" 'num2' = number with 2 decimal places\n")
+            cat(" 'num3' = number with 3 decimal places\n")
+            cat(" 'num4' = number with 4 decimal places\n")
+            cat(" 'dt1' = date (D-M-Y)\n")
+            cat(" 'dt2' = date (Y-M-D)\n")
+            cat(" 'dt_tm1' = datetime (D-M-Y H:M)\n")
+            cat(" 'dt_tm2' = datetime (Y-M-D H:M)\n")
+            cat(" 'tm1' = time (HH:MM:SS)\n")
+            cat(" 'tm2' = time (HH:MM)\n")
+            cat(" 'tm3' = time (MM:SS)\n")
+            cat(" 'exit' = do NOT change and stop loop\n")
+            cat(" 'skip' = do NOT change and move to next item")
+            conv <- ""
+          }
         }
       }
 
 
-      if (ans == 'exit') {                                                         # check answers:
+
+      ##### EVALUATE ----
+
+      ###### exit ----
+      # (break while-loop, for-loop will be broken below)
+      if (conv == 'exit') {
         for_break = TRUE
-        break                                                                      # exit (break while-loop, for-loop will be broken below)
+        break
+      }
 
-      } else  if (ans == "0") {
+      ###### skip ----
+      # (break while-loop, for-loop will be nexted below)
+      if (conv == 'skip') {
         for_skip = TRUE
-        break                                                                      # do not change type/class (break while-loop, for-loop will be nexted below)
+        break
+      }
 
-      } else if (ans == "1") {                                                     # change type/class
+      ###### convert ----
+      if (conv == 'char') {                                                           # convert to CHARACTER
+        new_var <- as.character(var)
+        log <- paste0(", ",name," = as.character(",name,")")
 
-        cat("\nWhat should the new type/class be? \n
-        'fct' = factor (e.g., Radiobutton) \n
-        'int' = integer
-        'num' = number
-        'num1' = number with 1 decimal place
-        'num2' = number with 2 decimal places
-        'num3' = number with 3 decimal places
-        'num4' = number with 4 decimal places\n
-        'dt1' = date (D-M-Y)
-        'dt2' = date (Y-M-D)
-        'dt_tm1' = datetime (D-M-Y H:M)
-        'dt_tm2' = datetime (Y-M-D H:M)\n
-        'tm1' = time (HH:MM:SS)
-        'tm2' = time (HH:MM)
-        'tm3' = time (MM:SS)\n
-        'exit' = do NOT change and stop loop
-        'skip' = do NOT change and move to next item")
-        ans <- ""
-        while (ans != 'int' && ans !=  'num' && ans != 'num1' && ans != 'num2' && ans != 'num3' && ans != 'num4' && ans != 'dt1' && ans != 'dt2' && ans != 'dt_tm1' && ans != 'dt_tm2' && ans != 'tm1' && ans != 'tm2' && ans != 'tm3' && ans != 'fct' && ans != 'skip' && ans != 'exit') {
-          ans <- readline(prompt="Answer= ")                                         # input for change type/class
-          if (ans != 'int' && ans !=  'num' && ans != 'num1' && ans != 'num2' && ans != 'num3' && ans != 'num4' && ans != 'dt1' && ans != 'dt2' && ans != 'dt_tm1' && ans != 'dt_tm2' && ans != 'tm1' && ans != 'tm2' && ans != 'tm3' && ans != 'fct' && ans != 'skip' && ans != 'exit') {
-            cat("Please check your answer! \n
-        'fct' = factor (e.g., Radiobutton)\n
-        'int' = integer
-        'num' = number
-        'num1' = numeric with 1 decimal place
-        'num2' = numeric with 2 decimal places
-        'num3' = numeric with 3 decimal places
-        'num4' = numeric with 4 decimal places\n
-        'dt1' = date (D-M-Y)
-        'dt2' = date (Y-M-D)
-        'dt_tm1' = datetime (D-M-Y H:M)
-        'dt_tm2' = datetime (Y-M-D H:M)\n
-        'tm1' = time (HH:MM:SS)
-        'tm2' = time (HH:MM)
-        'tm3' = time (MM:SS)\n
-        'exit' = do NOT change and stop loop
-        'skip' = do NOT change and move to next item")
-          }
+      } else if (conv == 'fct') {                                                   # convert to FACTOR
+        new_var <- as.factor(var)
+        log <- paste0(", ",name," = as.factor(",name,")")
+
+      } else if (conv == 'int') {                                                   # convert to INTEGER
+        new_var <- as.integer(var)
+        log <- paste0(", ",name," = as.integer(",name,")")
+
+      } else if (conv == 'num') {                                                   # convert to NUMBER
+        new_var <- as.numeric(var)
+        log <- paste0(", ",name," = as.numeric(",name,")")
+
+      } else if (conv == 'num1') {                                                  # convert to NUMBER WITH 1 DECIMAL PLACE
+        new_var <- ifelse(!is.na(var),sprintf(var, fmt = '%#.1f'),var)
+        log <- paste0(", ",name," = ifelse(!is.na(",name,"),sprintf(",name,", fmt = '%#.1f'),",name,")")
+
+      } else if (conv == 'num2') {                                                  # convert to NUMBER WITH 2 DECIMAL PLACES
+        new_var <- ifelse(!is.na(var),sprintf(var, fmt = '%#.2f'),var)
+        log <- paste0(", ",name," = ifelse(!is.na(",name,"),sprintf(",name,", fmt = '%#.2f'),",name,")")
+
+      } else if (conv == 'num3') {                                                  # convert to NUMBER WITH 3 DECIMAL PLACES
+        new_var <- ifelse(!is.na(var),sprintf(var, fmt = '%#.3f'),var)
+        log <- paste0(", ",name," = ifelse(!is.na(",name,"),sprintf(",name,", fmt = '%#.3f'),",name,")")
+
+      } else if (conv == 'num4') {                                                  # convert to NUMBER WITH 4 DECIMAL PLACES
+        new_var <- ifelse(!is.na(var),sprintf(var, fmt = '%#.4f'),var)
+        log <- paste0(", ",name," = ifelse(!is.na(",name,"),sprintf(",name,", fmt = '%#.4f'),",name,")")
+
+      } else if (conv == 'dt1') {                                                   # convert to DATE (D-M-Y)
+        var <- redcap_dates(var)
+        new_var <- format(as.Date(var), "%d-%m-%Y")
+        log <- paste0(", ",name," = format(as.Date(redcap_dates(",name,")), '%d-%m-%Y')")
+
+      } else if (conv == 'dt2') {                                                   # convert to DATE (Y-M-D)
+        var <- redcap_dates(var)
+        new_var <- as.Date(var)
+        log <- paste0(", ",name," = as.Date(redcap_dates(",name,"))")
+
+      } else if (conv == 'dt_tm1') {                                                # convert to DATETIME (D-M-Y H:M)
+        cat(red(bold(underline("Warning:"),
+                     "\nThis conversion has not yet been defined!",
+                     "\nNothing will happen here!")))
+        new_var <- var
+
+      } else if (conv == 'dt_tm2') {                                                # convert to DATETIME (Y-M-D H:M)
+        cat(red(bold(underline("Warning:"),
+                     "\nThis conversion has not yet been defined!",
+                     "\nNothing will happen here!")))
+        new_var <- var
+
+      } else if (conv == 'tm1') {                                                   # convert to TIME (HH:MM:SS)
+        cat(red(bold(underline("Warning:"),
+                     "\nThis conversion has not yet been defined!",
+                     "\nNothing will happen here!")))
+        new_var <- var
+
+      } else if (conv == 'tm2') {                                                   # convert to TIME (HH:MM)
+        cat(red(bold(underline("Warning:"),
+                     "\nThis conversion has not yet been defined!",
+                     "\nNothing will happen here!")))
+        new_var <- var
+
+      } else if (conv == 'tm3') {                                                   # convert to TIME (MM:SS)
+        cat(red(bold(underline("Warning:"),
+                     "\nThis conversion has not yet been defined!",
+                     "\nNothing will happen here!")))
+        new_var <- var
+
+      }
+
+
+
+      ## show new summary ----
+
+      cat("------------------------------- Conversion ------------------------------")
+      cat(paste0("\n\nNew Class: ",italic(class(new_var))))
+      cat("\n\nData Summary:\n")
+      print(summary(new_var))
+      cat(str(new_var))
+      cat("\n\n")
+      cat("-------------------------------------------------------------------------")
+
+
+      ## continue ----
+
+      ### INPUT ----
+      cat("\n\nContinue?")
+      cat("\n1 = YES")
+      cat("\n0 = NO (repeat conversion)")
+      ans <- ""
+
+      while (ans != '1' &&
+             ans != '0') {
+
+        ans <- readline(prompt="Answer= ")
+
+        if (ans != '1' &&
+            ans != '0') {
+
+          cat("Please check your answer!")
+          cat("\n1 = YES")
+          cat("\n0 = NO (repeat conversion)")
         }
+      }
 
 
-        if (ans == 'exit') {                                                         # check answers:
-          for_break = TRUE
-          break                                                                      # exit (break while-loop, for-loop will be broken below)
+      ### EVALUATE ----
 
-        } else if (ans == 'skip') {
-          for_skip = TRUE
-          break                                                                      # skip (break while-loop, for-loop will be nexted below)
+      ## finish conversion ----
+      # append outcome variable
+      # write log-file
+      # break go-back option ( = exit while-loop, continue with for-loop)
 
-        } else if (ans == 'fct') {                                                   # convert to FACTOR
-          new_var <- as.factor(var)
-          log <- paste0(", ",name," = as.factor(",name,")")
-
-        } else if (ans == 'int') {                                                   # convert to INTEGER
-          new_var <- as.integer(var)
-          log <- paste0(", ",name," = as.integer(",name,")")
-
-        } else if (ans == 'num') {                                                   # convert to NUMBER
-          new_var <- as.numeric(var)
-          log <- paste0(", ",name," = as.numeric(",name,")")
-
-        } else if (ans == 'num1') {                                                  # convert to NUMBER WITH 1 DECIMAL PLACE
-          new_var <- ifelse(!is.na(var),sprintf(var, fmt = '%#.1f'),var)
-          log <- paste0(", ",name," = ifelse(!is.na(",name,"),sprintf(",name,", fmt = '%#.1f'),",name,")")
-
-        } else if (ans == 'num2') {                                                  # convert to NUMBER WITH 2 DECIMAL PLACES
-          new_var <- ifelse(!is.na(var),sprintf(var, fmt = '%#.2f'),var)
-          log <- paste0(", ",name," = ifelse(!is.na(",name,"),sprintf(",name,", fmt = '%#.2f'),",name,")")
-
-        } else if (ans == 'num3') {                                                  # convert to NUMBER WITH 3 DECIMAL PLACES
-          new_var <- ifelse(!is.na(var),sprintf(var, fmt = '%#.3f'),var)
-          log <- paste0(", ",name," = ifelse(!is.na(",name,"),sprintf(",name,", fmt = '%#.3f'),",name,")")
-
-        } else if (ans == 'num4') {                                                  # convert to NUMBER WITH 4 DECIMAL PLACES
-          new_var <- ifelse(!is.na(var),sprintf(var, fmt = '%#.4f'),var)
-          log <- paste0(", ",name," = ifelse(!is.na(",name,"),sprintf(",name,", fmt = '%#.4f'),",name,")")
-
-        } else if (ans == 'dt1') {                                                   # convert to DATE (D-M-Y)
-          var <- redcap_dates(var)
-          new_var <- format(as.Date(var), "%d-%m-%Y")
-          log <- paste0(", ",name," = format(as.Date(redcap_dates(",name,")), '%d-%m-%Y')")
-
-        } else if (ans == 'dt2') {                                                   # convert to DATE (Y-M-D)
-          var <- redcap_dates(var)
-          new_var <- as.Date(var)
-          log <- paste0(", ",name," = as.Date(redcap_dates(",name,"))")
-
-        } else if (ans == 'dt_tm1') {                                                # convert to DATETIME (D-M-Y H:M)
-          cat(red(bold(underline("Warning:"),
-                       "\nThis conversion has not yet been defined!",
-                       "\nNothing will happen here!")))
-          new_var <- var
-
-        } else if (ans == 'dt_tm2') {                                                # convert to DATETIME (Y-M-D H:M)
-          cat(red(bold(underline("Warning:"),
-                       "\nThis conversion has not yet been defined!",
-                       "\nNothing will happen here!")))
-          new_var <- var
-
-        } else if (ans == 'tm1') {                                                   # convert to TIME (HH:MM:SS)
-          cat(red(bold(underline("Warning:"),
-                       "\nThis conversion has not yet been defined!",
-                       "\nNothing will happen here!")))
-          new_var <- var
-
-        } else if (ans == 'tm2') {                                                   # convert to TIME (HH:MM)
-          cat(red(bold(underline("Warning:"),
-                       "\nThis conversion has not yet been defined!",
-                       "\nNothing will happen here!")))
-          new_var <- var
-
-        } else if (ans == 'tm3') {                                                   # convert to TIME (MM:SS)
-          cat(red(bold(underline("Warning:"),
-                       "\nThis conversion has not yet been defined!",
-                       "\nNothing will happen here!")))
-          new_var <- var
-
-        }
-
-        # show new summary
-        cat(paste0("\n",bold(underline(name))))
-        cat("\n\nNew Summary:\n")
-        print(summary(new_var))
-        cat(str(new_var))
-        cat(paste0("\nNew Class: ", class(new_var)))
-        cat(paste0("\nType according to REDCap: ", rc_class," ",rc_val,"\n"))
-
-        cat("\nContinue?
-          1 = YES
-          0 = NO repeat conversion")
-        ans <- ""
-        while (ans != '1' && ans != '0') {                                         # go back?
-          ans <- readline(prompt="Answer= ")
-          if (ans != '1' && ans != '0') {
-            cat("Please check your answer!
-          1 = YES
-          0 = NO repeat conversion")
-          }
-        }
-
-        if (ans == '1') {                                                          # exit while-loop, continue for-loop
-          vars_recode[[length(vars_recode)+1]] <- new_var
-          names(vars_recode)[length(vars_recode)] <- name
-          write.table(log, log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
-          goback = FALSE
-        }
+      if (ans == '1') {
+        vars_recode[[length(vars_recode)+1]] <- new_var
+        names(vars_recode)[length(vars_recode)] <- name
+        write.table(log, log_file, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
+        goback = FALSE
       }
     }
 
-    if (for_break) {                                                               # break for-loop
+    ## exit ----
+    # break for-loop
+    if (for_break) {
       break
     }
-    if (for_skip) {                                                                # go to next item in for-loop
+
+    ## skip ----
+    # go to next item in for-loop
+    if (for_skip) {
       next
     }
 
 
-    if (is.factor(new_var)) {                                                      # recode options if factor!
+    # recode  ----
+    # if factor
 
-      cat(bold(paste0("\nVariable ",underline(name)),"is a factor. Please compare coding to REDCap!!"))
+    if (is.factor(new_var)) {
 
-      goback = TRUE                                                                  # initiate new go-back option
+      cat(paste0("\n",blue(bold(underline(name))),"\n"))
+
+      ## initiate new go-back option ----
+      goback = TRUE
       while_break = FALSE
+
       while (goback) {
 
-        # parse and separate codes from options
+        ### summarize codes & options ----
 
-        if (rc_class == 'yesno') {
+        if (rc_type == 'yesno') {
           choices <- "1, Yes | 0, No"
+        } else if (rc_type == 'truefalse') {
+          choices <- "1, True | 0, False"
         }
 
         choices_sep <- str_split(choices, pattern = ' \\| ')[[1]]
@@ -364,16 +521,49 @@ redcap_import_recode <- function(selected_data,
         cat(underline("\n\nFactor levels found in data table:\n\n"))
         cat(levels, sep = "\n")
         cat(underline("\n\nCoding according to REDCap:\n\n"))
-        print(coded_options)
+        print(coded_options,row.names = FALSE)
 
-        cat("\n\nDo you want to recode this variable?\n  1 = YES \n  0 = NO (move to next variable)")
+
+
+        ### auto recoding ----
+
+        #cat(underline("\n\nSuggested recoding:"))
+
+        for (l in seq_along(levels)) {
+          sim_code <- stringdist::stringsim(tolower(levels[l]),tolower(coded_options$codes))
+          sim_option <-stringdist::stringsim(tolower(levels[l]),tolower(coded_options$options))
+
+          # HIER!!!!
+          # try to build an output dataframe that can be printed afterwards!
+          # take either the code or the option depending on where the match was made
+          # but show always all three (level in data table, code in rc, label in rc)
+          # write NA if no match
+          # also write NA if multiple matches (should not happen ot often)
+
+          coded_options$options[sim_option > 0.8]
+          cat(levels[l],coded_options$options[sim_option > 0.8])
+
+        }
+
+
+        # cat("\n\nWould you like to recode this variable as suggested or do it manually?")
+        # cat("\n 1 = recode as suggested")
+        # cat("\n 0 = recode manually")
+        # cat("\n 'skip' = skip this variable")
+        # cat("\n 'exit' = stop loop")
+
+
+        cat("Do you want to recode this variable?")
+        cat("\n  1 = YES (start recoding now)")
+        cat("\n  0 = NO (move to next variable)")
         ans <- ""
+
         while (ans != '1' && ans != '0') {                                         # recoding?
           ans <- readline(prompt="Answer= ")
           if (ans != '1' && ans != '0') {
-            cat("Please check your answer!
-            1 = YES start recoding now
-            0 = NO move to next variable")
+            cat("Please check your answer!")
+            cat("\n  1 = YES (start recoding now)")
+            cat("\n  0 = NO (move to next variable)")
           }
         }
 
@@ -384,18 +574,39 @@ redcap_import_recode <- function(selected_data,
           cat(bold(underline(name)))
           log <- character()
           recoded_var <- new_var
+
           for (l in seq_along(levels)) {                                               # loop through factor levels and compare with codes in REDCap
             lvl <- as.character(levels[l])
+
             if (!any(str_detect(coded_options$codes,paste0("^",lvl,"$")))) {
+
               cat("\n\n\nNo matching code found for factor level:", bold(underline(lvl)))
               cat("\n\nPlease choose maching code from REDCap Dictionnary:\n")
               print(coded_options)
-              cat("\nPlease type matching code from the list above.\n 'NA' = set to missing value \n 'exit' = do Not recode this item \n 'skip' = do NOT recode this option")
+
+              cat("\nPlease type matching code from the list above.")
+              cat("\n 'NA' = set to missing value")
+              cat("\n 'exit' = do Not recode this item")
+              cat("\n 'skip' = do NOT recode this option")
               ans <- ""
-              while (!any(str_detect(coded_options$codes,paste0("^",ans,"$"))) && ans != 'exit' && ans != 'skip' && ans != 'NA') {
+
+              while (!any(str_detect(coded_options$codes,paste0("^",ans,"$"))) &&
+                     ans != 'exit' &&
+                     ans != 'skip' &&
+                     ans != 'NA') {
+
                 ans <- readline(prompt="Code= ")
-                if (!any(str_detect(coded_options$codes,paste0("^",ans,"$"))) && ans !='exit' && ans != 'skip' && ans != 'NA') {
-                  cat("Code not recognized: Please try again!\n 'NA' = set to missing value \n 'exit' = do Not recode this item \n 'skip' = do NOT recode this option")
+
+                if (!any(str_detect(coded_options$codes,paste0("^",ans,"$"))) &&
+                    ans !='exit' &&
+                    ans != 'skip' &&
+                    ans != 'NA') {
+
+                  cat("Code not recognized: Please try again!")
+                  cat("\n 'NA' = set to missing value")
+                  cat("\n 'exit' = do Not recode this item")
+                  cat("\n 'skip' = do NOT recode this option")
+                  ans <- ""
                 }
               }
 
