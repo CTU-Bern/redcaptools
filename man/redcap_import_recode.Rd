@@ -7,11 +7,19 @@
 redcap_import_recode(
   selected_data,
   dict = NULL,
+  missing_codes = NULL,
   rc_token,
   rc_url,
+  start_var = 1,
+  pot_miss = c("miss", "unknown", "excluded", "^0$", "NA", "N.A."),
+  auto_conv = TRUE,
+  auto_recode = FALSE,
   skip_intro = FALSE,
+  continue = TRUE,
   suppress_txt = FALSE,
   log = TRUE,
+  log_code = "redcap_import_recode_code.txt",
+  log_table = "redcap_import_recode_overview.csv",
   wait = 2
 )
 }
@@ -19,21 +27,50 @@ redcap_import_recode(
 \item{selected_data}{Data to be recoded}
 
 \item{dict}{Data dictionary (e.g. as downloaded from REDCap or via
-\code{redcap_export_meta(rc_token, rc_url)$meta}). If not supplied, this will
-be downloaded from the API using \code{rc_token}.}
+\code{redcap_export_meta(rc_token, rc_url)$meta}). If not supplied, this
+will be downloaded from the API using \code{rc_token} and \code{rc_token}.}
+
+\item{missing_codes}{If a data dictionary is provided by the user, missing
+codes as defined in REDCap must be provided as well (if applicable). The
+missing codes should be provided in a single string with [code] [label]
+separated by a comma for each option and a pipe between the options (e.g.,
+"EXCL, Excluded | NA, not available"). If no data dictionary is provided,
+the codes will be downloaded from the API using \code{rc_token} and
+\code{rc_token} (if applicable).}
 
 \item{rc_token}{REDCap API token}
 
-\item{rc_url}{Link to REDCap API. Default: https://redcap.ctu.unibe.ch/api/}
+\item{rc_url}{Link to REDCap API}
 
-\item{skip_intro}{If set to TRUE, the introduction messages will be skipped.
-Default = FALSE}
+\item{start_var}{Define in which column of the import data the loop should
+start. Default = 1.}
 
-\item{suppress_txt}{If set TRUE, all text output will be suppressed (not
+\item{pot_miss}{The data is inspected for potential missing values that can be
+recoded. Expressions can be defined in a character vector and a text-search
+is applied to search through the data. Default =
+c("miss","unknown","excluded","^0$","NA","N.A.").}
+
+\item{auto_conv}{If TRUE, ....}
+
+\item{auto_recode}{If TRUE, ....}
+
+\item{skip_intro}{If TRUE, the introduction messages will be skipped. Default
+= FALSE}
+
+\item{continue}{If TRUE, a question to continue will be asked before moving
+along the loop. Default = TRUE.}
+
+\item{suppress_txt}{If TRUE, all text output will be suppressed (not
 recommended). Default = FALSE.}
 
-\item{log}{If TRUE, an overview csv-table, and a log-file are stored in the
+\item{log}{If TRUE, an overview csv-table, and a txt-file are stored in the
 working directory. Default = TRUE.}
+
+\item{log_code}{Name and location of the txt-file containing the executed
+code. Default = redcap_import_recode_code.txt.}
+
+\item{log_table}{Name and location of the csv.table containing the tabular
+overview. Default = redcap_import_recode_overview.csv.}
 
 \item{wait}{Allows you to set the latency time between the steps. Default =
 2s.}
@@ -42,15 +79,15 @@ working directory. Default = TRUE.}
 Data frame with recoded data. Log-file with executed code.
 }
 \description{
-This function loops through all the variable classes of a data set and lets
-the user compare them with the variable types set up in REDCap. An API token
-is needed to download the variable names from REDCap. The class/type can be
-changed to output a new summary and to match REDCap. If 'factor' is chosen as
-class, the script loops through all the factor levels and compares them with
-the coding as defined in REDCap. The factor levels can then be matched with
-the respective codes in REDCap. The function returns a data frame with the
-recoded variables and writes the executed code to a log-file for copy-pasting
-and adjusting/reusing.
+This function loops through all the variables of a data set and lets the user
+compare them with the variables set up in REDCap. An API token is needed to
+download the variable names from REDCap. The class/type can be changed to
+output a new summary and to match REDCap. If 'factor' is chosen as class, the
+script loops through all the factor levels and compares them with the coding
+as defined in REDCap. The factor levels can then be matched with the
+respective codes in REDCap. The function returns a data frame with the recoded
+variables and writes the executed code to a log-file for copy-pasting and
+adjusting/reusing.
 }
 \examples{
 # data(importdemo_data)

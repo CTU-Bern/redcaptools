@@ -4,14 +4,16 @@
 #'user compare them with the variable names set up in REDCap. \cr The REDCap
 #'data dictionary can either be directly provided or downloaded from the REDCap
 #'project by providing an API token and matching URL. \cr For variables with
-#'matching names in REDCap, the user can decide to automatically select them
-#'without renaming. If auto-selecting is turned off, the user can decide to not
-#'select these variables at all or to select and rename them. \cr For variables
-#'without matching names in REDCap, the user will always be prompted to decide
-#'either to not select these variables at all or to select and rename them. \cr
+#'matching names in REDCap, the function can be run so that they will be
+#'automatically selected without renaming. If auto-selecting is turned off, the
+#'user can decide to not select these variables at all or to select and rename
+#'them. \cr For variables without matching names in REDCap, the function can be
+#'run so that they will be automatically skipped. If auto-skipping is turned
+#'off, the user can decide to select these variables anyway (helpful e.g. when
+#'they need to be split for checkbox fields) or to select and rename them. \cr
 #'The function returns a data frame with the selected/renamed variables, writes
-#'an overview csv-table, and a short summary with the executed code to a
-#'log-file for copy-pasting and adjusting/reusing.
+#'an overview csv-table, and the executed code to a txt-file for copy-pasting
+#'and adjusting/reusing.
 #'
 #'
 #'@param import_data Data frame to be imported
@@ -31,7 +33,7 @@
 #'@param auto_skip_nomatch If TRUE, variables without matching names will be
 #'  automatically skipped. If FALSE, the user can decide to select and rename
 #'  the variable. Default = FALSE.
-#'@param no_match_suggestion For variables without matching names similar names
+#'@param no_match_suggestion For variables without matching names, similar names
 #'  in REDCap will be suggested. With this numeric similarity index between 0
 #'  (no similarity at all = shows all items) and 1 (identical = shows only
 #'  perfect matches) the number of suggestions can be adjusted. Type '0' to turn
@@ -42,19 +44,21 @@
 #'  moving along the loop. Default = TRUE.
 #'@param suppress_txt If TRUE, all text output will be suppressed (not
 #'  recommended). Default = FALSE.
-#'@param log If TRUE, an overview csv-table, and a log-file are stored in the
+#'@param log If TRUE, an overview csv-table, and a txt-file are stored in the
 #'  working directory. Default = TRUE.
-#'@param log_code Name and location of the log-file containing the executed
+#'@param log_code Name and location of the txt-file containing the executed
 #'  code. Default = redcap_import_select_code.txt.
 #'@param log_table Name and location of the csv.table containing the tabular
 #'  overview. Default = redcap_import_select_overview.csv.
-#'@param log_unused IF TRUE, all non-used REDCap variables will be listed in the
-#' end of the csv-table. Default = TRUE.
+#'@param log_unused IF TRUE, all REDCap variable names that have not been
+#'  matched with the data dictionary  will be listed in the end of the
+#'  csv-table. Default = TRUE.
 #'@param wait Allows you to set the latency time between the steps. Default =
 #'  2s.
 #'
 #'@return Data frame with selected/renamed data. Log-file with executed code.
 #'  CSV-table with overview.
+#'
 #'@export
 #'@importFrom stringr str_detect
 #'@importFrom crayon bold underline blue italic
@@ -127,10 +131,10 @@ redcap_import_select <- function(import_data,
   if(!is.logical(auto_skip_nomatch)) stop("auto_skip_nomatch should be logical (TRUE/FALSE)")
   if(!is.numeric(no_match_suggestion) | no_match_suggestion < 0 | no_match_suggestion > 1) stop("no_match_suggestion should be a number between 0 and 1")
   if(!is.logical(skip_intro)) stop("skip_intro should be logical (TRUE/FALSE)")
-  if(!is.logical(continue)) stop("suppress_txt should be logical (TRUE/FALSE)")
+  if(!is.logical(continue)) stop("continue should be logical (TRUE/FALSE)")
   if(!is.logical(suppress_txt)) stop("suppress_txt should be logical (TRUE/FALSE)")
   if(!is.logical(log)) stop("log should be logical (TRUE/FALSE)")
-  if(!is.character(log_code) || length(log_code) != 1 || !grepl("\\.txt$", log_code)) stop("please provide a valid path for code-file")
+  if(!is.character(log_code) || length(log_code) != 1 || !grepl("\\.txt$", log_code)) stop("please provide a valid path for txt-file")
   if(!is.character(log_table) || length(log_table) != 1 || !grepl("\\.csv$", log_table)) stop("please provide a valid path for csv-table")
   if(!is.logical(log_unused)) stop("log_unused should be logical (TRUE/FALSE)")
   if(length(wait) != 1) {
@@ -216,7 +220,7 @@ redcap_import_select <- function(import_data,
   # open log-files ----
 
   if(log) {
-    write.table(paste0("\n\n",format(Sys.time(), "%Y-%m-%d %H:%M:%S"),":\n\nselected_data <- select(import_data"), log_code, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
+    write.table(paste0("\n\n",format(Sys.time(), "%Y-%m-%d %H:%M:%S"),":\n\nselected_data <- select(",deparse(substitute(import_data))), log_code, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
     write.table(paste0("\n\n",format(Sys.time(), "%Y-%m-%d %H:%M:%S")), log_table, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
     write.table(",Variable,Selected,Not Selected,New Name\n", log_table, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
   }
@@ -238,7 +242,7 @@ redcap_import_select <- function(import_data,
   for (i in seq_along(imp_vars)) {
 
     # initiate option to go back with a while loop
-    # in order to exit the for loop an additional variable is needed which can be set to through
+    # in order to exit the for-loop an additional variable is needed which can be set to TRUE during the loop
     goback = TRUE
     for_break = FALSE
 

@@ -86,7 +86,7 @@ redcap_dates <- function(var,
                 var)
 
   # if date was entered in Excel format
-  var <- ifelse(grepl("{5}",var),
+  var <- ifelse(grepl("^[0-9]{5}$",var),
                 as.character(as.Date(as.numeric(var), origin = "1899-12-30")),
                 var)
 
