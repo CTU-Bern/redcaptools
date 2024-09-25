@@ -20,7 +20,8 @@ redcap_import_recode(
   log = TRUE,
   log_code = "redcap_import_recode_code.txt",
   log_table = "redcap_import_recode_overview.csv",
-  wait = 2
+  wait = 2,
+  ...
 )
 }
 \arguments{
