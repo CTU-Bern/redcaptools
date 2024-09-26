@@ -76,6 +76,7 @@ redcap_import_recode <- function(selected_data,
                                  rc_url,
                                  start_var = 1,
                                  pot_miss = c("miss","unknown","excluded","^0$","NA","N.A."),
+                                 if_empty = NA,
                                  auto_conv = TRUE,
                                  auto_recode = FALSE,
                                  skip_intro = FALSE,
@@ -616,18 +617,18 @@ redcap_import_recode <- function(selected_data,
           log_default <- paste0("as.character(as.numeric(",name,"))")
         }
 
-
-          sprintf("2",fmt = '%#.1f')
         # number 1 DP
         if (conv_to == 'num1') {
 
           if (change_round) {
-            converted_var <- if_else(grepl("^[+-]?[0-9]+(\\.[0-9]{1})?$", as.character(round(as.numeric(var),digits = 1))),round(as.numeric(var),digits = 1),NA)
-            log_default <- paste0("as.character(round(as.numeric(",name,"),digits = 1))")
+            converted_var <- if_else(grepl("^[+-]?[0-9]+(\\.[0-9]{1})?$", as.character(round(as.numeric(var),digits = 1))),sprintf(as.numeric(var),fmt = '%#.1f'),NA)
+            special_sum_var <- if_else(grepl("^[+-]?[0-9]+(\\.[0-9]{1})?$", as.character(round(as.numeric(var),digits = 1))),round(as.numeric(var),digits = 1),NA)
+            log_default <- paste0("sprintf(as.numeric(",name,"),fmt = '%#.1f')")
 
           } else {
-            converted_var <- if_else(grepl("^[+-]?[0-9]+(\\.[0-9]{1})?$", var),round(as.numeric(var),digits = 1),NA)
-            log_default <- paste0("as.character(round(as.numeric(",name,"),digits = 1))")
+            converted_var <- if_else(grepl("^[+-]?[0-9]+(\\.[0-9]{1})?$", var),sprintf(as.numeric(var),fmt = '%#.1f'),NA)
+            special_sum_var <- if_else(grepl("^[+-]?[0-9]+(\\.[0-9]{1})?$", var),round(as.numeric(var),digits = 1),NA)
+            log_default <- paste0("sprintf(as.numeric(",name,"),fmt = '%#.1f')")
           }
 
         }
@@ -636,12 +637,14 @@ redcap_import_recode <- function(selected_data,
         if (conv_to == 'num2') {
 
           if (change_round) {
-            converted_var <- if_else(grepl("^[+-]?[0-9]+(\\.[0-9]{1,2})?$", as.character(round(as.numeric(var),digits = 2))),round(as.numeric(var),digits = 2),NA)
-            log_default <- paste0("as.character(round(as.numeric(",name,"),digits = 2))")
+            converted_var <- if_else(grepl("^[+-]?[0-9]+(\\.[0-9]{1,2})?$", as.character(round(as.numeric(var),digits = 2))),sprintf(as.numeric(var),fmt = '%#.2f'),NA)
+            special_sum_var <- if_else(grepl("^[+-]?[0-9]+(\\.[0-9]{1,2})?$", as.character(round(as.numeric(var),digits = 2))),round(as.numeric(var),digits = 2),NA)
+            log_default <- paste0("sprintf(as.numeric(",name,"),fmt = '%#.2f')")
 
           } else {
-            converted_var <- if_else(grepl("^[+-]?[0-9]+(\\.[0-9]{1,2})?$", var),round(as.numeric(var),digits = 2),NA)
-            log_default <- paste0("as.character(round(as.numeric(",name,"),digits = 2))")
+            converted_var <- if_else(grepl("^[+-]?[0-9]+(\\.[0-9]{1,2})?$", var),sprintf(as.numeric(var),fmt = '%#.2f'),NA)
+            special_sum_var <- if_else(grepl("^[+-]?[0-9]+(\\.[0-9]{1,2})?$", var),round(as.numeric(var),digits = 2),NA)
+            log_default <- paste0("sprintf(as.numeric(",name,"),fmt = '%#.2f')")
           }
 
         }
@@ -650,12 +653,14 @@ redcap_import_recode <- function(selected_data,
         if (conv_to == 'num3') {
 
           if (change_round) {
-            converted_var <- if_else(grepl("^[+-]?[0-9]+(\\.[0-9]{1,3})?$", as.character(round(as.numeric(var),digits = 3))),round(as.numeric(var),digits = 3),NA)
-            log_default <- paste0("as.character(round(as.numeric(",name,"),digits = 3))")
+            converted_var <- if_else(grepl("^[+-]?[0-9]+(\\.[0-9]{1,3})?$", as.character(round(as.numeric(var),digits = 3))),sprintf(as.numeric(var),fmt = '%#.3f'),NA)
+            special_sum_var <- if_else(grepl("^[+-]?[0-9]+(\\.[0-9]{1,3})?$", as.character(round(as.numeric(var),digits = 3))),round(as.numeric(var),digits = 3),NA)
+            log_default <- paste0("sprintf(as.numeric(",name,"),fmt = '%#.3f')")
 
           } else {
-            converted_var <- if_else(grepl("^[+-]?[0-9]+(\\.[0-9]{1,3})?$", var),round(as.numeric(var),digits = 3),NA)
-            log_default <- paste0("as.character(round(as.numeric(",name,"),digits = 3))")
+            converted_var <- if_else(grepl("^[+-]?[0-9]+(\\.[0-9]{1,3})?$", var),sprintf(as.numeric(var),fmt = '%#.3f'),NA)
+            special_sum_var <- if_else(grepl("^[+-]?[0-9]+(\\.[0-9]{1,3})?$", var),round(as.numeric(var),digits = 3),NA)
+            log_default <- paste0("sprintf(as.numeric(",name,"),fmt = '%#.3f')")
           }
 
         }
@@ -664,12 +669,14 @@ redcap_import_recode <- function(selected_data,
         if (conv_to == 'num4') {
 
           if (change_round) {
-            converted_var <- if_else(grepl("^[+-]?[0-9]+(\\.[0-9]{1,4})?$", as.character(round(as.numeric(var),digits = 4))),round(as.numeric(var),digits = 4),NA)
-            log_default <- paste0("as.character(round(as.numeric(",name,"),digits = 4))")
+            converted_var <- if_else(grepl("^[+-]?[0-9]+(\\.[0-9]{1,4})?$", as.character(round(as.numeric(var),digits = 4))),sprintf(as.numeric(var),fmt = '%#.4f'),NA)
+            special_sum_var <- if_else(grepl("^[+-]?[0-9]+(\\.[0-9]{1,4})?$", as.character(round(as.numeric(var),digits = 4))),round(as.numeric(var),digits = 4),NA)
+            log_default <- paste0("sprintf(as.numeric(",name,"),fmt = '%#.4f')")
 
           } else {
-            converted_var <- if_else(grepl("^[+-]?[0-9]+(\\.[0-9]{1,4})?$", var),round(as.numeric(var),digits = 4),NA)
-            log_default <- paste0("as.character(round(as.numeric(",name,"),digits = 4))")
+            converted_var <- if_else(grepl("^[+-]?[0-9]+(\\.[0-9]{1,4})?$", var),sprintf(as.numeric(var),fmt = '%#.4f'),NA)
+            special_sum_var <- if_else(grepl("^[+-]?[0-9]+(\\.[0-9]{1,4})?$", var),round(as.numeric(var),digits = 4),NA)
+            log_default <- paste0("sprintf(as.numeric(",name,"),fmt = '%#.4f')")
           }
 
         }
@@ -743,28 +750,38 @@ redcap_import_recode <- function(selected_data,
       cat("\n------------------------------- Conversion ------------------------------")
 
       cat("\n\nData Summary:\n")
-      print(summary(converted_var))
+      if(conv_to %in% c("num1","num2","num3","num4")) {
+        print(summary(special_sum_var))
+      } else {
+        print(summary(converted_var))
+      }
       cat(str(converted_var))
 
       ## Potential Missings ----
 
-      cat("\n\nPotential Missings:")
-      potential_missings <- grepl(paste(pot_miss,collapse="|"),var, ignore.case = TRUE) | is.na(var)
+      potential_missings <- grepl(paste(pot_miss,collapse="|"),var, ignore.case = TRUE)
 
       if (any(potential_missings)) {
+        cat("\n\nPotential Missings:")
         print(kable(summary(as.factor(var[potential_missings])),col.names = "Cases:"))
-      } else {
-        cat("\n(No missings found!)")
       }
 
+
       ## Not matching Format ----
-      cat("\n\nNot possible to convert:")
-      no_match <- is.na(converted_var) & !potential_missings
+
+      no_match <- is.na(converted_var) &  !is.na(var) & !potential_missings
 
       if (any(no_match)) {
+        cat("\n\nNot possible to convert:")
         print(kable(summary(as.factor(var[no_match])),col.names = "Cases:"))
-      } else {
-        cat("\n(No problems found!)")
+      }
+
+      ## Empty ----
+
+      empty_cells <- is.na(var)
+
+      if (any(empty_cells)) {
+        cat(paste0("\n\nEmpty cells: ",sum(empty_cells)))
       }
 
       cat("\n\n")
@@ -781,28 +798,28 @@ redcap_import_recode <- function(selected_data,
         cat("\n1 = YES (start recoding)")
         cat("\n2 = change expressions indicating missing values in this variable")
         if(conv_to %in% c("int","num1","num2","num3","num4")) {
-          cat("\nround = round values with too many decimals")
+          cat("\n3 = round values with too many decimals")
         }
         cat("\n0 = NO (start over)")
         contconv_ans <- ""
 
         while (contconv_ans != '1' &
                contconv_ans != '2' &
-               contconv_ans != 'round' &
+               contconv_ans != '3' &
                contconv_ans != '0') {
 
           contconv_ans <- readline(prompt="Answer: ")
 
           if (contconv_ans != '1' &
               contconv_ans != '2' &
-              contconv_ans != 'round' &
+              contconv_ans != '3' &
               contconv_ans != '0') {
 
             cat("Please check your answer!")
             cat("\n1 = YES (start recoding)")
             cat("\n2 = change expressions indicating missing values in this variable")
             if(conv_to %in% c("int","num1","num2","num3","num4")) {
-              cat("\nround = round values with too many decimals")
+              cat("\n3 = round values with too many decimals")
             }
             cat("\n0 = NO (start over)")
             contconv_ans <- ""
@@ -843,7 +860,7 @@ redcap_import_recode <- function(selected_data,
       }
 
       ### round numeric values ----
-      if (contconv_ans == 'round') {
+      if (contconv_ans == '3') {
 
         # set change_round to TRUE so questions are skipped and rounding performed in conversion-part
         change_round <- TRUE
@@ -887,7 +904,7 @@ redcap_import_recode <- function(selected_data,
     cat("------------------------------- Recoding --------------------------------")
 
 
-    if (!is.factor(converted_var) & !any(potential_missings) & !any(no_match)) {
+    if (!is.factor(converted_var) & !any(potential_missings) & !any(no_match) & !any(empty_cells)) {
 
       cat("\n\nNo recoding necessary!\n\n")
       recoded_var <- var
@@ -898,6 +915,12 @@ redcap_import_recode <- function(selected_data,
       to_recode <- c()
       coded_options <- data.frame(code = character(),
                                   label = character())
+    }
+
+    ### if empty cells ----
+
+    if (any(empty_cells)) {
+      to_recode <- c(to_recode,NA)
     }
 
     ### if factor ----
@@ -937,6 +960,8 @@ redcap_import_recode <- function(selected_data,
     }
 
 
+
+
 # TODO:
 # just because there is nothing to recode, does not mean that the var does not need to be converted
 # if all values match the suggested format, the conversion still needs to be made (e.g., for numbers)
@@ -965,7 +990,7 @@ redcap_import_recode <- function(selected_data,
         ## summarize values & codes ----
 
         cat(underline("\n\n\nPotential values to recode in data table:"))
-        print(kable(summary(factor(var[var %in% to_recode | is.na(var)],levels = to_recode)),col.names = "Cases:"))
+        print(kable(summary(factor(var[var %in% to_recode],levels = to_recode)),col.names = "Cases:"))
 
         cat(underline("\n\nPotential codes to use from REDCap codebook:"))
         print(kable(coded_options))
@@ -983,75 +1008,94 @@ redcap_import_recode <- function(selected_data,
                                   stringsAsFactors = FALSE)
 
 
-        #TODO: add NAs!
-
         ## start auto-recoding for-loop ----
         for (l in seq_along(to_recode)) {
 
           lvl = to_recode[l]
 
-          # compare code
-          sim_code <- stringdist::stringsim(tolower(lvl),tolower(coded_options$code))
-          # compare option label
-          sim_option <-stringdist::stringsim(tolower(lvl),tolower(coded_options$label))
+          if(!is.na(lvl)) {
 
-          ### no match ----
-          if (!any(sim_code > 0.8) & !any(sim_option > 0.8)) {
-            sugg_coding <- sugg_coding |>
-              rbind(data.frame(data = lvl,
-                               to = "   ",
-                               rc = "(no match found)",
-                               code = NA,
-                               stringsAsFactors = FALSE
-              ))
-            next
-          }
+            # compare code
+            sim_code <- stringdist::stringsim(tolower(lvl),tolower(coded_options$code))
+            # compare option label
+            sim_option <-stringdist::stringsim(tolower(lvl),tolower(coded_options$label))
 
-          ## multiple matches ----
-          if (sum(sim_code > 0.8) > 1 | sum(sim_option > 0.8) > 1) {
-            sugg_coding <- sugg_coding |>
-              rbind(data.frame(data = lvl,
-                               to = "   ",
-                               rc = "(mutliple matches found)",
-                               code = NA,
-                               stringsAsFactors = FALSE
-              ))
-            next
-          }
+            ### no match ----
+            if (!any(sim_code > 0.8) & !any(sim_option > 0.8)) {
+              sugg_coding <- sugg_coding |>
+                rbind(data.frame(data = lvl,
+                                 to = "   ",
+                                 rc = "(no match found)",
+                                 code = NA,
+                                 stringsAsFactors = FALSE
+                ))
+              next
+            }
 
-          ## code and option match----
-          if (any(sim_code > 0.8) & any(sim_option > 0.8)) {
-            sim_option <- NULL # code is more relevant than label
-          }
+            ## multiple matches ----
+            if (sum(sim_code > 0.8) > 1 | sum(sim_option > 0.8) > 1) {
+              sugg_coding <- sugg_coding |>
+                rbind(data.frame(data = lvl,
+                                 to = "   ",
+                                 rc = "(mutliple matches found)",
+                                 code = NA,
+                                 stringsAsFactors = FALSE
+                ))
+              next
+            }
 
-          ## code match ----
-          if (any(sim_code > 0.8)) {
-            sugg_coding <- sugg_coding |>
-              rbind(data.frame(data = lvl,
-                               to = "   ",
-                               rc = paste0(coded_options$code[sim_code > 0.8]," (",rc_option = coded_options$label[sim_code > 0.8],")"),
-                               code = coded_options$code[sim_code > 0.8],
-                               stringsAsFactors = FALSE
-              ))
-          }
+            ## code and option match----
+            if (any(sim_code > 0.8) & any(sim_option > 0.8)) {
+              sim_option <- NULL # code is more relevant than label
+            }
 
-          ## option match ----
-          if (any(sim_option > 0.8)) {
-            sugg_coding <- sugg_coding |>
-              rbind(data.frame(data = lvl,
-                               to = "   ",
-                               rc = paste0(coded_options$code[sim_option > 0.8]," (",rc_option = coded_options$label[sim_option > 0.8],")"),
-                               code = coded_options$code[sim_option > 0.8],
-                               stringsAsFactors = FALSE
-              )
-              )
+            ## code match ----
+            if (any(sim_code > 0.8)) {
+              sugg_coding <- sugg_coding |>
+                rbind(data.frame(data = lvl,
+                                 to = "   ",
+                                 rc = paste0(coded_options$code[sim_code > 0.8]," (",rc_option = coded_options$label[sim_code > 0.8],")"),
+                                 code = coded_options$code[sim_code > 0.8],
+                                 stringsAsFactors = FALSE
+                ))
+            }
+
+            ## option match ----
+            if (any(sim_option > 0.8)) {
+              sugg_coding <- sugg_coding |>
+                rbind(data.frame(data = lvl,
+                                 to = "   ",
+                                 rc = paste0(coded_options$code[sim_option > 0.8]," (",rc_option = coded_options$label[sim_option > 0.8],")"),
+                                 code = coded_options$code[sim_option > 0.8],
+                                 stringsAsFactors = FALSE
+                                 )
+                      )
+            }
           }
         } # end auto-recoding loop
 
         ## suggestion ----
         cat(underline("\n\nSuggestion:"))
         print(kable(sugg_coding[1:3],col.names = c("Value in Data Table","","Suggested Code")))
-        cat("\n(Values for which no/multiple matches are found will be set to NA!)")
+
+        ### empty cells ----
+        cat("\nValues for which no/multiple matches are found will be set to <NA>!")
+        if (any(empty_cells)) {
+          cat("\n\nEmpty cells (NA's) will be converted to: ")
+          if (is.na(if_empty)) {
+            cat("<NA>")
+            recode_empty <- NA
+          } else {
+            if (any(str_detect(coded_options$code,paste0("^",if_empty,"$")))) {
+              cat(paste0(coded_options$code[str_detect(coded_options$code,paste0("^",if_empty,"$"))]," (",coded_options$label[str_detect(coded_options$code,paste0("^",if_empty,"$"))],")"))
+              recode_empty <- coded_options$code[str_detect(coded_options$code,paste0("^",if_empty,"$"))]
+            } else {
+              cat("<NA> (provided code not recognized)")
+              recode_empty <- NA
+            }
+          }
+        }
+
         Sys.sleep(wait)
 
 
@@ -1123,15 +1167,34 @@ redcap_import_recode <- function(selected_data,
           log_recode <- character()
           recoded_var <- as.factor(var)
 
-          for (l in seq_along(to_recode)) {
-            lvl <- as.character(to_recode[l])
+          if (any(empty_cells)) {
+            # recode empty cells first:
+            recoded_var <- as.character(recoded_var)
+            recoded_var[is.na(recoded_var)] <- recode_empty
+            recoded_var <- as.factor(recoded_var)
 
-            levels(recoded_var)[which(levels(recoded_var) == lvl)] <- sugg_coding$code[l]
-
-            if (is.na(sugg_coding$code[l])) {
-              log_recode <- c(log_recode,paste0(", '",lvl,"' ~ NA"))
+            if (is.na(recode_empty)) {
+              log_recode <- c(log_recode,", NA ~ NA")
             } else {
-              log_recode <- c(log_recode,paste0(", '",lvl,"' ~ '",sugg_coding$code[l],"'"))
+              log_recode <- c(log_recode,paste0(", NA ~ '",recode_empty,"'"))
+            }
+          }
+
+
+
+          for (l in seq_along(to_recode)) {
+
+            # recode all levels, ignore NAs
+            if (!is.na(to_recode[l])) {
+
+              lvl <- as.character(to_recode[l])
+              levels(recoded_var)[which(levels(recoded_var) == lvl)] <- sugg_coding$code[sugg_coding$data == to_recode[l]]
+
+              if (is.na(sugg_coding$code[sugg_coding$data == to_recode[l]])) {
+                log_recode <- c(log_recode,paste0(", '",lvl,"' ~ NA"))
+              } else {
+                log_recode <- c(log_recode,paste0(", '",lvl,"' ~ '",sugg_coding$code[sugg_coding$data == to_recode[l]],"'"))
+              }
             }
           }
         }
@@ -1154,23 +1217,27 @@ redcap_import_recode <- function(selected_data,
           cat("Let's begin!\n\n\n")
 
 
-
           ### start manual-recoding for-loop ----
           # loop through values to recode and compare with codes in REDCap
 
           for (l in seq_along(to_recode)) {
-            lvl <- as.character(to_recode[l])
 
-            cat("Value to recode:", bold(underline(lvl)))
+            if (l == 1 & any(empty_cells)) {
+              cat(bold(underline("First let's decide what to do with empty cells!")))
+
+            } else {
+              lvl <- as.character(to_recode[l])
+              cat("\nValue to recode:", bold(underline(lvl)))
+            }
+
             cat("\n\nCodes to use from codebook in REDCap:")
             print(kable(coded_options))
-
 
 
             ### INPUT ----
 
             cat("\nPlease type matching code from the codebook or choose one of the following options:")
-            cat("\n 'delete' = delete value, field will be set to NA")
+            cat("\n 'delete' = delete value, field will be set to NA (or stays NA)")
             cat("\n 'skip' = do NOT recode this value, value will stay as it is")
             cat("\n 'stop' = stop recoding for this variable, move to next variable")
             cat("\n 'exit' = stop loop, exit code")
@@ -1192,7 +1259,7 @@ redcap_import_recode <- function(selected_data,
 
                 cat("Code not recognized: Please try again!")
                 cat("\n\nPlease type matching code from the codebook or choose one of the following options:")
-                cat("\n 'delete' = delete value, field will be set to NA")
+                cat("\n 'delete' = delete value, field will be set to NA (or stays NA)")
                 cat("\n 'skip' = do NOT recode this value, value will stay as it is")
                 cat("\n 'stop' = stop recoding for this variable, move to next variable")
                 cat("\n 'exit' = stop loop, exit code")
@@ -1229,15 +1296,42 @@ redcap_import_recode <- function(selected_data,
 
             # set to missing
             if (rec_ans == 'delete') {
-              levels(recoded_var)[which(levels(recoded_var) == lvl)] <- NA
-              log_recode <- c(log_recode,paste0(", '",lvl,"' ~ NA"))
+
+              # empty cells
+              if (l == 1 & any(empty_cells)) {
+                recoded_var <- recoded_var
+                log_recode <- c(log_recode,", NA ~ NA")
+
+                # any other value
+                } else {
+                  levels(recoded_var)[which(levels(recoded_var) == lvl)] <- NA
+                  log_recode <- c(log_recode,paste0(", '",lvl,"' ~ NA"))
+                }
             }
+
 
             # recode
             if (any(str_detect(coded_options$code,paste0("^",rec_ans,"$")))) {
-              levels(recoded_var)[which(levels(recoded_var) == lvl)] <- rec_ans
-              log_recode <- c(log_recode,paste0(", '",lvl,"' ~ '",rec_ans,"'"))
+
+              # empty cells
+              if (l == 1 & any(empty_cells)) {
+                recoded_var <- as.character(recoded_var)
+                recoded_var[is.na(recoded_var)] <- rec_ans
+                recoded_var <- as.factor(recoded_var)
+
+                log_recode <- c(log_recode,paste0(", NA ~ '",rec_ans,"'"))
+
+              # any other value
+              } else {
+                levels(recoded_var)[which(levels(recoded_var) == lvl)] <- rec_ans
+                log_recode <- c(log_recode,paste0(", '",lvl,"' ~ '",rec_ans,"'"))
+              }
             }
+
+
+
+
+
 
 
             ## end manual-recoding for-loop ----
@@ -1276,10 +1370,10 @@ redcap_import_recode <- function(selected_data,
         print(kable(coded_options))
 
         cat(underline("\n\nSummary before recoding:"))
-        print(kable(summary(as.factor(var[var %in% to_recode | is.na(var)])),col.names = "Cases:"))
+        print(kable(summary(as.factor(var[var %in% to_recode])),col.names = "Cases:"))
 
         cat(underline("\n\nSummary after recoding:"))
-        print(kable(summary(as.factor(recoded_var[var %in% to_recode | is.na(var)])),col.names = "Cases:"))
+        print(kable(summary(as.factor(recoded_var[var %in% to_recode])),col.names = "Cases:"))
 
         cat("\n-------------------------------------------------------------------------")
         Sys.sleep(wait)
@@ -1322,7 +1416,8 @@ redcap_import_recode <- function(selected_data,
                                   recoded_var
           ) |>
             mutate(final_var = if_else(recoded_var != var |
-                                         (recoded_var == var & recoded_var %in% missing_codes$code),
+                                         (recoded_var == var & recoded_var %in% missing_codes$code) |
+                                         (is.na(var) & !is.na(recoded_var)),
                                        recoded_var,
                                        converted_var)) |>
             pull(final_var)
