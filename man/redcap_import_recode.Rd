@@ -12,8 +12,10 @@ redcap_import_recode(
   rc_url,
   start_var = 1,
   pot_miss = c("miss", "unknown", "excluded", "^0$", "NA", "N.A."),
+  if_empty = NA,
   auto_conv = TRUE,
   auto_recode = FALSE,
+  auto_recode_precision = 0.8,
   skip_intro = FALSE,
   continue = TRUE,
   suppress_txt = FALSE,
@@ -49,11 +51,15 @@ start. Default = 1.}
 \item{pot_miss}{The data is inspected for potential missing values that can be
 recoded. Expressions can be defined in a character vector and a text-search
 is applied to search through the data. Default =
-c("miss","unknown","excluded","^0$","NA","N.A.").}
+c("miss","unknown","excluded","^0$","NA","N.A."). To disable this search set pot_miss to NULL.}
 
 \item{auto_conv}{If TRUE, ....}
 
 \item{auto_recode}{If TRUE, ....}
+
+\item{auto_recode_precision}{With this numeric similarity index between 0
+(no similarity at all = shows all items) and 1 (identical = shows only
+perfect matches) the number of suggestions can be adjusted. Default = 0.8.}
 
 \item{skip_intro}{If TRUE, the introduction messages will be skipped. Default
 = FALSE}

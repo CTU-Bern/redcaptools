@@ -168,10 +168,23 @@ redcap_import_times <- function(var,
 
 
   df_out <- data.frame(input = as.character(var)) |>
-    separate(input, into = c("h", "m","s"), sep = ":", fill = "right") |>
+
+    mutate(modified = case_when(
+      # sometimes entries are separated with / or -
+      # will be replaced with ':'
+      grepl("[/-]",input) ~ gsub("[/-]",":",input),
+
+      # missing ':'
+      grepl("^[0-2]{1}[0-9]{1}[0-5]{1}[0-9]{1}$",input) ~ gsub("(\\d{2})(\\d{2})", "\\1:\\2", input),
+      grepl("^[0-2]{1}[0-9]{1}[0-5]{1}[0-9]{1}[0-5]{1}[0-9]{1}$",input) ~ gsub("(\\d{2})(\\d{2})(\\d{2})", "\\1:\\2:\\3", input),
+      TRUE ~ input
+    )) |>
+
+    separate(modified, into = c("h", "m","s"), sep = ":", fill = "right") |>
     mutate(
       h = case_when(
         grepl("^[0-9]$",h) ~ paste0("0",h),
+        is.na(as.numeric(h)) ~ NA,
         as.numeric(h) > 24 ~ NA,
         TRUE ~ h),
       m = case_when(
@@ -185,7 +198,8 @@ redcap_import_times <- function(var,
         !is.na(h) & is.na(s) ~ as.character(unk_sec),
         TRUE ~ s),
       output = case_when(
-        !is.na(h) ~ paste0(h,":",m,":",s)
+        !is.na(h) & !is.na(m) & !is.na(s) ~ paste0(h,":",m,":",s),
+        !is.na(h) & !is.na(m) & is.na(s) ~ paste0(h,":",m),
       )
     ) |>
     pull(output)
