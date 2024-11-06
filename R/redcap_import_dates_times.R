@@ -10,7 +10,7 @@
 #'   + year is found. The default is 01 (2022 -> 2022-01-01).
 #' @param unk_month Month to use if unknown, i.e. if only the year is found. The
 #'   default is 01 (2022 -> 2022-01-01).
-#' @param format Date format to be used: "European" (DMY) or "American" (MDY).
+#' @param format Date format to be used: "european" (DMY) or "american" (MDY).
 #'   Dates that match both formats will be converted accordingly.
 #'
 #'

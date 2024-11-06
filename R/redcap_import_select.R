@@ -129,7 +129,11 @@ redcap_import_select <- function(import_data,
   }
   if(!is.logical(auto_match)) stop("auto_match should be logical (TRUE/FALSE)")
   if(!is.logical(auto_skip_nomatch)) stop("auto_skip_nomatch should be logical (TRUE/FALSE)")
-  if(!is.numeric(no_match_suggestion) | no_match_suggestion < 0 | no_match_suggestion > 1) stop("no_match_suggestion should be a number between 0 and 1")
+  if(length(no_match_suggestion) != 1) {
+    stop("no_match_suggestion should be a number between 0 and 1")
+  } else {
+    if(!is.numeric(no_match_suggestion) | no_match_suggestion < 0 | no_match_suggestion > 1) stop("no_match_suggestion should be a number between 0 and 1")
+  }
   if(!is.logical(skip_intro)) stop("skip_intro should be logical (TRUE/FALSE)")
   if(!is.logical(continue)) stop("continue should be logical (TRUE/FALSE)")
   if(!is.logical(suppress_txt)) stop("suppress_txt should be logical (TRUE/FALSE)")
