@@ -26,7 +26,7 @@
 #' not a foolproof method: there may be other variables in the data that end with
 #' \code{_complete}.
 #'
-#' @importFrom dplyr if_else pull filter mutate select everything across where slice
+#' @importFrom dplyr if_else pull filter mutate select everything across where slice matches
 #' @importFrom tidyr fill
 #' @importFrom stringr str_detect str_extract
 #' @export
@@ -42,6 +42,10 @@ redcap_toform <- function(data,
                           metadata = NULL,
                           guess_events = TRUE,
                           ...){
+
+  field_name <- form_name <- field_type <- regex <- NULL
+
+
   if(!is.null(datadict)){
     # a manually downloaded data dictionary has different variable names to the
     #   API version

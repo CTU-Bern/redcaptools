@@ -52,3 +52,13 @@ test_that("check_forms", {
 test_that("check_data", {
   expect_error(check_data(c(1, 2)))
 })
+test_that("check_missing_codes", {
+  expect_error(check_missing_codes(c(1,2)))
+  expect_error(check_missing_codes(data.frame(x=1,y=2,z=3)))
+  expect_error(check_missing_codes(data.frame(x=1,label=2)))
+  expect_error(check_missing_codes(data.frame(code=1,y=2)))
+  expect_error(check_missing_codes(data.frame(code=NA,label=2)))
+  expect_error(check_missing_codes(data.frame(code=1,label=NA)))
+})
+
+

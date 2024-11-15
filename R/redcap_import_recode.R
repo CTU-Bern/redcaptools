@@ -73,6 +73,8 @@
 #'  overview. Default = redcap_import_recode_overview.csv.
 #'@param wait Allows you to set the latency time between the steps. Default =
 #'  2s.
+#'@param ... other parameters used for \code{redcap_import_dates} or
+#'  \code{redcap_import_times}
 #'
 #'@return Data frame with recoded data. Log-file with executed code.
 #'@export
@@ -82,6 +84,7 @@
 #'@importFrom tidyselect everything
 #'@importFrom utils str write.table
 #'@importFrom knitr kable
+#'@importFrom lubridate hm hms ms
 #'
 #' @examples
 #' # data(importdemo_data)
@@ -116,7 +119,7 @@ redcap_import_recode <- function(selected_data,
                                  wait = 2,
                                  ...) {
 
-  field_name <- field_type <- select_choices_or_calculations <- text_validation_type_or_show_slider_number <- NULL
+  field_name <- field_type <- select_choices_or_calculations <- text_validation_type_or_show_slider_number <- field_label <- text_validation_min <- text_validation_max <- NULL
 
   # evaluate inputs ----
 
@@ -370,6 +373,8 @@ redcap_import_recode <- function(selected_data,
   # open log-files ----
   if(log) {
     write.table(paste0("\n\n",format(Sys.time(), "%Y-%m-%d %H:%M:%S"),":\n\nrecoded_data <- mutate(",deparse(substitute(selected_data))), log_code, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
+    write.table(paste0("\n, across(everything(), as.character)"), log_code, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
+
     write.table(paste0("\n\n",format(Sys.time(), "%Y-%m-%d %H:%M:%S")), log_table, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
     write.table(",Variable,Old Coding,New Coding\n\n", log_table, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
   }
@@ -573,7 +578,7 @@ redcap_import_recode <- function(selected_data,
 
             # slider
           } else if (rc_type == "slider") {
-            conv_to <- "slider"
+              conv_to <- "slider"
             conv_label <- "Slider Variable"
             # currently min/max are hard checked during import, so they need to be included
             # if empty, they are the defaults from 0 to 100
@@ -611,6 +616,9 @@ redcap_import_recode <- function(selected_data,
             for_skip = TRUE
             break
           }
+
+
+
           if (!suppress_txt) {
             cat(bold(paste0("\n\nSuggested Conversion to: ",italic(conv_label))))
             cat("\n\n\n")
@@ -621,7 +629,7 @@ redcap_import_recode <- function(selected_data,
           # auto or manual conversion? ----
 
           if (auto_conv) {
-            if (!suppress_txt) cat(paste0(bold(underline("NOTE"),": Auto-conversion is active!\n(To turn it off, set 'auto_conv = FALSE' or select 'off' when prompted to continue.)\n\n\n")))
+            if (!suppress_txt) cat(paste0(bold(underline("NOTE:")," Auto-conversion is active!\n(To turn it off, set 'auto_conv = FALSE' or type 'off' when prompted to continue.)\n\n\n")))
             Sys.sleep(wait)
 
           } else {
@@ -906,8 +914,27 @@ redcap_import_recode <- function(selected_data,
 
             ## date ----
           } else if (conv_to == 'dt') {
+
+            if (change_round) {
+              converted_var <- as.Date(redcap_import_datetime(var,args_rc_dates,args_rc_times,date_only = TRUE))
+              log_default <- paste0("redcap_import_datetime(",name,
+                                    ", args_rc_dates = list(",
+                                    paste0(log_rc_dates,collapse = ", "),
+                                    "), args_rc_times = list(",
+                                    paste0(log_rc_times,collapse = ", "),
+                                    "),date_only = TRUE)")
+
+            } else {
             converted_var <- do.call(redcap_import_dates,c(list(var = var),args_rc_dates))
+            # sometimes date-times are entered in Excel-format: they are recoded into a special variable for displaying the no-matches
+            # because it's easier to understand what the no-match is about (instead of displaying e.g. 31341.34375)
+            if (any(grepl("^\\d{4,}\\.\\d+$",var))) {
+              special_no_match <- if_else(grepl("^\\d{4,}\\.\\d+$",var),redcap_import_datetime(var,args_rc_dates,args_rc_times),var)
+            } else {
+              special_no_match <- var
+            }
             log_default <- paste0("format(redcap_import_dates(",name,", ",paste0(log_rc_dates,collapse = ", "),"))")
+            }
 
 
             ## date-time ----
@@ -1033,7 +1060,10 @@ redcap_import_recode <- function(selected_data,
         if (any(potential_missings)) {
           if (!suppress_txt) {
             cat("\n\nPotential Missings:")
-            print(kable(summary(as.factor(var[potential_missings])),col.names = "Cases:"))
+            summary_table <- data.frame(Value = names(summary(as.factor(var[potential_missings]))),
+                                        Count = as.numeric(summary(as.factor(var[potential_missings])))
+            )
+            print(kable(summary_table))
           }
         }
 
@@ -1044,7 +1074,16 @@ redcap_import_recode <- function(selected_data,
         if (any(no_match)) {
           if (!suppress_txt) {
             cat("\n\nNot possible to convert:")
-            print(kable(summary(as.factor(var[no_match])),col.names = "Cases:"))
+            if (conv_to == 'dt') {
+              summary_table <- data.frame(Value = names(summary(as.factor(special_no_match[no_match]))),
+                                          Count = as.numeric(summary(as.factor(var[no_match])))
+              )
+            } else {
+              summary_table <- data.frame(Value = names(summary(as.factor(var[no_match]))),
+                                          Count = as.numeric(summary(as.factor(var[no_match])))
+              )
+            }
+            print(kable(summary_table))
           }
         }
 
@@ -1075,8 +1114,8 @@ redcap_import_recode <- function(selected_data,
         cat("\n\nContinue?")
         cat("\n 1 = YES (start recoding)")
         cat("\n 2 = change expressions indicating missing values in this variable and the following")
-        if(conv_to %in% c("int","num1","num2","num3","num4","time_hm")) {
-          cat("\n 3 = round values with too many decimals (or delete superfluous time info)")
+        if(conv_to %in% c("int","num1","num2","num3","num4","time_hm","dt")) {
+          cat("\n 3 = round values with too many decimals (or delete unneccessary time info)")
         }
         if (!auto_conv) {
           cat("\n 0 = NO (start over)")
@@ -1111,8 +1150,8 @@ redcap_import_recode <- function(selected_data,
             cat("Please check your answer!")
             cat("\n 1 = YES (start recoding)")
             cat("\n 2 = change expressions indicating missing values in this variable and the following")
-            if(conv_to %in% c("int","num1","num2","num3","num4","time_hm")) {
-              cat("\n 3 = round values with too many decimals (or delete superfluous time info)")
+            if(conv_to %in% c("int","num1","num2","num3","num4","time_hm","dt")) {
+              cat("\n 3 = round values with too many decimals (or delete unneccessary time info)")
             }
             if (!auto_conv) {
               cat("\n 0 = NO (start over)")
@@ -1378,7 +1417,10 @@ redcap_import_recode <- function(selected_data,
         if (!suppress_txt) {
 
           cat(underline("\n\n\nPotential values to recode in data table:"))
-          print(kable(summary(factor(var[var %in% to_recode],levels = to_recode)),col.names = "Cases:"))
+          summary_table <- data.frame(Value = names(summary(factor(var[var %in% to_recode],levels = to_recode))),
+                                      Count = as.numeric(summary(factor(var[var %in% to_recode],levels = to_recode)))
+          )
+          print(kable(summary_table))
 
           cat(underline("\n\nPotential codes to use from REDCap codebook:"))
           print(kable(coded_options))
@@ -1504,7 +1546,7 @@ redcap_import_recode <- function(selected_data,
           ## INPUT ----
 
           if (auto_recode) {
-            if (!suppress_txt) cat(paste0("\n\n\n",bold(underline("NOTE"),": Auto-recoding is active!\n(To turn it off, set 'auto_recode = FALSE' or select 'off' when prompted to continue.)\n\n\n")))
+            if (!suppress_txt) cat(paste0("\n\n\n",bold(underline("NOTE:")," Auto-recoding is active!\n(To turn it off, set 'auto_recode = FALSE' or type 'off' when prompted to continue.)\n\n\n")))
             Sys.sleep(wait)
             manrec_ans <- "1"
 
@@ -1638,10 +1680,10 @@ redcap_import_recode <- function(selected_data,
 
               if (is.na(sugg_coding$code[sugg_coding$data == to_recode[l]])) {
                 log_recode_code <- c(log_recode_code,paste0(", '",lvl,"' ~ NA"))
-                log_recode_table <- c(log_recode_table,paste0(",,",lvl,",(empty)"))
+                log_recode_table <- c(log_recode_table,paste0(",,",gsub(","," ",lvl),",(empty)"))
               } else {
                 log_recode_code <- c(log_recode_code,paste0(", '",lvl,"' ~ '",sugg_coding$code[sugg_coding$data == to_recode[l]],"'"))
-                log_recode_table <- c(log_recode_table,paste0(",,",lvl,",",sugg_coding$code[sugg_coding$data == to_recode[l]]))
+                log_recode_table <- c(log_recode_table,paste0(",,",gsub(","," ",lvl),",",sugg_coding$code[sugg_coding$data == to_recode[l]]))
               }
             }
           }
@@ -1741,7 +1783,7 @@ redcap_import_recode <- function(selected_data,
             # moves to next item in manual-recoding for-loop
             if (rec_ans == 'skip') {
               log_recode_code <- c(log_recode_code,paste0(", '",lvl,"' ~ '",lvl,"'"))
-              log_recode_table <- c(log_recode_table,paste0(",,",lvl,",",lvl))
+              log_recode_table <- c(log_recode_table,paste0(",,",gsub(","," ",lvl),",",gsub(","," ",lvl)))
               next
             }
 
@@ -1758,7 +1800,7 @@ redcap_import_recode <- function(selected_data,
               } else {
                 levels(recoded_var)[which(levels(recoded_var) == lvl)] <- NA
                 log_recode_code <- c(log_recode_code,paste0(", '",lvl,"' ~ NA"))
-                log_recode_table <- c(log_recode_table,paste0(",,",lvl,",(empty)"))
+                log_recode_table <- c(log_recode_table,paste0(",,",gsub(","," ",lvl),",(empty)"))
               }
             }
 
@@ -1779,7 +1821,7 @@ redcap_import_recode <- function(selected_data,
               } else {
                 levels(recoded_var)[which(levels(recoded_var) == lvl)] <- rec_ans
                 log_recode_code <- c(log_recode_code,paste0(", '",lvl,"' ~ '",rec_ans,"'"))
-                log_recode_table <- c(log_recode_table,paste0(",,",lvl,",",rec_ans))
+                log_recode_table <- c(log_recode_table,paste0(",,",gsub(","," ",lvl),",",rec_ans))
               }
             }
 
@@ -1826,10 +1868,16 @@ redcap_import_recode <- function(selected_data,
           print(kable(coded_options))
 
           cat(underline("\n\nSummary before recoding:"))
-          print(kable(summary(as.factor(var[var %in% to_recode])),col.names = "Cases:"))
+          summary_table <- data.frame(Value = names(summary(as.factor(var[var %in% to_recode]))),
+                                      Count = as.numeric(summary(as.factor(var[var %in% to_recode])))
+          )
+          print(kable(summary_table))
 
           cat(underline("\n\nSummary after recoding:"))
-          print(kable(summary(as.factor(recoded_var[var %in% to_recode])),col.names = "Cases:"))
+          summary_table <- data.frame(Value = names(summary(as.factor(recoded_var[var %in% to_recode]))),
+                                      Count = as.numeric(summary(as.factor(recoded_var[var %in% to_recode])))
+                                      )
+          print(kable(summary_table))
 
           cat("\n-------------------------------------------------------------------------")
         }
@@ -1922,6 +1970,7 @@ redcap_import_recode <- function(selected_data,
 
           # output needs to be character
           converted_var <- as.character(converted_var)
+          var <- as.character(var)
 
           # take the converted values or, if recording, the recorded values
           final_var <- data.frame(var,
@@ -1938,7 +1987,7 @@ redcap_import_recode <- function(selected_data,
                          (is.na(var) & !is.na(recoded_var)) |
                          # if var should not be recoded but does not match the format
                          (var == recoded_var & is.na(converted_var)),
-                       #... the use the recoded var
+                       #... then use the recoded var
                        recoded_var,
                        # ...otherwise the converted var
                        converted_var)) |>

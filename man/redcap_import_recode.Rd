@@ -99,6 +99,9 @@ overview. Default = redcap_import_recode_overview.csv.}
 
 \item{wait}{Allows you to set the latency time between the steps. Default =
 2s.}
+
+\item{...}{other parameters used for \code{redcap_import_dates} or
+\code{redcap_import_times}}
 }
 \value{
 Data frame with recoded data. Log-file with executed code.
@@ -111,15 +114,15 @@ the REDCap project by providing an API token and matching URL. \cr Variables
 can be converted automatically or manually to match the type and validation in
 REDCap. \cr The script will then summarize all values that do not match the
 expected format and will look for values that could potentially indicate
-missing values (such as 'missing','excluded',...). \cr In a second step, these
-values can be recoded automatically or manually according to missing data
-codes as potentially defined in REDCap Additional Customizations (or simply
-set to NA). \cr If a variable has been converted to a factor (e.g., radio
-button field), the recoding is (additionally) prompted for all factor levels.
-\cr") The function returns a data frame with the recoded variables, writes an
-overview csv-table, and the executed code to a txt-file for copy-pasting and
-adjusting/reusing. \cr It is advised to use \code{redcap_import_select} on the
-data first, before running this function.
+missing values (such as 'missing', 'excluded',...). \cr In a second step,
+these values can be recoded automatically or manually if missing data codes
+have defined in REDCap Additional Customizations (or simply set to NA). \cr If
+a variable has been converted to a factor (e.g., radio button field), the
+recoding is (additionally) prompted for all factor levels. \cr The function
+returns a data frame with the recoded variables, writes an overview csv-table,
+and the executed code to a txt-file for copy-pasting and adjusting/reusing.
+\cr It is advised to use \code{redcap_import_select} on the data first, before
+running this function.
 }
 \examples{
 # data(importdemo_data)

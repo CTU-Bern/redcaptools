@@ -7,22 +7,23 @@
 redcap_import_times(var, unk_min = "00", unk_sec = "00")
 }
 \arguments{
-\item{var}{variable to convert}
+\item{var}{Variable to convert}
 
 \item{unk_min}{Minutes to use if unknown. The default is 00 (11 -> 11:00).}
 
-\item{unk_sec}{Seconds to use if unknown. The default is 00 (11:11 -> 11:11:00).}
+\item{unk_sec}{Seconds to use if unknown. The default is 00 (11:11 ->
+11:11:00).}
 }
 \value{
 converted variable
 }
 \description{
-This function is used to prepare time-values in a data table for import in REDCap.
-In an Excel, time-values can be entered in various shapes and forms. This function
-tries to take most possibilities how time-values could have been entered into
-account and converts them to a format that can be imported into REDCap.
+This function prepares time values in a data table for import in REDCap. In
+Excel, time values can be entered in various formats. This function attempts
+for the most common ways time values may have been entered and converts them
+into a format compatible with REDCap.
 }
 \examples{
-var <-c("11:11:00","11:11","11")
+var <-c("11:11:00","11:11","11","0.34375" )
 redcap_import_times(var)
 }
