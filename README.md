@@ -5,7 +5,7 @@
 
 <!-- badges: start -->
 
-[![](https://img.shields.io/badge/dev%20version-0.4.0-blue.svg)](https://github.com/CTU-Bern/redcaptools)
+[![](https://img.shields.io/badge/dev%20version-0.5.0-blue.svg)](https://github.com/CTU-Bern/redcaptools)
 [![R-CMD-check](https://github.com/CTU-Bern/redcaptools/workflows/R-CMD-check/badge.svg)](https://github.com/CTU-Bern/redcaptools/actions)
 
 <!-- badges: end -->
