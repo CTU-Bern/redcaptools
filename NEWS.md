@@ -1,3 +1,9 @@
+# redcaptools 0.5.0
+
+* finalizing `redcap_import_recode` with user-friendly introduction, more useful output, automated options and tests
+* improving `redcap_import_dates` to prepare dates for import
+* addition of `redcap_import_times` and `redcap_import_datetime` to prepare time or date-time values for import
+
 # redcaptools 0.4.0
 
 * some data preparation functions have been renamed to improve consistency and clarity. The old functions remain to work, but issue a warning about deprecation.

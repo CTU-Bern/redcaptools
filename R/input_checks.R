@@ -51,3 +51,15 @@ check_forms <- function(x) {
 check_data <- function(x) {
   if(!is.data.frame(x)) stop("import data should be a data frame")
 }
+
+check_missing_codes <- function(x) {
+
+  if(!is.data.frame(x) |
+     length(x) != 2 |
+     names(x)[1] != "code" |
+     names(x)[2] != "label" |
+     any(is.na(x))) {
+    stop("missing codes could not be parsed correctly")
+  }
+
+}

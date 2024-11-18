@@ -1,18 +1,18 @@
-record_id,text,date_dmy,datevar_ymd,datetime_dmy_hm,datetimevar_ymd_hm,datetime_dmy_hms,datetimevar_ymd_hms,email,intvar,letter,numvar,num_1dp,numvar_2dp,num_3dp,numvar_4dp,patid_hcc,patidvar_ihr,phone,pseudovar,time_hms,timevar_hm,time_ms,timevar_hms2,notes,calc,singlec_dd,singlecvar_rb,multic_2,yn,tf,slidervar
-1,1234,02.02.2022,,,,,,,,,,,,,,,,,,,,,,,,,,,yes,true,
-2,abcd,2022,,,,,,,,,,,,,,,,,,,,,,,,,,,no,false,
-3,,2.2022,,,,,,,,,,,,,,,,,,,,,,,,,,,1,1,
-4,,2.2022,,,,,,,,,,,,,,,,,,,,,,,,,,,0,0,
-5,1234,2.22,,,,,,,,,,,,,,,,,,,,,,,,,,,y,t,
-6,abcd,2.2022,,,,,,,,,,,,,,,,,,,,,,,,,,,n,f,
-7,,02.02.2022,,,,,,,,,,,,,,,,,,,,,,,,,,,YES,TRUE,
-8,,02.02.2022,,,,,,,,,,,,,,,,,,,,,,,,,,,NO,FALSE,
-9,1234,02.02.2022,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-10,abcd,02.02.2022,,,,,,,,,,,,,,,,,,,,,,,,,,,yes,true,
-11,,02.02.2022,,,,,,,,,,,,,,,,,,,,,,,,,,,no,false,
-12,,02.02.2022,,,,,,,,,,,,,,,,,,,,,,,,,,,1,1,
-13,1234,02.02.2022,,,,,,,,,,,,,,,,,,,,,,,,,,,0,0,
-14,abcd,02.02.2022,,,,,,,,,,,,,,,,,,,,,,,,,,,y,t,
-15,,20220202,,,,,,,,,,,,,,,,,,,,,,,,,,,n,f,
-16,,2022022,,,,,,,,,,,,,,,,,,,,,,,,,,,YES,TRUE,
-17,,44594,,,,,,,,,,,,,,,,,,,,,,,,,,,NO,FALSE,
+record_id,text,date_dmy,datevar_ymd,datetime_dmy_hm,datetimevar_ymd_hm,datetime_dmy_hms,datetimevar_ymd_hms,email,intvar,letter,numvar,num_1dp,numvar_2dp,num_3dp,numvar_4dp,phone,pseudovar,time_hms,timevar_hm,time_ms,timevar_hms2,notes,calc,singlec_dd,singlecvar_rb,multic_2,yn,tf,slidervar
+1,1234,02.02.2022,02.02.2022,02.02.2022,02.02.2022,02.02.2022,02.02.2022,missing,1234,1234,1234,1234,1234,1234,1234,0561234567,123-456-789,11:11:11,11:11:11,11:11:11,11:11:11,1234,missing,1,1,,yes,true,1234
+2,abcd,2022,2022,2022,2022,2022,2022,unknown,abcd,abcd,abcd,abcd,abcd,abcd,abcd,0041761234567,123456789,11:11,11:11,11:11,11:11,abcd,unknown,2,2,,no,false,abcd
+3,missing,2.2022,2.2022,2.2022,2.2022,2.2022,2.2022,abcd,missing,missing,missing,missing,missing,missing,missing,+41761234567,123-456-78X,11,11,11,11,missing,abcd,3,3,,1,1,missing
+4,unknown,2.2022,2.2022,2.2022,2.2022,2.2022,2.2022,bla@bli.blu,unknown,unknown,unknown,unknown,unknown,unknown,unknown,0761234567,,1234,1234,1234,1234,unknown,NA,missing,missing,,0,0,unknown
+5,1234,2.22,2.22,2.22,2.22,2.22,2.22,bla@bli,1.1,1234,1234,1.1,1.1,1.1,1.1,0791234567,unknown,abcd,abcd,abcd,abcd,1.1,n.a.,unknown,unknown,,y,t,1.1
+6,abcd,2.2022,2.2022,02.02.2022,02.02.2022,02.02.2022,02.02.2022,NA,1.11,abcd,abcd,1.11,1.11,1.11,1.11,791234567,NA,missing,missing,missing,missing,1.11,excluded,1,1,,n,f,0
+7,NA,01.02.2022,01.02.2022,2022 11:11:00,2022 11:11:00,2022 11:11:11,2022 11:11:11,n.a.,1.111,NA,NA,1.111,1.111,1.111,1.111,079123456,,unknown,unknown,unknown,unknown,1.111,,2,2,,YES,TRUE,
+8,n.a.,02.02.2022,02.02.2022,01.02.2022 11:11,01.02.2022 11:11,01.02.2022 11:11,01.02.2022 11:11,,1.1111,n.a.,n.a.,1.1111,1.1111,1.1111,1.1111,,,NA,NA,NA,NA,1.1111,,3,3,,NO,FALSE,
+9,1234,01.02.2022,01.02.2022,01.02.2022 11:11,01.02.2022 11:11,01.02.2022 11:11,01.02.2022 11:11,,,1234,1234,NA,NA,NA,NA,unknown,,n.a.,n.a.,n.a.,n.a.,NA,,missing,missing,,,,
+10,abcd,02.02.2022,02.02.2022,01.02.2022 11:11,01.02.2022 11:11,01.02.2022 11:11,01.02.2022 11:11,,,abcd,abcd,n.a.,n.a.,n.a.,n.a.,NA,,excluded,excluded,excluded,excluded,n.a.,,unknown,unknown,,yes,true,
+11,excluded,01.02.2022,01.02.2022,02.02.2022  11,02.02.2022  11,02.02.2022,02.02.2022,,,excluded,excluded,excluded,excluded,excluded,excluded,,,,,,,excluded,,NA,NA,,no,false,
+12,,02.02.2022,02.02.2022,2022 11,2022 11,2022 11:11,2022 11:11,,,,,,,,,,,,,,,,,n.a.,n.a.,,missing,missing,
+13,1234,missing,missing,01.02.2022  11,01.02.2022  11,01.02.2022 11:11,01.02.2022 11:11,,,1234,1234,,,,,,,,,,,,,excluded,excluded,,unknown,unknown,
+14,abcd,unknown,unknown,01.02.2022  11,01.02.2022  11,01.02.2022  11,01.02.2022  11,,,abcd,abcd,,,,,,,,,,,,,missing,missing,,NA,NA,
+15,,20220202,20220202,01.02.2022  11,01.02.2022  11,01.02.2022  11,abcd,,,,,,,,,,,,,,,,,unknown,unknown,,n.a.,n.a.,
+16,,2022022,2022022,missing,missing,missing,missing,,,,,,,,,,,,,,,,,,,,excluded,excluded,
+17,,44594,44594,unknown,unknown,unknown,unknown,,,,,,,,,,,,,,,,,,,,NO,FALSE,
