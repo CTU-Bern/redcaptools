@@ -48,7 +48,10 @@ reference:
   contents:
   - redcap_import_select
   - redcap_import_recode
-  - redcap_dates
+  - redcap_import_dates
+  - redcap_import_times
+  - redcap_import_datetime
+
 
 - subtitle: Demonstration datasets
   contents:
