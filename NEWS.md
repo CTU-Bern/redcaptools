@@ -1,3 +1,8 @@
+# redcaptools 0.5.1
+
+* bug fix for redcap_export_batch: problems with quotation marks in text fields
+* addition of checkbox recoding to redcap_import_recode
+
 # redcaptools 0.5.0
 
 * finalizing `redcap_import_recode` with user-friendly introduction, more useful output, automated options and tests

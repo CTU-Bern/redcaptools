@@ -189,6 +189,7 @@ redcap_export_byform <- function(token,
 #' @return depending on \code{byform}, either a list of dataframes or a single dataframe
 #' @export
 #' @importFrom dplyr bind_rows
+#' @importFrom stringr str_replace_all
 #' @seealso \link{redcap_export_tbl}, \link{redcap_export_byform}
 #'
 #' @examples
@@ -240,15 +241,18 @@ redcap_export_batch <- function(token,
         records <- paste(records, collapse = ",")
         if(longitudinal) {
           csv <- redcap_export_tbl(token,url,"record",
-                                 records = records,
-                                 events = events,
-                                 forms = sheet,
-                                 'fields[0]' = idvar)
+                                   records = records,
+                                   events = events,
+                                   forms = sheet,
+                                   'fields[0]' = idvar) |>
+            mutate(across(everything(), ~ str_replace_all(.,'"', "'")))
+
           if(remove_empty & !is.null(csv)) csv <- remove_empty_rows(csv)
         } else {csv <- redcap_export_tbl(token,url,"record",
                                          records = records,
                                          forms = sheet,
-                                         'fields[0]' = idvar)
+                                         'fields[0]' = idvar) |>
+          mutate(across(everything(), ~ str_replace_all(.,'"', "'")))
         }
 
         if (i == 1){
@@ -274,7 +278,8 @@ redcap_export_batch <- function(token,
       message(paste0("Downloading batch ",i, " of ",nbatch))
       records <- split_ids[[i]]
       records <- paste(records, collapse = ",")
-      csv <- redcap_export_tbl(token,url,"record",records = records)
+      csv <- redcap_export_tbl(token,url,"record",records = records) |>
+        mutate(across(everything(), ~ str_replace_all(.,'"', "'")))
 
       if (i == 1){
         write.table(csv, tempfile, sep = ",", row.names = FALSE, col.names = TRUE)
