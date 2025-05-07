@@ -6,3 +6,6 @@ inst/doc
 redcap_select_rename_code.txt
 redcap_select_rename_overview.csv
 redcap_import_recode.txt
+docs
+pkgdown
+redcaptools.Rproj

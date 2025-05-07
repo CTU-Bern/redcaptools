@@ -13,6 +13,7 @@ redcap_import_recode(
   start_var = 1,
   pot_miss = c("miss", "unknown", "excluded", "^0$", "NA", "N.A."),
   if_empty = NA,
+  cb_delims = c(",", " ", ".", ";", "|"),
   auto_conv = TRUE,
   auto_recode = FALSE,
   auto_recode_precision = 0.5,
@@ -58,6 +59,10 @@ pot_miss to NULL.}
 \item{if_empty}{Sets a default value for empty cells. This value can be
 changed for each variable when using manual recoding. Default = NA (meaning
 the cell remains empty).}
+
+\item{cb_delims}{Character vector to specify the delimiter(s) to separate
+values for checkbox fields in a single cell. Default = c(",","
+",".",";","|")}
 
 \item{auto_conv}{If TRUE, the variable will be auto-converted according to the
 best matching field type and validation in REDCap. If FALSE, the user can
