@@ -16,7 +16,7 @@
 #'and adjusting/reusing.
 #'
 #'
-#'@param import_data Data frame to be imported
+#'@param input_data Data frame to be imported
 #'@param dict Data dictionary (e.g. as
 #'  downloaded from REDCap or via \code{redcap_export_meta(rc_token,
 #'  rc_url)$meta}). If not supplied, this will be downloaded from the API using
@@ -80,7 +80,7 @@
 
 
 
-redcap_import_select <- function(import_data,
+redcap_import_select <- function(input_data,
                                  dict = NULL,
                                  rc_token,
                                  rc_url,
@@ -104,7 +104,7 @@ redcap_import_select <- function(import_data,
 
   # evaluate inputs ----
 
-  check_data(import_data)
+  check_data(input_data)
 
   if(is.null(dict)) {
     check_token(rc_token)
@@ -224,7 +224,7 @@ redcap_import_select <- function(import_data,
   # open log-files ----
 
   if(log) {
-    write.table(paste0("\n\n",format(Sys.time(), "%Y-%m-%d %H:%M:%S"),":\n\nselected_data <- select(",deparse(substitute(import_data))), log_code, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
+    write.table(paste0("\n\n",format(Sys.time(), "%Y-%m-%d %H:%M:%S"),":\n\nselected_data <- select(",deparse(substitute(input_data))), log_code, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
     write.table(paste0("\n\n",format(Sys.time(), "%Y-%m-%d %H:%M:%S")), log_table, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
     write.table(",Variable,Selected,Not Selected,New Name\n", log_table, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
   }
@@ -232,7 +232,7 @@ redcap_import_select <- function(import_data,
 
   # read data & dict, initiate output variable ----
 
-  imp_vars <- colnames(import_data)[start_var:ncol(import_data)]
+  imp_vars <- colnames(input_data)[start_var:ncol(input_data)]
 
   rc_vars <- select(dict,c(field_name,field_label,form_name))
   rc_vars$field_label <- strtrim(rc_vars$field_label,50)
@@ -427,7 +427,7 @@ redcap_import_select <- function(import_data,
 
         # no select
         if (what_to_do == "no_select") {
-          write.table(paste("",imp_vars[i],"","x","", sep = ","), log_table, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
+          if(log) write.table(paste("",imp_vars[i],"","x","", sep = ","), log_table, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
         }
 
         # no rename
@@ -474,7 +474,7 @@ redcap_import_select <- function(import_data,
 
 
   # execute code ----
-  selected_data <- select(import_data, !!!vars_rename)
+  selected_data <- select(input_data, !!!vars_rename)
 
 
   # finalize log-file ----

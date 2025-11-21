@@ -18,7 +18,7 @@
 #'running this function.
 #'
 #'
-#'@param selected_data Data to be recoded
+#'@param input_data Data to be recoded
 #'@param dict Data dictionary (e.g. as downloaded from REDCap or via
 #'  \code{redcap_export_meta(rc_token, rc_url)$meta}). If not supplied, this
 #'  will be downloaded from the API using \code{rc_token} and \code{rc_token}.
@@ -103,7 +103,7 @@
 
 
 
-redcap_import_recode <- function(selected_data,
+redcap_import_recode <- function(input_data,
                                  dict = NULL,
                                  missing_codes = NULL,
                                  rc_token,
@@ -129,7 +129,7 @@ redcap_import_recode <- function(selected_data,
   # evaluate inputs ----
 
   # data
-  check_data(selected_data)
+  check_data(input_data)
 
 
   # dict
@@ -326,42 +326,42 @@ redcap_import_recode <- function(selected_data,
     cat(bold("Potential Missings:\n"))
     cat("The provided data will be inspected for potential missing values according to the following patterns:\n")
     if (!is.null(pot_miss)) {
-       cat(paste(pot_miss,collapse = ", "))
-     } else {
-       cat("(No check for potential missings has been defined!)")
-     }
-     cat("\nThis text-search can be changed by providing a character vector for pot_miss.\n")
-     cat("E.g., pot_miss = c('miss','unknown','excluded','^0$','NA','N.A.')\n")
-     cat("To disable the search for potential missings, set 'pot_miss = NULL'!\n")
-     Sys.sleep(wait+1)
+      cat(paste(pot_miss,collapse = ", "))
+    } else {
+      cat("(No check for potential missings has been defined!)")
+    }
+    cat("\nThis text-search can be changed by providing a character vector for pot_miss.\n")
+    cat("E.g., pot_miss = c('miss','unknown','excluded','^0$','NA','N.A.')\n")
+    cat("To disable the search for potential missings, set 'pot_miss = NULL'!\n")
+    Sys.sleep(wait+1)
 
-     cat("\n\n")
-     cat(bold("Empty Cells:\n"))
-     cat("The default value for empty cells has been set as:\n")
-     if (is.na(if_empty)) {
-       cat("<NA> (field will stay empty)")
-     } else {
-       cat(italic(if_empty))
-     }
-     cat("\nTo change it, provide a different value for if_empty (e.g., if_empty = 'N.A.')\n")
-     Sys.sleep(wait+1)
+    cat("\n\n")
+    cat(bold("Empty Cells:\n"))
+    cat("The default value for empty cells has been set as:\n")
+    if (is.na(if_empty)) {
+      cat("<NA> (field will stay empty)")
+    } else {
+      cat(italic(if_empty))
+    }
+    cat("\nTo change it, provide a different value for if_empty (e.g., if_empty = 'N.A.')\n")
+    Sys.sleep(wait+1)
 
-     cat("\n\n\n")
-     cat("There are other things that you can change when running the function.\n")
-     cat("Feel free to have a look at the documentation.\n\n\n")
+    cat("\n\n\n")
+    cat("There are other things that you can change when running the function.\n")
+    cat("Feel free to have a look at the documentation.\n\n\n")
 
 
-     intro_ans <- ""
-     while (intro_ans != 1) {
-       intro_ans <- readline(prompt="Type '1' to continue: ")
-       if (intro_ans != 1) {
-         cat("Please check your answer! (Type 'Esc' to cancel)")
-       }
-     }
+    intro_ans <- ""
+    while (intro_ans != 1) {
+      intro_ans <- readline(prompt="Type '1' to continue: ")
+      if (intro_ans != 1) {
+        cat("Please check your answer! (Type 'Esc' to cancel)")
+      }
+    }
 
-     cat("\n\n")
-     cat(bold("WHEN MOVING ALONG THE LOOP, PLEASE BE CAREFUL WITH YOUR CHOICES AS IT IS NOT POSSIBLE TO GO BACK!!\n\n"))
-     cat("You can press 'Esc' any time to stop the function but it is advised to finish the loop properly! This can be done by either typing 'exit' in the prompt or by looping through all the variables. It makes sure that the executed code is properly written in the log-file and can be copy-pasted into your R-script and adjusted manually at a later time.\n\n")
+    cat("\n\n")
+    cat(bold("WHEN MOVING ALONG THE LOOP, PLEASE BE CAREFUL WITH YOUR CHOICES AS IT IS NOT POSSIBLE TO GO BACK!!\n\n"))
+    cat("You can press 'Esc' any time to stop the function but it is advised to finish the loop properly! This can be done by either typing 'exit' in the prompt or by looping through all the variables. It makes sure that the executed code is properly written in the log-file and can be copy-pasted into your R-script and adjusted manually at a later time.\n\n")
 
 
     cat("Are you ready to begin? \n 1 = YES\n'esc' = STOP")
@@ -382,7 +382,7 @@ redcap_import_recode <- function(selected_data,
 
   # open log-files ----
   if(log) {
-    write.table(paste0("\n\n",format(Sys.time(), "%Y-%m-%d %H:%M:%S"),":\n\nrecoded_data <- mutate(",deparse(substitute(selected_data))), log_code, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
+    write.table(paste0("\n\n",format(Sys.time(), "%Y-%m-%d %H:%M:%S"),":\n\nrecoded_data <- mutate(",deparse(substitute(input_data))), log_code, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
     write.table(paste0("\n, across(everything(), as.character)"), log_code, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
 
     write.table(paste0("\n\n",format(Sys.time(), "%Y-%m-%d %H:%M:%S")), log_table, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
@@ -392,7 +392,7 @@ redcap_import_recode <- function(selected_data,
 
   # read data & dict, prepare output variables ----
 
-  name_vars <- colnames(selected_data)
+  name_vars <- colnames(input_data)
 
   rc_spec <- dict |>
     select(field_name,
@@ -410,7 +410,7 @@ redcap_import_recode <- function(selected_data,
 
   # start variable for-loop ----
 
-  for (i in seq_along(name_vars)[start_var:ncol(selected_data)]) {
+  for (i in seq_along(name_vars)[start_var:ncol(input_data)]) {
 
     # initiate option to go back with a while loop
     goback = TRUE
@@ -438,7 +438,7 @@ redcap_import_recode <- function(selected_data,
 
       ## summarize data and RC dict ----
 
-      var <- selected_data[,i]
+      var <- input_data[,i]
       name <- name_vars[i]
 
 
@@ -591,7 +591,7 @@ redcap_import_recode <- function(selected_data,
 
             # slider
           } else if (rc_type == "slider") {
-              conv_to <- "slider"
+            conv_to <- "slider"
             conv_label <- "Slider Variable"
             # currently min/max are hard checked during import, so they need to be included
             # if empty, they are the defaults from 0 to 100
@@ -937,15 +937,15 @@ redcap_import_recode <- function(selected_data,
                                     "),date_only = TRUE)")
 
             } else {
-            converted_var <- do.call(redcap_import_dates,c(list(var = var),args_rc_dates))
-            # sometimes date-times are entered in Excel-format: they are recoded into a special variable for displaying the no-matches
-            # because it's easier to understand what the no-match is about (instead of displaying e.g. 31341.34375)
-            if (any(grepl("^\\d{4,}\\.\\d+$",var))) {
-              special_no_match <- if_else(grepl("^\\d{4,}\\.\\d+$",var),redcap_import_datetime(var,args_rc_dates,args_rc_times),var)
-            } else {
-              special_no_match <- var
-            }
-            log_default <- paste0("format(redcap_import_dates(",name,", ",paste0(log_rc_dates,collapse = ", "),"))")
+              converted_var <- do.call(redcap_import_dates,c(list(var = var),args_rc_dates))
+              # sometimes date-times are entered in Excel-format: they are recoded into a special variable for displaying the no-matches
+              # because it's easier to understand what the no-match is about (instead of displaying e.g. 31341.34375)
+              if (any(grepl("^\\d{4,}\\.\\d+$",var))) {
+                special_no_match <- if_else(grepl("^\\d{4,}\\.\\d+$",var),redcap_import_datetime(var,args_rc_dates,args_rc_times),var)
+              } else {
+                special_no_match <- var
+              }
+              log_default <- paste0("format(redcap_import_dates(",name,", ",paste0(log_rc_dates,collapse = ", "),"))")
             }
 
 
@@ -1377,7 +1377,7 @@ redcap_import_recode <- function(selected_data,
       if (!identical(var,converted_var)) {
 
         recoded_var <- as.character(converted_var)
-        write.table(paste0("\n, ",name," = ",log_default), log_code, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
+        if(log) write.table(paste0("\n, ",name," = ",log_default), log_code, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
 
       } else {
         recoded_var <- as.character(var)
@@ -1455,13 +1455,13 @@ redcap_import_recode <- function(selected_data,
       recoded_var <- as.character(converted_var)
       vars_recode[[length(vars_recode)+1]] <- recoded_var
       names(vars_recode)[length(vars_recode)] <- name
-      write.table(paste0("\n, ",name," = ",log_default), log_code, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
+      if(log) write.table(paste0("\n, ",name," = ",log_default), log_code, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
 
       to_recode <- NULL
       if (!suppress_txt) {
-      cat("\n\nCurrently missing data codes can't be imported for slider variables (06.11.2024).\n")
-      cat("All cells with values indicating potential missings or with values not matching the format will be set to NA (empty).\n")
-      cat("Empty cells will remain empty.\n\n")
+        cat("\n\nCurrently missing data codes can't be imported for slider variables (06.11.2024).\n")
+        cat("All cells with values indicating potential missings or with values not matching the format will be set to NA (empty).\n")
+        cat("Empty cells will remain empty.\n\n")
       }
     }
 
@@ -1498,7 +1498,7 @@ redcap_import_recode <- function(selected_data,
           cat(underline("\n\n\nPotential values to recode in data table:"))
           summary_table <- data.frame(Value = names(summary(factor(var[var %in% to_recode],levels = to_recode))),
                                       Count = as.numeric(summary(factor(var[var %in% to_recode],levels = to_recode)))
-                                      )
+          )
           print(kable(summary_table))
 
           cat(underline("\n\nPotential codes to use from REDCap codebook:"))
@@ -1956,7 +1956,7 @@ redcap_import_recode <- function(selected_data,
           cat(underline("\n\nSummary after recoding:"))
           summary_table <- data.frame(Value = names(summary(as.factor(recoded_var[var %in% to_recode]))),
                                       Count = as.numeric(summary(as.factor(recoded_var[var %in% to_recode])))
-                                      )
+          )
           print(kable(summary_table))
 
           cat("\n-------------------------------------------------------------------------")
@@ -2118,9 +2118,9 @@ redcap_import_recode <- function(selected_data,
 
               write.table(
                 paste0(
-                "\n) |> \n
+                  "\n) |> \n
                 mutate(n = row_number()) |>
-                left_join(data.frame(var = ",deparse(substitute(selected_data)),"$",name,") |>
+                left_join(data.frame(var = ",deparse(substitute(input_data)),"$",name,") |>
                 mutate(n= row_number(),
                 var = gsub('",gsub("(\\\\)", "\\\\\\\\", pattern),"','split_here', var)
                 ) |>
@@ -2133,7 +2133,7 @@ redcap_import_recode <- function(selected_data,
 
               write.table(
                 paste0(
-                ")) |>
+                  ")) |>
                 mutate(var = tolower(var),\n
                      value = if_else(!is.na(var),'1','0')) |>
               pivot_wider(names_from = var,
@@ -2147,7 +2147,7 @@ redcap_import_recode <- function(selected_data,
 
               if (paste0(name,"___NA") %in% names(final_df)) {
                 write.table(paste0(",",name,"___NA = NULL"), log_code, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
-}
+              }
 
 
               write.table(paste0(",",name), log_table, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
@@ -2192,14 +2192,15 @@ redcap_import_recode <- function(selected_data,
 
 
   # execute code ----
-  recoded_data <- selected_data |>
+  recoded_data <- input_data |>
     mutate(!!!vars_recode) |>
     select(-all_of(remove_cb_col))
 
 
   # finalize log-file ----
-  write.table(")\n\n--------------------------------------------------------------------------------------------------\n", log_code, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
-
+  if(log) {
+    write.table(")\n\n--------------------------------------------------------------------------------------------------\n", log_code, quote = FALSE, row.names = FALSE, col.names = FALSE, append = TRUE)
+}
 
   # Return Output ----
   if (!suppress_txt) {

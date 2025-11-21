@@ -181,7 +181,7 @@ redcap_prep_datetimes <- function(data, metadata, replace = FALSE, append = "_da
   if(nrow(tmp) > 0){
     for(i in 1:nrow(tmp)){
       ov <- tmp$field_name[i]
-      print(ov)
+      # print(ov)
       v <- if(replace) ov else paste0(ov, append)
       data[, v] <- ymd_hm(data[, ov], ...)
       var_label(data[, ov]) <- unique(tmp$field_label[i])
