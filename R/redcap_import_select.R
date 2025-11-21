@@ -99,7 +99,7 @@ redcap_import_select <- function(import_data,
                                  wait = 2) {
 
   form_name <- field_name <- field_label <- NULL
-
+  intro_ans <- match_ans <- nomatch_ans <- cont_ans <- ""
 
 
   # evaluate inputs ----
