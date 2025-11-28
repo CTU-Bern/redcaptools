@@ -741,7 +741,7 @@ redcap_import_recode <- function(input_data,
                                                           "do NOT convert and move to next item",
                                                           "do NOT convert and stop loop"))
 
-              print(kable(manual_choices,col.names = c("Options:","Description:")))
+              print(kable(manual_choices,col.names = c("Option:","Description:")))
               conv_to <- ""
 
               while (conv_to != 'txt' &

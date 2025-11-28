@@ -5,7 +5,7 @@
 \title{REDCap Recode}
 \usage{
 redcap_import_recode(
-  selected_data,
+  input_data,
   dict = NULL,
   missing_codes = NULL,
   rc_token,
@@ -28,7 +28,7 @@ redcap_import_recode(
 )
 }
 \arguments{
-\item{selected_data}{Data to be recoded}
+\item{input_data}{Data to be recoded}
 
 \item{dict}{Data dictionary (e.g. as downloaded from REDCap or via
 \code{redcap_export_meta(rc_token, rc_url)$meta}). If not supplied, this

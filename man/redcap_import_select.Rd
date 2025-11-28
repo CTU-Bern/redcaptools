@@ -5,11 +5,12 @@
 \title{REDCap Select and Rename}
 \usage{
 redcap_import_select(
-  import_data,
+  input_data,
   dict = NULL,
   rc_token,
   rc_url,
   forms = NULL,
+  batch_size = NULL,
   start_var = 1,
   auto_match = TRUE,
   auto_skip_nomatch = FALSE,
@@ -25,7 +26,7 @@ redcap_import_select(
 )
 }
 \arguments{
-\item{import_data}{Data frame to be imported}
+\item{input_data}{Data frame to be imported}
 
 \item{dict}{Data dictionary (e.g. as
 downloaded from REDCap or via \code{redcap_export_meta(rc_token,
@@ -38,6 +39,8 @@ rc_url)$meta}). If not supplied, this will be downloaded from the API using
 
 \item{forms}{Character vector of the forms as set up in REDCap of which
 variable names will be displayed. Default = all forms.}
+
+\item{batch_size}{Number of REDCap variables displayed per batch. Default = all variables.}
 
 \item{start_var}{Define in which column of the import data the loop should
 start. Default = 1.}
@@ -54,7 +57,8 @@ the variable. Default = FALSE.}
 in REDCap will be suggested. With this numeric similarity index between 0
 (no similarity at all = shows all items) and 1 (identical = shows only
 perfect matches) the number of suggestions can be adjusted. Type '0' to turn
-off similarity suggestions. Default = 0.5.}
+off similarity suggestions. If auto-skipping is switched off, this index
+can be adjusted while running the script. Default = 0.5.}
 
 \item{skip_intro}{If TRUE, the introduction messages will be skipped.
 Default = FALSE}
