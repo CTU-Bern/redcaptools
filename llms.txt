@@ -1,0 +1,176 @@
+# `redcaptools`
+
+`redcaptools` contains home-grown functions for working with REDCap data
+in R.
+
+## Installation
+
+You can install the development version of `redcaptools` from github
+with:
+
+``` r
+remotes::install_github("CTU-Bern/redcaptools")
+```
+
+Or from CTU Bern’s package universe
+
+``` r
+install.packages("redcaptools", repos = c('https://ctu-bern.r-universe.dev', 'https://cloud.r-project.org'))
+```
+
+## Export data from REDCap
+
+REDCap offers (at least) two approaches for exporting a projects data -
+throught the web interface via clicking buttons, and the API, which
+allows programmatic access to a lot more information than is available
+through the web interface. In order to use the API, a token is required.
+The API token can be requested from the projects API page, accessible
+from the link in the applications section of the menu on the left side
+of the page.
+
+![](reference/figures/api_link.png)
+
+If you do not see that link, consult with whoever is in charge of user
+management for the project to give you access to it.
+
+Once you have access, you can request a token, which a system
+administrator must approve. Once approved, the token is shown on the API
+page. Now you have everything to download data through the API. Because
+your token is essentially your username, password and a reference to a
+specific project, extra care must be taken with it. The `httr` package
+has a [vignette on managing
+secrets](https://cran.r-project.org/web/packages/httr/vignettes/secrets.html),
+which is relevant to the API token.
+
+The standard download can be replicated via
+
+``` r
+# the URL ir the same as the website just with '/api/' on the end
+url <- "https://redcap.domain.something/api/"
+token <- readLines("path-to-file-containing-token") # or some other method
+d <- redcap_export_tbl(token, url, "record")
+```
+
+More interesting is the `redcap_export_byform` function, which returns a
+list of dataframes, where each element of the list is a specific eCRF
+from the database.
+
+``` r
+l <- redcap_export_byform(token, url)
+```
+
+Some of the available metadata stored in REDCap is available via the
+`redcap_export_meta` function, including the data dictionary, which can
+also be downloaded via the website.
+
+``` r
+m <- redcap_export_meta(token, url)
+```
+
+Once you have the data and metadata, the `redcap_prep` function can be
+used to reformat the data - convert variables to date, POSIX, factors,
+etc as appropriate.
+
+``` r
+prepped <- redcap_prep(d, m$metadata)
+prepped_list <- sapply(l, redcap_prep, metadata = m$metadata)
+```
+
+# Package index
+
+## Exporting data
+
+Functions for communicating with the REDCap API
+
+- [`redcap_export_tbl()`](redcap_export_tbl.md) : Export tables from
+  REDCap
+- [`redcap_export_byform()`](redcap_export_byform.md) : Export REDCap
+  data by form
+- [`redcap_export_batch()`](redcap_export_batch.md) : Export data in
+  batches
+- [`redcap_export_meta()`](redcap_export_meta.md) : Export the most
+  important REDCap metadata tables
+
+## Working with manually exported datasets
+
+REDcap can export data through the web interface too. These functions
+may be helpful in such cases.
+
+- [`redcap_toform()`](redcap_toform.md) : Convert manually downloaded
+  REDCap data into a list of forms
+
+## Preparing data for analysis
+
+Functions for converting from REDCap’s data representation to a more
+useful format for analysis
+
+- [`redcap_prep()`](redcap_prep.md) : Convert REDCap variable types
+  (dates, datetimes, factors) and apply labels
+
+- [`redcap_prep_dates()`](redcap_prep_dates.md)
+  [`redcap_prep_datetimes()`](redcap_prep_dates.md) :
+
+  Convert dates stored as strings to `Date` variables
+
+- [`singlechoice_factor()`](singlechoice_factor.md) : create factors for
+  single choice variables
+
+- [`multichoice_factor()`](multichoice_factor.md) : create factors for
+  multiple choice variables
+
+- [`label_others()`](label_others.md) :
+
+  Label non-single/multiple choice/date(time) fields
+  `singlechoice_factor`, `multichoice_factor`, `rc_date` and
+  `rc_datetime`
+
+- [`convert_to_logical()`](convert_to_logical.md) : Convert variables to
+  logical
+
+- [`remove_empty_rows()`](remove_empty_rows.md) : Analagous to
+  \`janitor::remove_empty(..., "rows")\`, but allows ignoring specific
+  variables
+
+## Exploring metadata
+
+Functions for exploring the metadata of a REDCap project
+
+- [`singlechoice_opts()`](choice_options.md)
+  [`multichoice_opts()`](choice_options.md) : Get options for single and
+  multi choice questions
+
+## Preparing data for import INTO REDCap
+
+REDCap expects data to be in a specific format for import. These
+functions help to format the data appropriately, including guiding the
+user through converting from an old data format to the REDCap format.
+
+- [`redcap_import_select()`](redcap_import_select.md) : REDCap Select
+  and Rename
+- [`redcap_import_recode()`](redcap_import_recode.md) : REDCap Recode
+- [`redcap_import_dates()`](redcap_import_dates.md) : REDCap Date
+  Conversion
+- [`redcap_import_times()`](redcap_import_times.md) : REDCap Time
+  Conversion
+- [`redcap_import_datetime()`](redcap_import_datetime.md) : REDCap
+  Date-Time Conversion
+
+### Demonstration datasets
+
+- [`importdemo_data`](importdemo_data.md) : Example import data
+- [`importdemo_dict`](importdemo_dict.md) : Example data dictionary
+
+## Deprecated functions
+
+- [`rc_prep()`](deprecated.md) [`rc_dates()`](deprecated.md)
+  [`rc_datetimes()`](deprecated.md) [`split_by_form()`](deprecated.md) :
+  Deprecated functions These functions have been renamed to be more
+  consistent with the rest of the package. They may be removed in a
+  future version.
+
+# Articles
+
+### All vignettes
+
+- [REDCap API endpoints](api_endpoints.md):
+- [redcaptools](redcaptools.md):

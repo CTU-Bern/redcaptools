@@ -1,0 +1,186 @@
+# REDCap Recode
+
+This function loops through all the variables of a data set and compares
+them with the field type and validation of the variables as set up in
+REDCap.  
+The REDCap data dictionary can either be directly provided or downloaded
+from the REDCap project by providing an API token and matching URL.  
+Variables can be converted automatically or manually to match the type
+and validation in REDCap.  
+The script will then summarize all values that do not match the expected
+format and will look for values that could potentially indicate missing
+values (such as 'missing', 'excluded',...).  
+In a second step, these values can be recoded automatically or manually
+if missing data codes have defined in REDCap Additional Customizations
+(or simply set to NA).  
+If a variable has been converted to a factor (e.g., radio button field),
+the recoding is (additionally) prompted for all factor levels.  
+The function returns a data frame with the recoded variables, writes an
+overview csv-table, and the executed code to a txt-file for copy-pasting
+and adjusting/reusing.  
+It is advised to use `redcap_import_select` on the data first, before
+running this function.
+
+## Usage
+
+``` r
+redcap_import_recode(
+  selected_data,
+  dict = NULL,
+  missing_codes = NULL,
+  rc_token,
+  rc_url,
+  start_var = 1,
+  pot_miss = c("miss", "unknown", "excluded", "^0$", "NA", "N.A."),
+  if_empty = NA,
+  cb_delims = c(",", " ", ".", ";", "|"),
+  auto_conv = TRUE,
+  auto_recode = FALSE,
+  auto_recode_precision = 0.5,
+  skip_intro = FALSE,
+  continue = TRUE,
+  suppress_txt = FALSE,
+  log = TRUE,
+  log_code = "redcap_import_recode_code.txt",
+  log_table = "redcap_import_recode_overview.csv",
+  wait = 2,
+  ...
+)
+```
+
+## Arguments
+
+- selected_data:
+
+  Data to be recoded
+
+- dict:
+
+  Data dictionary (e.g. as downloaded from REDCap or via
+  `redcap_export_meta(rc_token, rc_url)$meta`). If not supplied, this
+  will be downloaded from the API using `rc_token` and `rc_token`.
+
+- missing_codes:
+
+  If a data dictionary is provided by the user, Missing Data Codes as
+  defined in REDCap Additional Customizations can be provided here (if
+  set up accordingly). The Missing Data Codes should be provided in a
+  single string with \[code\] \[label\] separated by a comma and a pipe
+  between the options (e.g., "-99, Missing \| EXCL, Excluded \| NA, not
+  available"). If no data dictionary is provided, the codes will be
+  downloaded from the API using `rc_token` and `rc_token` (if set up
+  accordingly).
+
+- rc_token:
+
+  REDCap API token
+
+- rc_url:
+
+  Link to REDCap API
+
+- start_var:
+
+  Define in which column of the data the loop should start. Default = 1.
+
+- pot_miss:
+
+  The provided data is inspected for potential missing values that could
+  be recoded. This is mainly helpful for text variables. Expressions can
+  simply be defined in a character vector and a text-search is applied
+  to search through the data. Default =
+  c("miss","unknown","excluded","^0\$","NA","N.A."). To disable this
+  search set pot_miss to NULL.
+
+- if_empty:
+
+  Sets a default value for empty cells. This value can be changed for
+  each variable when using manual recoding. Default = NA (meaning the
+  cell remains empty).
+
+- cb_delims:
+
+  Character vector to specify the delimiter(s) to separate values for
+  checkbox fields in a single cell. Default = c(","," ",".",";","\|")
+
+- auto_conv:
+
+  If TRUE, the variable will be auto-converted according to the best
+  matching field type and validation in REDCap. If FALSE, the user can
+  decide how the variable should be converted. If the option to continue
+  is active (see below), this auto-conversion can be switched on and off
+  while running the script. Default = TRUE.
+
+- auto_recode:
+
+  If TRUE, the values that need recoding will be auto-recoded by
+  matching them with codes and labels as set up in REDCap. If FALSE, the
+  user can decide to recode the values as suggested or to recode each
+  value individually. Default = FALSE.
+
+- auto_recode_precision:
+
+  The values that need recoding are compared with codes and labels as
+  set up in REDCap. With this numeric similarity index between 0 (no
+  similarity at all = shows basically all code/labels as similar) and 1
+  (identical = shows only perfect codes/labels) the number of
+  suggestions can be adjusted. If auto-recoding is switched off, this
+  index can be adjusted while running the script. If multiple matches
+  are found, the value will be set to NA. Default = 0.5.
+
+- skip_intro:
+
+  If TRUE, the introduction messages will be skipped. Default = FALSE
+
+- continue:
+
+  If TRUE, a question to continue will be asked before moving along the
+  loop. Default = TRUE.
+
+- suppress_txt:
+
+  If TRUE, all text output will be suppressed when used with
+  auto-conversion and auto-recoding. This is not recommended and should
+  only be used for testing. Default = FALSE.
+
+- log:
+
+  If TRUE, an overview csv-table, and a txt-file are stored in the
+  working directory. Default = TRUE.
+
+- log_code:
+
+  Name and location of the txt-file containing the executed code.
+  Default = redcap_import_recode_code.txt.
+
+- log_table:
+
+  Name and location of the csv.table containing the tabular overview.
+  Default = redcap_import_recode_overview.csv.
+
+- wait:
+
+  Allows you to set the latency time between the steps. Default = 2s.
+
+- ...:
+
+  other parameters used for `redcap_import_dates` or
+  `redcap_import_times`
+
+## Value
+
+Data frame with recoded data. Log-file with executed code.
+
+## Examples
+
+``` r
+# data(importdemo_data)
+# data(importdemo_dict)
+# redcap_import_recode(importdemo_data, importdemo_dict)
+
+# if using local data:
+# token <- "xxxxx"
+# url <- "xxxxx"
+# file <- "data.csv"
+# redcap_import_recode(file, rc_token = token, rc_url = url)
+```
