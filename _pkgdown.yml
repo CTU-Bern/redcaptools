@@ -7,7 +7,7 @@ navbar:
   components:
     github:
       icon: fa-github
-      href: https://github.com/CTU-Bern/randolist
+      href: https://github.com/CTU-Bern/redcaptools
       target: _blank
 
 reference:
