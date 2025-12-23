@@ -237,7 +237,7 @@ redcap_import_select <- function(input_data,
     while (intro_ans != "y") {
       intro_ans <- readline(prompt="Answer= ")
       if (intro_ans != "y") {
-        cat("Please check your answer!")
+        cat("\nPlease check your answer!")
         cat(paste0("\nType ",green(bold("y")), " and press Enter to continue."))
         cat(paste0("\nPress ",red(bold("ESC"))," to stop.\n"))
       }
@@ -293,7 +293,7 @@ redcap_import_select <- function(input_data,
       ## variable name found in REDCap dictionary ----
       # compares var name to data dictionary field names
       if (any(str_detect(rc_vars$field_name,paste0("^",imp_vars[i],"$")))) {
-        if(!suppress_txt) cat(paste("\nVariable name found in REDCap:", blue(bold(underline(imp_vars[i])))))
+        if(!suppress_txt) cat(paste0("\nVariable name found in REDCap:", blue(bold(underline(imp_vars[i])))))
         Sys.sleep(wait)
 
         # options will only be displayed if auto-matching is set to FALSE
@@ -316,7 +316,7 @@ redcap_import_select <- function(input_data,
                 match_ans != "n" &&
                 match_ans != "skip" &&
                 match_ans != 'exit') {
-              cat("Please check your answer!")
+              cat("\nPlease check your answer!")
               cat("\n\nChoose an option (type and press Enter):\n")
               cat(prhelp(green(bold("y")),"YES, select variable without renaming."))
               cat(prhelp(yellow(bold("n")),"NO, rename the variable."))
@@ -353,7 +353,7 @@ redcap_import_select <- function(input_data,
       ## variable name is not found in REDCap dictionary ...----
       # compares var name to data dictionary field names
       if (!any(str_detect(rc_vars$field_name,paste0("^",imp_vars[i],"$")))) {
-        if(!suppress_txt) cat(paste("\nVariable name", underline("NOT"),"found in REDCap:", blue(bold(underline(imp_vars[i])))),"\n\n")
+        if(!suppress_txt) cat(paste0("\nVariable name", underline("NOT"),"found in REDCap:", blue(bold(underline(imp_vars[i])))),"\n\n")
         Sys.sleep(wait)
       }
 
@@ -397,7 +397,7 @@ redcap_import_select <- function(input_data,
             }
             Sys.sleep(wait)
 
-            cat(paste("\n\nWhat would you like to do for", blue(bold(underline(imp_vars[i])))),"?")
+            cat(paste0("\n\nWhat would you like to do for", blue(bold(underline(imp_vars[i])))),"?")
             cat("\n\nChoose an option (type and press Enter):\n")
             cat(paste0("To ",green("rename")," the variable, type the field name or choose the respective number from the list above!\n"))
             cat(prhelp(yellow("select"),"select the variable anyway (without renaming)",14))
@@ -431,7 +431,7 @@ redcap_import_select <- function(input_data,
                   nomatch_ans != 'adjust batch'&&
                   nomatch_ans != 'exit') {
 
-                cat("Please check your answer!")
+                cat("\nPlease check your answer!")
                 cat("\n\nChoose an option (type and press Enter):\n")
                 cat(paste0("To ",green("rename")," the variable, type the field name or choose the respective number from the list above!\n"))
                 cat(prhelp(yellow("select"),"select the variable anyway (without renaming)",14))
@@ -637,7 +637,7 @@ redcap_import_select <- function(input_data,
               cont_ans != 'auto_skip off' &&
               cont_ans != 'exit') {
 
-            cat("Please check your answer!")
+            cat("\nPlease check your answer!")
             cat("\n\nChoose an option (type and press Enter):\n")
             cat(prhelp(green(bold("y")),"YES",15))
             cat(prhelp(yellow(bold("n")),"NO (repeat same variable)",15))
