@@ -1,6 +1,14 @@
 template:
   # package: tidytemplate
   bootstrap: 5
+navbar:
+  structure:
+    right: [search, github]
+  components:
+    github:
+      icon: fa-github
+      href: https://github.com/CTU-Bern/redcaptools
+      target: _blank
 
 reference:
 - title: Exporting data
